@@ -1,8 +1,12 @@
 # Zlaark Deals
 
-Fourteen Elementor widgets plus a **Deals** manager in the WordPress sidebar. One set of deals, entered once, feeds every widget: the homepage scorecard, the deals index, the single-deal offer panel, ranked picks, trust stats and a logo marquee.
+Fifteen Elementor widgets plus a **Deals** manager in the WordPress sidebar. One set of deals, entered once, feeds every widget: the homepage scorecard, the deals index, the single-deal offer panel, ranked picks, trust stats and a logo marquee.
 
-Version 3.7.1 · Requires PHP 7.4 · Elementor 3.5+ for the widgets (the Deals manager works without it).
+Version 4.1.0 · Requires PHP 7.4 · Elementor 3.5+ for the widgets (the Deals manager works without it).
+
+**Elementor Pro is not required.** Every widget uses only free Elementor APIs.
+Headers and footers come from *Header Footer Elementor* (free), and single deal
+pages are handled by the plugin itself rather than Pro's Theme Builder.
 
 ---
 
@@ -107,6 +111,30 @@ Leave **Expires On** empty for evergreen offers. Set it and the deal disappears 
 
 All widgets sit under **Zlaark Deals** in the Elementor panel. Every one has a **Content Max Width** control defaulting to 1240px, so stacking them down a page lines them all up.
 
+### Header and footer
+
+Neither lives on a page — both go in a **template** that every page inherits.
+This site already has *Header Footer Elementor* installed, so:
+
+**Templates → Header Footer Builder → Add New**, choose *Header* or *Footer*,
+set the display rule to *Entire Site*, then build inside it.
+
+| | Widget | Notes |
+|---|---|---|
+| Header | **Zlaark Navbar** | Logo, menu (repeater or a WP menu), sticky with shrink-on-scroll, one CTA |
+| Footer | **Zlaark Footer** | Brand column with live figures, three link columns, the disclosure block, legal strip |
+
+**Use one header only.** The live site currently renders the theme's Blocksy
+header *and* a Zlaark Navbar stacked on top of each other — pick whichever you
+prefer and delete the other. Two headers is the single most visible bug on the
+site today.
+
+The footer's first figure and its "Last catalogue sweep" date both read from the
+catalogue, so neither can go stale. The disclosure block is a titled section
+rather than a sentence buried in an about-us paragraph — that is a legal
+requirement for affiliate links, and it reads as confidence rather than
+small print.
+
 ### Homepage — one widget
 
 Drop **Zlaark Homepage** on a blank page and the whole architecture renders at once: hero, scorecard, the dark methodology band, live deals, editor's picks, the logo marquee and a closing call to action.
@@ -115,17 +143,44 @@ Each section has its own panel in the Elementor sidebar with a **Show This Secti
 
 | Panel | What it renders |
 |---|---|
-| 01 · Hero | Headline with a highlight phrase, sub-line, CTA, and a **savings scoreboard** built from your four biggest current discounts |
+| 01 · Hero | Headline with a highlight phrase, sub-line, CTA, and a **savings scoreboard** built from your biggest current discounts |
 | 02 · Scorecard | Top deals by score, capped with each deal's **Rank Label**, bars from the Score Breakdown |
 | 03 · Methodology band | The one dark section. Receipts repeater; the first figure can auto-fill from the live deal count |
 | 04 · Live deals | Cards sorted by biggest saving, with coupon, renewal price and verification |
-| 05 · Editor's picks | Three ranked cards with highlights |
-| 06 · Trusted by | Logo marquee, built from deals that have an image |
-| 07 · Closing CTA | Heading, body, and any signup form shortcode |
+| 05 · Editor's picks | Three ranked cards |
+| 06 · Browse by category | Tiles with live per-category counts — doubles as navigation |
+| 07 · Expiring this week | Only renders when something is genuinely expiring, so a countdown is never fake |
+| 08 · How we test | Four numbered steps. Numbered because it is a real sequence |
+| 09 · Trusted by | Logo marquee, built from deals that have an image |
+| 10 · About us | The people who do the testing — photo, name, role, one line each |
+| 11 · Questions | Expandable Q&A, and it emits **FAQPage** markup for search results |
+| 12 · Closing CTA | Heading, body, and any signup form shortcode |
+
+Every section has a **Show This Section** toggle, and each one hides itself when
+it has nothing to say — no empty "Ending soon" with no deadlines, no category
+tiles with one category.
 
 Sections bleed to the viewport edge automatically, so the dark band and the marquee run full width without needing separate Elementor rows.
 
 **Prefer to build it by hand?** Every individual widget is still there — Hero Fresh, Comparison, Stats, About, Deals Grid, Top Picks and Logo Marquee — and can be stacked in the same order.
+
+### The card
+
+Every deal card — scorecard column, ranked pick, and grid card — is built from
+the same slots:
+
+**brand row** (logo, name, offer type and tested date, score) → **price** (with
+the struck original and the savings kept beside it) → **body slot** → **terms**
+(renewal, refund, "verified N days ago") → **action**.
+
+The body slot has a fallback chain: **score bars**, else the **highlights**
+checklist, else the **tagline**. Something always fills it, which is what stops
+a thinly-filled deal rendering as a hairline floating above an empty gap. The
+slot also absorbs the slack when cards in a row stretch to match heights, so a
+sparse card is *compact* rather than tall and empty.
+
+Deals are deduplicated by title, because with no scores every deal ties and the
+same brand can otherwise win several places in one row.
 
 ### Deals page — `/deals`
 
@@ -148,14 +203,24 @@ With the toggle on and IDs on the URL, those deals are shown in the order they
 were ticked and the category filter is ignored. Without IDs the widget falls
 back to its normal category behaviour, so the page is never empty.
 
-### Single deal page
+### Single deal page — no Elementor Pro needed
 
-Build an Elementor **single template** for the Deal post type:
+Building a single template for a custom post type needs Pro's Theme Builder, so
+the plugin does it for you instead. **Zlaark Deals → Settings → Single deal
+pages** offers three options:
 
-- **Zlaark Deal Panel** in a sidebar column, *Deal Source: Current deal*, *Stick On Scroll: on*.
-- Your editorial content in the main column.
+| Option | Result |
+|---|---|
+| **Beside the content** (default) | Panel in a right-hand column, sticky on scroll, above the content on mobile |
+| **Above the content** | Panel first, then the article |
+| **Off** | Nothing injected — place the **Zlaark Deal Panel** widget yourself |
 
-Set *Sticky Offset* to clear your header height (96px suits a 72px sticky header).
+The injected panel is the same markup the widget renders, from one shared file,
+so the two cannot drift apart. It stands down automatically when a deal has been
+built with Elementor, so a hand-built page is never doubled up.
+
+Choose **Off** only if you have Elementor Pro and would rather lay the page out
+by hand.
 
 ### Hosting Finder
 
@@ -214,7 +279,7 @@ zlaark-deals-pro/
 │   ├── class-zlaark-deals-meta.php         Deal Details meta box
 │   ├── class-zlaark-deals-schema.php       JSON-LD
 │   └── class-zlaark-deals-elementor.php    widget registration
-├── widgets/                                14 widgets + shared base
+├── widgets/                                15 widgets + shared base
 └── assets/                                 frontend + admin CSS/JS
 ```
 

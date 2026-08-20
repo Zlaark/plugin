@@ -94,7 +94,8 @@
 .zd-marquee,
 .zd-index,
 .zd-panel,
-.zd-home {
+.zd-home,
+.zd-footer {
 	/* Type — all three faces are SIL Open Font License (free, self-hostable). */
 	--zd-font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	--zd-font-display: 'Bricolage Grotesque', 'Instrument Sans', -apple-system, 'Segoe UI', sans-serif;
@@ -182,7 +183,11 @@
 .zd-marquee.zd-marquee *,
 .zd-index.zd-index *,
 .zd-panel.zd-panel *,
-.zd-home.zd-home * {
+.zd-home.zd-home *,
+.zd-footer.zd-footer *,
+.zd-single.zd-single *,
+.zd-card.zd-card *,
+.zd-board.zd-board * {
 	font-family: var(--zd-font-sans);
 }
 
@@ -199,27 +204,35 @@
 .zd-marquee.zd-marquee :is(h1, h2, h3, h4, h5, h6),
 .zd-index.zd-index :is(h1, h2, h3, h4, h5, h6),
 .zd-panel.zd-panel :is(h1, h2, h3, h4, h5, h6),
-.zd-home.zd-home :is(h1, h2, h3, h4, h5, h6) {
+.zd-home.zd-home :is(h1, h2, h3, h4, h5, h6),
+.zd-footer.zd-footer :is(h1, h2, h3, h4, h5, h6),
+.zd-single.zd-single :is(h1, h2, h3, h4, h5, h6),
+.zd-card.zd-card :is(h1, h2, h3, h4, h5, h6),
+.zd-board.zd-board :is(h1, h2, h3, h4, h5, h6) {
 	font-family: var(--zd-font-display);
 	color: var(--zd-heading);
 	letter-spacing: -0.02em;
 	text-wrap: balance;
 }
 
-.zd-hero.zd-hero :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-hc.zd-hc :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-hf.zd-hf :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-bento.zd-bento :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-nav.zd-nav :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-about.zd-about :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-deals.zd-deals :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-picks.zd-picks :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-compare.zd-compare :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-stats.zd-stats :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-marquee.zd-marquee :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-index.zd-index :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-panel.zd-panel :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono),
-.zd-home.zd-home :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__eyebrow"], [class*="__count"], [class*="__stat-value"], .zd-mono) {
+.zd-hero.zd-hero :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-hc.zd-hc :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-hf.zd-hf :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-bento.zd-bento :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-nav.zd-nav :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-about.zd-about :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-deals.zd-deals :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-picks.zd-picks :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-compare.zd-compare :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-stats.zd-stats :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-marquee.zd-marquee :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-index.zd-index :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-panel.zd-panel :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-home.zd-home :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-footer.zd-footer :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-single.zd-single :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-card.zd-card :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-board.zd-board :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono) {
 	font-family: var(--zd-font-mono);
 	font-variant-numeric: tabular-nums;
 }
@@ -460,7 +473,7 @@
 
 .zd-empty {
 	padding: 22px;
-	border: 1px dashed #c3c9d4;
+	border: 1px dashed #dce3df;
 	border-radius: 12px;
 	color: #5e6c64;
 	font-size: 14px;
@@ -564,7 +577,7 @@
 	position: relative;
 	overflow: hidden;
 	isolation: isolate;
-	background: linear-gradient(180deg, #f7f8fc 0%, #eef1f9 100%);
+	background: linear-gradient(180deg, #ffffff 0%, #f4f7f5 100%);
 }
 
 .zd-hero__inner {
@@ -718,21 +731,15 @@
 /* --- hero content -------------------------------------------------------- */
 
 .zd-hero__eyebrow {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	gap: 9px;
+	gap: 12px;
 	margin: 0 0 20px;
-	padding: 8px 16px 8px 13px;
-	border: 1px solid rgba(11, 17, 32, 0.09);
-	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.72);
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
-	font-size: 13px;
-	font-weight: 600;
-	letter-spacing: 0.01em;
-	color: #4a5a52;
-	box-shadow: 0 6px 18px -12px rgba(11, 17, 32, 0.5);
+	font-family: var(--zd-font-sans);
+	font-size: 0.88rem;
+	font-weight: 500;
+	letter-spacing: 0;
+	color: var(--zd-muted);
 }
 
 .zd-hero__dot {
@@ -999,7 +1006,7 @@
 .zd-section__sub {
 	margin: 8px 0 0;
 	font-size: 15px;
-	color: #9ca3af;
+	color: #5e6c64;
 }
 
 .zd-tabs {
@@ -1162,7 +1169,7 @@
 
 .zd-card__old-price {
 	font-size: 16px;
-	color: #9ca3af;
+	color: #5e6c64;
 }
 
 .zd-card__rating { flex: 0 0 auto; }
@@ -1204,9 +1211,11 @@
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
+	padding: 26px 22px 22px;
 	background: #fff;
-	border-radius: 22px;
-	box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 14px 34px -18px rgba(16, 24, 40, 0.4);
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-lg);
+	box-shadow: var(--zd-shadow-rest);
 }
 
 .zd-pick--featured {
@@ -1266,7 +1275,7 @@
 
 .zd-pick__rank-label {
 	margin: 0 0 12px;
-	padding-left: 52px;
+	padding-left: 46px;
 	font-size: 11px;
 	font-weight: 800;
 	letter-spacing: 0.1em;
@@ -1327,8 +1336,9 @@
 	position: relative;
 	z-index: 1;
 	display: flex;
+	flex-wrap: wrap;
 	align-items: baseline;
-	gap: 10px;
+	gap: 4px 10px;
 	margin: 0;
 }
 
@@ -1341,7 +1351,7 @@
 
 .zd-pick__old-price {
 	font-size: 15px;
-	color: #9ca3af;
+	color: #5e6c64;
 }
 
 .zd-pick__list {
@@ -1446,7 +1456,7 @@
 	width: 48px;
 	height: 48px;
 	border-radius: 12px;
-	background: #f7f8fc;
+	background: var(--zd-surface);
 	overflow: hidden;
 	transition: transform 0.45s var(--zd-ease);
 }
@@ -1581,7 +1591,7 @@
 	margin: 0;
 	font-size: 15px;
 	font-weight: 700;
-	color: #111827;
+	color: #101a16;
 }
 
 .zd-stat-card__note {
@@ -1608,7 +1618,7 @@
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
 	text-align: center;
-	color: #9ca3af;
+	color: #5e6c64;
 }
 
 .zd-marquee__viewport {
@@ -1764,7 +1774,7 @@
 
 .zd-bento {
 	--zd-accent: #0b7a4f;
-	--zd-accent-2: #c2410c;
+	--zd-accent-2: #065f42;
 	--zd-ease: cubic-bezier(0.16, 1, 0.3, 1);
 	position: relative;
 	background: #fff;
@@ -1792,7 +1802,7 @@
 .zd-bento__stage {
 	--zd-bento-radius: 22px;
 	--zd-wire: #111111;
-	--zd-ghost: #e9e9ec;
+	--zd-ghost: #e8ece9;
 	--zd-float-speed: 7s;
 	position: relative;
 	width: 100%;
@@ -1821,7 +1831,7 @@
 	margin: 0;
 	border-radius: var(--zd-bento-radius);
 	overflow: hidden;
-	background: #f4f4f5;
+	background: #f4f7f5;
 	box-shadow: 0 10px 30px -14px rgba(10, 10, 10, 0.28);
 }
 
@@ -1840,12 +1850,12 @@
 }
 
 .zd-bento__card--3 {
-	background: #0a0a0a;
+	background: #0a1310;
 	border: 2px solid var(--zd-wire);
 }
 
 .zd-bento__card--4 {
-	background: #0a0a0a;
+	background: #0a1310;
 }
 
 /* Dashed centre line inside the large panel. */
@@ -1870,7 +1880,7 @@
 	width: 21%;
 	aspect-ratio: 1;
 	border-radius: 28%;
-	background: #0a0a0a;
+	background: #0a1310;
 	color: #fff;
 	font-size: 17px;
 	box-shadow: 0 8px 20px -8px rgba(10, 10, 10, 0.6);
@@ -2010,7 +2020,7 @@
 	line-height: 0.98;
 	font-weight: 600;
 	letter-spacing: -0.035em;
-	color: #0a0a0a;
+	color: var(--zd-ink);
 }
 
 .zd-bento__desc {
@@ -2018,7 +2028,7 @@
 	max-width: 400px;
 	font-size: 17px;
 	line-height: 1.5;
-	color: #3f3f46;
+	color: #4a5a52;
 }
 
 .zd-bento__desc p:last-child { margin-bottom: 0; }
@@ -2047,7 +2057,7 @@
 }
 
 .zd-pill--solid {
-	background: #0a0a0a;
+	background: #0a1310;
 	color: #fff;
 }
 
@@ -2055,7 +2065,7 @@
 	padding-left: 12px;
 	padding-right: 12px;
 	background: transparent;
-	color: #0a0a0a;
+	color: var(--zd-ink);
 }
 
 .zd-pill--solid::before {
@@ -2117,7 +2127,7 @@
 	font-weight: 600;
 	line-height: 1;
 	letter-spacing: -0.03em;
-	color: #0a0a0a;
+	color: var(--zd-ink);
 	font-variant-numeric: tabular-nums;
 }
 
@@ -2125,7 +2135,7 @@
 	margin: 0;
 	font-size: 14px;
 	line-height: 1.4;
-	color: #52525b;
+	color: var(--zd-muted);
 }
 
 /* --- responsive ---------------------------------------------------------- */
@@ -2185,14 +2195,14 @@
    ========================================================================= */
 
 .zd-nav {
-	--zd-nav-accent: #1d6aff;
-	--zd-nav-link: #3f3f46;
+	--zd-nav-accent: #0b7a4f;
+	--zd-nav-link: #4a5a52;
 	--zd-nav-link-lit: #ffffff;
 	--zd-ease: cubic-bezier(0.16, 1, 0.3, 1);
 	position: relative;
 	z-index: 90;
 	background: #fff;
-	border-bottom: 1px solid #ececf0;
+	border-bottom: 1px solid #dce3df;
 }
 
 .zd-nav--sticky {
@@ -2230,7 +2240,7 @@
 	font-weight: 700;
 	letter-spacing: -0.03em;
 	line-height: 1;
-	color: #0a0a0a;
+	color: var(--zd-ink);
 	text-decoration: none;
 	transition: opacity 0.3s ease;
 }
@@ -2250,7 +2260,7 @@
 	display: flex;
 	align-items: center;
 	padding: 6px;
-	border: 1px solid #e7e7ec;
+	border: 1px solid #dce3df;
 	border-radius: 999px;
 	background: #fff;
 }
@@ -2322,7 +2332,7 @@
 .zd-nav__link-action {
 	font-size: 15px;
 	font-weight: 500;
-	color: #0a0a0a;
+	color: var(--zd-ink);
 	text-decoration: none;
 	transition: opacity 0.25s ease;
 }
@@ -2335,7 +2345,7 @@
 	align-items: center;
 	padding: 13px 28px;
 	border-radius: 999px;
-	background: #0a0a0a;
+	background: #0a1310;
 	color: #fff;
 	font-size: 15px;
 	font-weight: 600;
@@ -2362,7 +2372,7 @@
 	width: 42px;
 	height: 42px;
 	padding: 0;
-	border: 1px solid #e7e7ec;
+	border: 1px solid #dce3df;
 	border-radius: 12px;
 	background: #fff;
 	cursor: pointer;
@@ -2374,7 +2384,7 @@
 	height: 2px;
 	margin: 3px auto;
 	border-radius: 2px;
-	background: #0a0a0a;
+	background: #0a1310;
 	transition: transform 0.35s var(--zd-ease), opacity 0.25s ease;
 }
 
@@ -2436,7 +2446,7 @@
 	gap: 12px;
 	margin-top: 10px;
 	padding-top: 14px;
-	border-top: 1px solid #ececf0;
+	border-top: 1px solid var(--zd-hairline);
 }
 
 .zd-nav--collapsed .zd-nav__actions--panel .zd-nav__cta { flex: 1 1 auto; justify-content: center; }
@@ -2533,7 +2543,7 @@
 .zd-pill--bare:hover,
 .zd-pill--bare:focus,
 .zd-pill--bare:active {
-	color: #0a0a0a;
+	color: var(--zd-ink);
 }
 
 .zd-card__button,
@@ -2577,7 +2587,7 @@
 
 .zd-bento {
 	--zd-bloom-1: #0b7a4f;
-	--zd-bloom-2: #22d3ee;
+	--zd-bloom-2: #5fd9a4;
 	overflow: hidden;
 	isolation: isolate;
 }
@@ -2714,7 +2724,7 @@
 	font-weight: 600;
 	line-height: 1;
 	white-space: nowrap;
-	color: #18181b;
+	color: var(--zd-ink);
 	animation: zd-chip-float 8s ease-in-out infinite alternate;
 	animation-delay: calc(var(--zd-i, 0) * -1.7s);
 }
@@ -2727,7 +2737,7 @@
 .zd-bento__chip-icon svg { width: 1em; height: 1em; fill: currentColor; }
 
 .zd-bento__chip--1 { top: -2%; right: 4%; }
-.zd-bento__chip--2 { top: 46%; right: -3%; }
+.zd-bento__chip--2 { top: 46%; right: 1%; }
 .zd-bento__chip--3 { bottom: 4%; right: 16%; }
 
 @keyframes zd-chip-float {
@@ -2738,20 +2748,15 @@
 /* --- eyebrow pill -------------------------------------------------------- */
 
 .zd-bento__eyebrow {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	gap: 9px;
-	margin: 0 0 22px;
-	padding: 8px 16px 8px 13px;
-	border: 1px solid rgba(10, 10, 10, 0.09);
-	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.75);
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
-	font-size: 13px;
-	font-weight: 600;
-	color: #3f3f46;
-	box-shadow: 0 6px 18px -12px rgba(10, 10, 10, 0.5);
+	gap: 12px;
+	margin: 0 0 20px;
+	font-family: var(--zd-font-sans);
+	font-size: 0.88rem;
+	font-weight: 500;
+	letter-spacing: 0;
+	color: var(--zd-muted);
 }
 
 .zd-bento__eyebrow-dot {
@@ -2843,7 +2848,7 @@
 
 .zd-hc {
 	--zd-accent: #0b7a4f;
-	--zd-accent-2: #06b6d4;
+	--zd-accent-2: #065f42;
 	--zd-ink: #0a1310;
 	--zd-muted: #5e6c64;
 	--zd-ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -2853,7 +2858,7 @@
 	justify-content: center;
 	overflow: hidden;
 	isolation: isolate;
-	background: linear-gradient(180deg, #fbfbfe 0%, #f4f6fb 100%);
+	background: linear-gradient(180deg, #ffffff 0%, #f4f7f5 100%);
 	perspective: 1400px;
 }
 
@@ -2955,21 +2960,15 @@
 /* --- eyebrow ------------------------------------------------------------- */
 
 .zd-hc__eyebrow {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	gap: 10px;
-	margin: 0 0 24px;
-	padding: 6px 18px 6px 6px;
-	border: 1px solid rgba(11, 17, 32, 0.08);
-	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.8);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	font-size: 13px;
-	font-weight: 600;
-	letter-spacing: 0.01em;
-	color: #4a5a52;
-	box-shadow: 0 8px 22px -16px rgba(11, 17, 32, 0.7);
+	gap: 12px;
+	margin: 0 0 20px;
+	font-family: var(--zd-font-sans);
+	font-size: 0.88rem;
+	font-weight: 500;
+	letter-spacing: 0;
+	color: var(--zd-muted);
 }
 
 .zd-hc__eyebrow-icon {
@@ -3023,7 +3022,7 @@
 	max-width: 520px;
 	font-size: 17.5px;
 	line-height: 1.7;
-	color: #3f3f46;
+	color: #4a5a52;
 }
 
 .zd-hc__desc p:last-child { margin-bottom: 0; }
@@ -3037,7 +3036,7 @@
 	display: flex;
 	gap: 10px 12px;
 	font-size: 14px;
-	color: #27272a;
+	color: var(--zd-body);
 }
 
 .zd-hc__features--inline { flex-wrap: wrap; }
@@ -3114,7 +3113,7 @@
 	border-radius: 50%;
 	border: 2.5px solid #fff;
 	overflow: hidden;
-	background: #e5e7eb;
+	background: #ebf0ed;
 	box-shadow: 0 4px 12px -6px rgba(11, 17, 32, 0.6);
 	transition: transform 0.35s var(--zd-ease);
 }
@@ -3148,14 +3147,14 @@
 .zd-hc__star {
 	position: relative;
 	display: inline-block;
-	color: #d4d4d8;
+	color: #dce3df;
 }
 
 .zd-hc__star-fill {
 	position: absolute;
 	inset: 0;
 	overflow: hidden;
-	color: #f59e0b;
+	color: var(--zd-ember);
 	white-space: nowrap;
 }
 
@@ -3289,7 +3288,7 @@
 	align-items: center;
 	gap: 7px;
 	padding: 0 15px;
-	background: #f6f7fa;
+	background: #f4f7f5;
 	border-bottom: 1px solid rgba(11, 17, 32, 0.07);
 }
 
@@ -3297,7 +3296,7 @@
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	background: #d7dae1;
+	background: #dce3df;
 }
 
 .zd-hc__chrome span:nth-child(1) { background: #ff5f57; }
@@ -3359,7 +3358,7 @@
 .zd-hc__livebadge {
 	position: absolute;
 	top: 26px;
-	right: -20px;
+	right: 10px;
 	z-index: 3;
 	display: inline-flex;
 	align-items: center;
@@ -3383,7 +3382,7 @@
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
-	background: #22c55e;
+	background: var(--zd-accent);
 	flex: 0 0 auto;
 }
 
@@ -3479,7 +3478,7 @@
 	font-weight: 500;
 	letter-spacing: 0;
 	text-transform: none;
-	color: #9aa1ae;
+	color: #5e6c64;
 }
 
 /* Label sitting beside the track instead of above it. */
@@ -3776,7 +3775,7 @@
 .zd-grid--spotlight .zd-card {
 	position: relative;
 	min-height: 340px;
-	background: #10121b;
+	background: #0a1310;
 }
 
 .zd-grid--spotlight .zd-card__inner {
@@ -3793,7 +3792,7 @@
 	height: 100%;
 	padding: 0;
 	border-radius: 0;
-	background: #10121b;
+	background: #0a1310;
 	box-shadow: none;
 	z-index: 0;
 }
@@ -3899,7 +3898,7 @@
 
 .zd-about {
 	--zd-accent: #0b7a4f;
-	--zd-accent-2: #06b6d4;
+	--zd-accent-2: #065f42;
 	--zd-ink: #0a1310;
 	--zd-muted: #5e6c64;
 	--zd-ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -3954,7 +3953,7 @@
 	position: relative;
 	border-radius: 24px;
 	overflow: hidden;
-	background: #f4f4f5;
+	background: #f4f7f5;
 	box-shadow:
 		0 2px 4px rgba(11, 17, 32, 0.04),
 		0 30px 70px -32px rgba(11, 17, 32, 0.5);
@@ -4186,7 +4185,7 @@
 
 .zd-about__statcard {
 	position: absolute;
-	left: -22px;
+	left: 8px;
 	top: 26px;
 	z-index: 4;
 	display: flex;
@@ -4314,7 +4313,7 @@
 	width: 44px;
 	height: 44px;
 	border-radius: 13px;
-	background: #eef2ff;
+	background: #e6f5ee;
 	color: #0b7a4f;
 	font-size: 17px;
 	transition: transform 0.4s var(--zd-ease);
@@ -4448,21 +4447,21 @@
 /* Theme 1 — Monochrome: white surface, near-black type, orange accent. */
 .zd-hf--mono {
 	--zd-hf-bg: #ffffff;
-	--zd-hf-ink: #0a0a0a;
-	--zd-hf-muted: #63676d;
-	--zd-hf-accent: #f97316;
+	--zd-hf-ink: #0a1310;
+	--zd-hf-muted: #5e6c64;
+	--zd-hf-accent: #0b7a4f;
 	--zd-hf-accent-2: #c2410c;
-	--zd-hf-border: #e6e6e6;
+	--zd-hf-border: #dce3df;
 }
 
 /* Theme 2 — Fresh: white surface, slate type, green + yellow accent. */
 .zd-hf--green {
 	--zd-hf-bg: #ffffff;
-	--zd-hf-ink: #0f172a;
-	--zd-hf-muted: #5b6472;
-	--zd-hf-accent: #16a34a;
-	--zd-hf-accent-2: #eab308;
-	--zd-hf-border: #e3e7ea;
+	--zd-hf-ink: #0a1310;
+	--zd-hf-muted: #5e6c64;
+	--zd-hf-accent: #0b7a4f;
+	--zd-hf-accent-2: #c2410c;
+	--zd-hf-border: #dce3df;
 }
 
 .zd-hf__inner {
@@ -5553,8 +5552,8 @@
 	align-items: center;
 	gap: 6px;
 	font-family: var(--zd-font-mono);
-	font-size: 0.68rem;
-	color: var(--zd-accent);
+	font-size: 0.7rem;
+	color: var(--zd-accent-lite);
 }
 
 .zd-home__live::before {
@@ -5562,7 +5561,7 @@
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
-	background: var(--zd-accent);
+	background: var(--zd-accent-lite);
 }
 
 .zd-home__boardrow {
@@ -5873,4 +5872,969 @@
 	.zd-home__sec { padding-top: 52px; padding-bottom: 52px; }
 	.zd-home__cards--3,
 	.zd-home__cards--4 { grid-template-columns: 1fr; }
+}
+
+
+/* =========================================================================
+   16. Zlaark Footer
+   Closes the page the way the methodology band opens it. Colours come from
+   footer-scoped tokens so the Style tab can recolour the whole block without
+   any rule here needing a literal.
+   ========================================================================= */
+
+.zd-footer {
+	--zd-footer-bg: #0a1310;
+	--zd-footer-ink: #bdccc4;
+	--zd-footer-heading: #e8efea;
+	--zd-footer-accent: #5fd9a4;
+	--zd-footer-rule: rgba(255, 255, 255, 0.13);
+
+	/*
+	 * The doubled reset (`.zd-footer.zd-footer :is(h1..h6)`) outranks any
+	 * single-class rule here, so a heading would take the LIGHT-mode ink and
+	 * vanish on this ground. Remap the generic tokens instead of fighting
+	 * specificity — that also covers headings added later.
+	 */
+	--zd-ink: #e8efea;
+	--zd-heading: #e8efea;
+	--zd-body: #bdccc4;
+	--zd-muted: #9fb0a7;
+	--zd-hairline: rgba(255, 255, 255, 0.13);
+	--zd-accent: #5fd9a4;
+	--zd-surface: rgba(255, 255, 255, 0.04);
+
+	background: var(--zd-footer-bg);
+	color: var(--zd-footer-ink);
+	margin-left: calc(50% - 50vw + var(--zd-sbw, 0px) / 2);
+	margin-right: calc(50% - 50vw + var(--zd-sbw, 0px) / 2);
+	padding: 52px calc(50vw - 50% - var(--zd-sbw, 0px) / 2) 26px;
+}
+
+.zd-footer__inner {
+	margin-left: auto;
+	margin-right: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 36px;
+}
+
+.zd-footer__top {
+	display: grid;
+	grid-template-columns: 1.5fr 1fr 1fr 1fr;
+	gap: 32px;
+}
+
+.zd-footer__brand {
+	display: flex;
+	flex-direction: column;
+	gap: 13px;
+	max-width: 34ch;
+}
+
+.zd-footer__logo { max-height: 34px; width: auto; }
+
+.zd-footer__word {
+	margin: 0;
+	font-family: var(--zd-font-display);
+	font-weight: 800;
+	font-size: 1.06rem;
+	letter-spacing: -0.03em;
+	color: var(--zd-footer-heading);
+}
+
+.zd-footer__word span { color: var(--zd-footer-accent); }
+
+.zd-footer__blurb {
+	margin: 0;
+	font-size: 0.88rem;
+	line-height: 1.6;
+	color: var(--zd-footer-ink);
+}
+
+.zd-footer__figs { display: flex; gap: 22px; flex-wrap: wrap; }
+.zd-footer__figs div { display: flex; flex-direction: column; }
+
+.zd-footer__figs b {
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 1.15rem;
+	font-weight: 600;
+	color: var(--zd-footer-accent);
+}
+
+.zd-footer__figs span { font-size: 0.76rem; opacity: 0.8; }
+
+/*
+ * Column heads are navigation labels, not data, so they stay in the text face.
+ * Mono caps is reserved for chips and figures, which keeps that treatment
+ * meaning something instead of appearing everywhere.
+ */
+.zd-footer__colhead {
+	margin: 0 0 13px;
+	font-family: var(--zd-font-sans);
+	font-size: 0.9rem;
+	font-weight: 600;
+	letter-spacing: 0;
+	color: var(--zd-footer-heading);
+}
+
+.zd-footer__col ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+}
+
+.zd-footer__col a {
+	font-size: 0.88rem;
+	color: var(--zd-footer-ink);
+	text-decoration: none;
+	transition: color var(--zd-dur-hover) ease;
+}
+
+.zd-footer__col a:hover { color: var(--zd-footer-accent); }
+
+.zd-footer__money {
+	border: 1px solid var(--zd-footer-rule);
+	border-radius: var(--zd-r-md);
+	padding: 20px 22px;
+	display: flex;
+	gap: 22px;
+	flex-wrap: wrap;
+}
+
+.zd-footer__money > div { flex: 1 1 260px; display: flex; flex-direction: column; gap: 5px; }
+
+.zd-footer__money b {
+	font-family: var(--zd-font-display);
+	font-size: 0.98rem;
+	font-weight: 700;
+	color: var(--zd-footer-heading);
+}
+
+.zd-footer__money p { margin: 0; font-size: 0.85rem; line-height: 1.55; }
+.zd-footer__money a { color: var(--zd-footer-accent); text-decoration: none; }
+.zd-footer__money a:hover { text-decoration: underline; }
+
+.zd-footer__legal {
+	border-top: 1px solid var(--zd-footer-rule);
+	padding-top: 19px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 9px 20px;
+	align-items: center;
+	font-size: 0.81rem;
+}
+
+.zd-footer__legal a { color: var(--zd-footer-ink); text-decoration: none; }
+.zd-footer__legal a:hover { color: var(--zd-footer-heading); text-decoration: underline; }
+.zd-footer__sweep { margin-left: auto; opacity: 0.8; }
+
+@media (max-width: 900px) {
+	.zd-footer__top { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+	.zd-footer__top { grid-template-columns: 1fr; }
+	.zd-footer__sweep { margin-left: 0; }
+}
+
+@media (pointer: coarse) {
+	.zd-footer__col a,
+	.zd-footer__legal a { display: inline-flex; align-items: center; min-height: 44px; }
+}
+
+
+/* =========================================================================
+   17. Single deal pages without Elementor Pro
+   The offer panel is injected into the_content, so a deal page gets the full
+   treatment on free Elementor — or with Elementor switched off entirely.
+   ========================================================================= */
+
+.zd-single {
+	--zd-font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--zd-font-display: 'Bricolage Grotesque', 'Instrument Sans', -apple-system, 'Segoe UI', sans-serif;
+	--zd-font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+	--zd-accent: #0b7a4f;
+	--zd-accent-2: #065f42;
+	--zd-accent-lite: #5fd9a4;
+	--zd-accent-tint: #e6f5ee;
+	--zd-on-accent: #ffffff;
+	--zd-ember: #c2410c;
+	--zd-ember-tint: #fff1e6;
+	--zd-ink: #0a1310;
+	--zd-heading: #101a16;
+	--zd-body: #4a5a52;
+	--zd-muted: #5e6c64;
+	--zd-hairline: #dce3df;
+	--zd-surface: #f4f7f5;
+	--zd-track: #ebf0ed;
+	--zd-score-good: #0b7a4f;
+	--zd-score-fair: #a16207;
+	--zd-score-weak: #b91c1c;
+	--zd-r-sm: 8px;
+	--zd-r-md: 16px;
+	--zd-r-lg: 28px;
+	--zd-shadow-rest: 0 1px 2px rgba(10, 19, 16, 0.05);
+	--zd-shadow-hover: 0 12px 32px rgba(10, 19, 16, 0.10);
+	--zd-ease: cubic-bezier(0.16, 1, 0.3, 1);
+	--zd-dur-hover: 180ms;
+	--zd-lift: -4px;
+}
+
+.zd-single--side {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 360px;
+	gap: 40px;
+	align-items: start;
+}
+
+.zd-single__body { min-width: 0; }
+
+.zd-single--above .zd-panel { margin-bottom: 32px; }
+
+/* The panel only sticks when it sits beside the content. */
+.zd-single--above .zd-panel--sticky { position: static; }
+
+@media (max-width: 900px) {
+	.zd-single--side { grid-template-columns: 1fr; gap: 28px; }
+	.zd-single--side .zd-panel--sticky { position: static; }
+	/* On one column the offer belongs above the long read, not buried under it. */
+	.zd-single__aside { order: -1; }
+}
+
+
+
+/* =========================================================================
+   18. The card system
+   One rule: a card is a stack of optional slots with a guaranteed minimum,
+   and the minimum still has to look composed. The body slot always carries
+   something — score bars, a highlights checklist, or the tagline — so a thin
+   deal can never render as a hairline floating above an empty gap.
+   ========================================================================= */
+
+.zd-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 20px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-md);
+	box-shadow: var(--zd-shadow-rest);
+	transition: transform var(--zd-dur-hover) var(--zd-ease),
+		box-shadow var(--zd-dur-hover) var(--zd-ease),
+		border-color var(--zd-dur-hover) ease;
+}
+
+.zd-card:hover {
+	transform: translateY(var(--zd-lift));
+	box-shadow: var(--zd-shadow-hover);
+	border-color: color-mix(in srgb, var(--zd-accent) 32%, var(--zd-hairline));
+}
+
+/* ---- verdict cap / rank / urgency ---- */
+
+.zd-card__cap {
+	align-self: flex-start;
+	font-family: var(--zd-font-mono);
+	font-size: 0.66rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zd-accent);
+	background: var(--zd-accent-tint);
+	border: 1px solid color-mix(in srgb, var(--zd-accent) 26%, transparent);
+	border-radius: var(--zd-r-sm);
+	padding: 5px 10px;
+}
+
+/* Only the top pick gets the solid fill, so one column leads the row. */
+.zd-card__cap--lead {
+	background: var(--zd-accent);
+	color: var(--zd-on-accent);
+	border-color: var(--zd-accent);
+}
+
+.zd-card__rank {
+	width: 30px;
+	height: 30px;
+	display: grid;
+	place-items: center;
+	border-radius: 50%;
+	background: var(--zd-ink);
+	color: var(--zd-on-accent);
+	font-family: var(--zd-font-mono);
+	font-weight: 600;
+	font-size: 0.84rem;
+}
+
+.zd-card__flag {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.64rem;
+	font-weight: 600;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+	color: var(--zd-ember);
+	background: var(--zd-ember-tint);
+	border: 1px solid color-mix(in srgb, var(--zd-ember) 28%, transparent);
+	border-radius: var(--zd-r-sm);
+	padding: 4px 9px;
+}
+
+/* ---- brand row: logo, name, score, all on one line ---- */
+
+.zd-cbrand {
+	display: grid;
+	grid-template-columns: 42px minmax(0, 1fr) auto;
+	gap: 12px;
+	align-items: center;
+}
+
+.zd-cbrand__logo {
+	width: 42px;
+	height: 42px;
+	display: grid;
+	place-items: center;
+	border-radius: 9px;
+	background: var(--zd-surface);
+	overflow: hidden;
+}
+
+.zd-cbrand__logo img {
+	max-width: 84%;
+	max-height: 76%;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+}
+
+.zd-cbrand__logo i {
+	font-style: normal;
+	font-family: var(--zd-font-mono);
+	font-size: 0.74rem;
+	font-weight: 600;
+	color: var(--zd-muted);
+	text-transform: uppercase;
+}
+
+.zd-cbrand__id { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.zd-cbrand__id h3 {
+	margin: 0;
+	font-family: var(--zd-font-display);
+	font-size: 1.04rem;
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: -0.018em;
+	color: var(--zd-heading);
+}
+
+.zd-cbrand__id span {
+	font-size: 0.78rem;
+	color: var(--zd-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.zd-cscore {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-width: 48px;
+	padding: 6px 8px;
+	border-radius: var(--zd-r-sm);
+	background: var(--zd-accent-tint);
+	color: var(--zd-score-good);
+	line-height: 1;
+}
+
+.zd-cscore b {
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 1.04rem;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.zd-cscore i {
+	font-style: normal;
+	font-size: 0.55rem;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	opacity: 0.72;
+	margin-top: 3px;
+}
+
+.zd-cscore.zd-score--fair {
+	background: color-mix(in srgb, var(--zd-score-fair) 13%, transparent);
+	color: var(--zd-score-fair);
+}
+
+.zd-cscore.zd-score--weak {
+	background: color-mix(in srgb, var(--zd-score-weak) 11%, transparent);
+	color: var(--zd-score-weak);
+}
+
+/* ---- price: the savings stays with the price it describes ---- */
+
+.zd-cprice {
+	margin: 0;
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 8px;
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+}
+
+.zd-cprice b {
+	font-size: 1.5rem;
+	font-weight: 600;
+	letter-spacing: -0.035em;
+	color: var(--zd-heading);
+}
+
+.zd-cprice--word { font-size: 1.16rem; letter-spacing: -0.02em; }
+.zd-cprice s { font-size: 0.84rem; color: var(--zd-muted); }
+
+.zd-cprice em {
+	font-style: normal;
+	font-family: var(--zd-font-sans);
+	font-size: 0.68rem;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--zd-accent);
+	background: var(--zd-accent-tint);
+	border-radius: 5px;
+	padding: 3px 7px;
+}
+
+/*
+ * The body slot absorbs the slack when cards in a row are stretched to match.
+ * Putting it here rather than above the footer is what keeps the empty gap
+ * from opening up under a divider.
+ */
+.zd-card__slot { flex: 1 1 auto; display: flex; flex-direction: column; }
+.zd-card__slot:empty { display: none; }
+
+.zd-cbody { margin: 0; }
+
+.zd-cbody--bars { display: flex; flex-direction: column; gap: 9px; }
+
+.zd-cbar {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 68px 34px;
+	gap: 10px;
+	align-items: center;
+	font-size: 0.82rem;
+	color: var(--zd-body);
+}
+
+.zd-cbar__track { height: 6px; border-radius: 3px; background: var(--zd-track); overflow: hidden; }
+
+.zd-cbar__fill {
+	display: block;
+	height: 100%;
+	width: 0;
+	border-radius: 3px;
+	background: var(--zd-accent);
+	transition: width 0.9s var(--zd-ease);
+	transition-delay: calc(var(--zd-i, 0) * 80ms);
+}
+
+.zd-cbar b {
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.82rem;
+	font-weight: 600;
+	text-align: right;
+}
+
+.zd-cbody--ticks { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.zd-cbody--ticks li {
+	position: relative;
+	padding-left: 21px;
+	font-size: 0.86rem;
+	line-height: 1.45;
+	color: var(--zd-body);
+}
+
+.zd-cbody--ticks li::before {
+	content: "";
+	position: absolute;
+	left: 1px;
+	top: 0.4em;
+	width: 5px;
+	height: 9px;
+	border-right: 2px solid var(--zd-accent);
+	border-bottom: 2px solid var(--zd-accent);
+	transform: rotate(42deg);
+}
+
+.zd-cbody--text { font-size: 0.88rem; line-height: 1.55; color: var(--zd-body); }
+
+/* ---- terms: the divider only exists because there is content below it ---- */
+
+.zd-cterms {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding-top: 13px;
+	border-top: 1px solid var(--zd-hairline);
+	font-size: 0.8rem;
+	line-height: 1.45;
+	color: var(--zd-muted);
+}
+
+.zd-cverified {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.76rem;
+	color: var(--zd-accent);
+}
+
+.zd-cverified::before {
+	content: "";
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--zd-accent);
+	flex: none;
+}
+
+.zd-card__foot { display: flex; flex-direction: column; gap: 8px; }
+
+.zd-card__review {
+	text-align: center;
+	font-size: 0.8rem;
+	color: var(--zd-muted);
+	text-decoration: none;
+	transition: color var(--zd-dur-hover) ease;
+}
+
+.zd-card__review:hover { color: var(--zd-accent); }
+
+/* =========================================================================
+   19. Browse by category · Ending soon · How we test · Questions
+   ========================================================================= */
+
+.zd-cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+
+.zd-cats__tile {
+	display: flex;
+	flex-direction: column;
+	gap: 11px;
+	padding: 18px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-md);
+	text-decoration: none;
+	transition: border-color var(--zd-dur-hover) ease, transform var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-cats__tile:hover {
+	border-color: color-mix(in srgb, var(--zd-accent) 40%, var(--zd-hairline));
+	transform: translateY(-3px);
+}
+
+.zd-cats__top { display: flex; flex-direction: column; gap: 3px; }
+
+.zd-cats__name {
+	font-family: var(--zd-font-display);
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: -0.018em;
+	color: var(--zd-heading);
+}
+
+/* The reason to click, not the size of the pile behind it. */
+.zd-cats__best {
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--zd-accent);
+}
+
+/* Share of the catalogue, so the tiles read as a set rather than a list. */
+.zd-cats__bar { display: block; height: 3px; border-radius: 2px; background: var(--zd-track); overflow: hidden; }
+
+.zd-cats__bar i {
+	display: block;
+	height: 100%;
+	border-radius: 2px;
+	background: color-mix(in srgb, var(--zd-accent) 55%, transparent);
+}
+
+.zd-cats__n { font-family: var(--zd-font-mono); font-size: 0.74rem; color: var(--zd-muted); }
+
+/* -------------------------------------------------------------------------
+   The readout: used by the hero savings board and by "ending soon". Square,
+   hard-ruled and mono-led, so it reads as an instrument rather than a card —
+   and reusing it makes it a motif instead of a one-off.
+   ------------------------------------------------------------------------- */
+
+.zd-board { border: 1px solid var(--zd-ink); border-radius: 0; overflow: hidden; }
+
+.zd-board__head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 11px 16px;
+	background: var(--zd-ink);
+}
+
+.zd-board__head b {
+	font-family: var(--zd-font-mono);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	color: var(--zd-on-accent);
+}
+
+.zd-board__live {
+	margin-left: auto;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.7rem;
+	color: var(--zd-accent-lite);
+}
+
+.zd-board__live::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--zd-accent-lite);
+}
+
+.zd-board--ember .zd-board__live { color: var(--zd-ember-lite); }
+.zd-board--ember .zd-board__live::before { background: var(--zd-ember-lite); }
+
+.zd-board__row {
+	display: grid;
+	grid-template-columns: 36px minmax(0, 1fr) auto auto;
+	gap: 16px;
+	align-items: center;
+	padding: 13px 16px;
+	border-bottom: 1px solid var(--zd-hairline);
+	background: var(--zd-paper, transparent);
+}
+
+.zd-board__row:last-child { border-bottom: 0; }
+
+.zd-board__logo {
+	width: 36px;
+	height: 36px;
+	display: grid;
+	place-items: center;
+	border-radius: 4px;
+	background: var(--zd-surface);
+	overflow: hidden;
+}
+
+.zd-board__logo img { max-width: 80%; max-height: 74%; width: auto; height: auto; object-fit: contain; }
+
+.zd-board__logo i {
+	font-style: normal;
+	font-family: var(--zd-font-mono);
+	font-size: 0.68rem;
+	font-weight: 600;
+	color: var(--zd-muted);
+	text-transform: uppercase;
+}
+
+.zd-board__name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.zd-board__name b { font-size: 0.95rem; font-weight: 600; color: var(--zd-heading); }
+
+.zd-board__name span {
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.78rem;
+	color: var(--zd-muted);
+}
+
+.zd-board__name s { opacity: 0.75; }
+
+/* The countdown is the loudest thing on the row, because it is the point. */
+.zd-board__count {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 62px;
+	padding: 5px 9px;
+	border-radius: var(--zd-r-sm);
+	background: var(--zd-ember-tint);
+	color: var(--zd-ember);
+	line-height: 1;
+}
+
+.zd-board__count b {
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 1.24rem;
+	font-weight: 600;
+	letter-spacing: -0.03em;
+}
+
+.zd-board__count i {
+	font-style: normal;
+	font-size: 0.56rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	opacity: 0.8;
+	margin-top: 3px;
+}
+
+@media (max-width: 720px) {
+	.zd-board__row { grid-template-columns: 36px minmax(0, 1fr) auto; row-gap: 12px; }
+	.zd-board__go { grid-column: 2 / -1; }
+	.zd-board__go .zd-btn { width: 100%; }
+}
+
+/* ---- how we test: numbered because it genuinely is a sequence ---- */
+
+.zd-method {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+	gap: 26px;
+}
+
+.zd-method li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: start; }
+
+.zd-method__n {
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.86rem;
+	font-weight: 600;
+	color: var(--zd-accent);
+	padding-top: 3px;
+	border-top: 2px solid var(--zd-accent);
+}
+
+.zd-method h3 {
+	margin: 0 0 5px;
+	font-family: var(--zd-font-display);
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: -0.018em;
+	color: var(--zd-heading);
+}
+
+.zd-method p { margin: 0; font-size: 0.88rem; line-height: 1.55; color: var(--zd-body); }
+
+/* ---- questions ---- */
+
+.zd-faq {
+	display: flex;
+	flex-direction: column;
+	border-top: 1px solid var(--zd-hairline);
+	max-width: 72ch;
+}
+
+.zd-faq__item { border-bottom: 1px solid var(--zd-hairline); }
+
+.zd-faq__item summary {
+	list-style: none;
+	cursor: pointer;
+	padding: 17px 34px 17px 0;
+	position: relative;
+	font-family: var(--zd-font-display);
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: -0.015em;
+	color: var(--zd-heading);
+}
+
+.zd-faq__item summary::-webkit-details-marker { display: none; }
+
+.zd-faq__item summary::after {
+	content: "";
+	position: absolute;
+	right: 6px;
+	top: 50%;
+	width: 9px;
+	height: 9px;
+	margin-top: -6px;
+	border-right: 2px solid var(--zd-muted);
+	border-bottom: 2px solid var(--zd-muted);
+	transform: rotate(45deg);
+	transition: transform var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-faq__item[open] summary::after { transform: rotate(-135deg); margin-top: -2px; }
+
+.zd-faq__item p {
+	margin: 0;
+	padding: 0 34px 19px 0;
+	font-size: 0.92rem;
+	line-height: 1.6;
+	color: var(--zd-body);
+	max-width: 68ch;
+}
+
+@media (pointer: coarse) {
+	.zd-card__review { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+	.zd-faq__item summary { padding-top: 20px; padding-bottom: 20px; }
+}
+
+
+/* =========================================================================
+   20. About us
+   For a review site this section IS the credibility argument, so it names the
+   people who do the testing rather than describing a "passionate team".
+   ========================================================================= */
+
+.zd-about2 { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 56px; align-items: start; }
+
+.zd-about2__lead h2 {
+	margin: 0;
+	font-family: var(--zd-font-display);
+	font-size: clamp(1.45rem, 2.4vw, 1.8rem);
+	font-weight: 700;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	color: var(--zd-heading);
+}
+
+.zd-about2__text { margin: 14px 0 0; font-size: 0.95rem; line-height: 1.6; color: var(--zd-body); max-width: 42ch; }
+.zd-about2__cta { margin-top: 20px; }
+
+.zd-about2__people {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 24px;
+}
+
+.zd-about2__people li { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 16px; align-items: start; }
+
+.zd-about2__photo {
+	width: 62px;
+	height: 62px;
+	border-radius: 50%;
+	overflow: hidden;
+	background: var(--zd-surface);
+	display: grid;
+	place-items: center;
+}
+
+.zd-about2__photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.zd-about2__photo i {
+	font-style: normal;
+	font-family: var(--zd-font-display);
+	font-size: 1.4rem;
+	font-weight: 700;
+	color: var(--zd-muted);
+}
+
+.zd-about2__who { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+.zd-about2__who b {
+	font-family: var(--zd-font-display);
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: -0.018em;
+	color: var(--zd-heading);
+}
+
+.zd-about2__role {
+	font-family: var(--zd-font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--zd-accent);
+}
+
+.zd-about2__line { font-size: 0.87rem; line-height: 1.55; color: var(--zd-body); margin-top: 3px; }
+
+@media (max-width: 900px) {
+	.zd-about2 { grid-template-columns: 1fr; gap: 32px; }
+}
+
+
+/* =========================================================================
+   Eyebrows
+   A pill with a pulsing dot is the default treatment everywhere on the web
+   right now, which is exactly why it stopped reading as a signal. These say
+   the same thing with a rule and a line of text — quieter, and the rule
+   doubles as the optical left edge for the headline underneath it.
+   ========================================================================= */
+
+.zd-hero__dot,
+.zd-hc__eyebrow-icon,
+.zd-bento__eyebrow-dot {
+	flex: 0 0 auto;
+	width: 26px;
+	height: 1px;
+	min-width: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: var(--zd-accent);
+	box-shadow: none;
+	animation: none;
+	overflow: hidden;
+	text-indent: -999px;
+}
+
+.zd-hero__dot::after,
+.zd-bento__eyebrow-dot::after { content: none; }
+.zd-hc__eyebrow-icon svg { display: none; }
+
+
+/* =========================================================================
+   Visually hidden
+   The index used WordPress's `.screen-reader-text`, which is a THEME class —
+   nothing here defines it. On a theme that omits it (or an Elementor canvas
+   template) the label text laid out at full width and pushed the first grid
+   track to 241px, collapsing the deal title to 31px at 390px wide. Owning the
+   class removes the dependency.
+   ========================================================================= */
+
+.zd-index .screen-reader-text,
+.zd-sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* A grid child defaults to min-width:auto, so one unbreakable run can force a
+   track wider than the row. These may all shrink. */
+.zd-row > * { min-width: 0; }
+
+
+/* A four-up card row is too tight for a price and its struck original on a
+   tablet; the grid only stepped down at 767px, so 768-1024 overflowed. */
+@media (min-width: 768px) and (max-width: 1024px) {
+	.zd-picks__grid,
+	.zd-home__cards--4 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
 }

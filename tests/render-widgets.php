@@ -25,6 +25,7 @@ require __DIR__ . '/elementor-stub.php';
 
 $P = dirname( __DIR__ ) . '/';
 require $P . 'includes/class-zlaark-deals-computed.php';
+require $P . 'includes/class-zlaark-deals-panel.php';
 
 class Zlaark_Deals_Settings { const SCHEMA = 2; public static function get( $k ) { return 1; } }
 
@@ -49,7 +50,7 @@ class Zlaark_Deals_Meta {
 require $P . 'widgets/class-zlaark-widget-base.php';
 
 $WIDGETS = array(
-	'homepage' => 'Zlaark_Homepage_Widget', 'navbar' => 'Zlaark_Navbar_Widget',
+	'homepage' => 'Zlaark_Homepage_Widget', 'navbar' => 'Zlaark_Navbar_Widget', 'footer' => 'Zlaark_Footer_Widget',
 	'hero' => 'Zlaark_Hero_Widget', 'hero-classic' => 'Zlaark_Hero_Classic_Widget',
 	'hero-bento' => 'Zlaark_Hero_Bento_Widget', 'hero-fresh' => 'Zlaark_Hero_Fresh_Widget',
 	'about' => 'Zlaark_About_Widget', 'deals' => 'Zlaark_Deals_Widget',

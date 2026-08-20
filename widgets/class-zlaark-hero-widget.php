@@ -99,7 +99,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'        => __( 'Highlight Underline', 'zlaark-deals-pro' ),
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => 'yes',
+				'default'      => '',
 				'return_value' => 'yes',
 				'condition'    => array( 'title_highlight!' => '' ),
 				'description'  => __( 'Draws a gradient line under the highlighted words.', 'zlaark-deals-pro' ),

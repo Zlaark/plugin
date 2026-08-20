@@ -22,6 +22,7 @@ class Zlaark_Deals_Settings {
 		return array(
 			'delete_data_on_uninstall' => 0,
 			'load_fonts'               => 1,
+			'single_panel'             => 'side',
 		);
 	}
 
@@ -73,6 +74,10 @@ class Zlaark_Deals_Settings {
 		$out = self::defaults();
 		$out['delete_data_on_uninstall'] = empty( $input['delete_data_on_uninstall'] ) ? 0 : 1;
 		$out['load_fonts']               = empty( $input['load_fonts'] ) ? 0 : 1;
+
+		$mode = isset( $input['single_panel'] ) ? sanitize_key( $input['single_panel'] ) : 'side';
+		$out['single_panel'] = in_array( $mode, array( 'off', 'above', 'side' ), true ) ? $mode : 'side';
+
 		return $out;
 	}
 
@@ -106,6 +111,29 @@ class Zlaark_Deals_Settings {
 							</label>
 							<p class="description">
 								<?php esc_html_e( 'Turn this off only if your theme already loads these three families. All three are free and open-source (SIL Open Font License).', 'zlaark-deals-pro' ); ?>
+							</p>
+						</td>
+					</tr>
+				</table>
+
+				<h2 class="title"><?php esc_html_e( 'Single deal pages', 'zlaark-deals-pro' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Offer panel', 'zlaark-deals-pro' ); ?></th>
+						<td>
+							<select name="<?php echo esc_attr( self::OPTION ); ?>[single_panel]">
+								<option value="side" <?php selected( $settings['single_panel'], 'side' ); ?>>
+									<?php esc_html_e( 'Beside the content', 'zlaark-deals-pro' ); ?>
+								</option>
+								<option value="above" <?php selected( $settings['single_panel'], 'above' ); ?>>
+									<?php esc_html_e( 'Above the content', 'zlaark-deals-pro' ); ?>
+								</option>
+								<option value="off" <?php selected( $settings['single_panel'], 'off' ); ?>>
+									<?php esc_html_e( 'Off — I will place the widget myself', 'zlaark-deals-pro' ); ?>
+								</option>
+							</select>
+							<p class="description">
+								<?php esc_html_e( 'Adds the offer panel — score, price, savings, coupon, renewal price and verification — to every deal page automatically. Building a single template by hand needs Elementor Pro, so this is on by default. Turn it off if you have Pro and would rather place the Deal Panel widget yourself.', 'zlaark-deals-pro' ); ?>
 							</p>
 						</td>
 					</tr>

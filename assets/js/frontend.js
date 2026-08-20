@@ -1021,6 +1021,7 @@
 		[
 			'zlaark_homepage',
 			'zlaark_navbar',
+			'zlaark_footer',
 			'zlaark_hero',
 			'zlaark_hero_classic',
 			'zlaark_hero_bento',

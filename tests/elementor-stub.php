@@ -41,6 +41,9 @@ function sanitize_textarea_field( $t ) { return trim( strip_tags( (string) $t ) 
 function sanitize_key( $t ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $t ) ); }
 function sanitize_title( $t ) { return strtolower( preg_replace( '/[^A-Za-z0-9\-]+/', '-', (string) $t ) ); }
 function absint( $v ) { return abs( (int) $v ); }
+function wp_parse_args( $a, $d = array() ) { return array_merge( (array) $d, (array) $a ); }
+function in_the_loop() { return true; }
+function is_main_query() { return true; }
 function wp_unslash( $v ) { return is_string( $v ) ? stripslashes( $v ) : $v; }
 function add_action( $h, $c, $p = 10, $a = 1 ) { $GLOBALS['zd_calls'][] = "action:$h"; }
 function add_filter( $h, $c, $p = 10, $a = 1 ) { $GLOBALS['zd_calls'][] = "filter:$h"; }
@@ -48,10 +51,12 @@ function apply_filters( $h, $v ) { return $v; }
 function do_shortcode( $s ) { return $s; }
 function current_time( $f ) { return gmdate( $f ); }
 function number_format_i18n( $n, $d = 0 ) { return number_format( (float) $n, $d ); }
-function date_i18n( $f, $ts ) { return gmdate( $f, $ts ); }
+function date_i18n( $f, $ts = false ) { return gmdate( $f, false === $ts ? time() : $ts ); }
 function get_bloginfo( $x ) { return 'Test'; }
 function home_url() { return 'https://example.com'; }
 function is_admin() { return true; }
+function wp_count_posts( $t = 'post' ) { $o = new stdClass(); $o->publish = 102; $o->draft = 0; return $o; }
+function get_option( $k, $d = false ) { return 'j F Y'; }
 function wp_list_pluck( $a, $f ) { return array_map( function ( $x ) use ( $f ) { return is_object( $x ) ? $x->$f : $x[ $f ]; }, $a ); }
 function wp_get_attachment_image( $id, $s = 'full', $i = false, $a = array() ) { return '<img src="x.png" alt="">'; }
 function wp_get_attachment_image_url( $id, $s = 'full' ) { return 'https://example.com/x.png'; }
@@ -78,6 +83,7 @@ function get_post( $p = null ) { return isset( $GLOBALS['zd_current'] ) ? new ZD
 function wp_reset_postdata() {}
 function wp_get_nav_menus( $a = array() ) { return array(); }
 function is_wp_error( $t ) { return false; }
+function get_term_link( $t ) { return 'https://example.com/cat'; }
 // WordPress polyfills these in wp-includes/compat.php when mbstring is absent,
 // so the plugin may use them freely; the stub has to provide them too.
 if ( ! function_exists( 'mb_substr' ) ) {

@@ -16,6 +16,7 @@ class Zlaark_Deals_Elementor {
 	const WIDGETS = array(
 		'homepage'     => 'Zlaark_Homepage_Widget',
 		'navbar'       => 'Zlaark_Navbar_Widget',
+		'footer'       => 'Zlaark_Footer_Widget',
 		'hero'         => 'Zlaark_Hero_Widget',
 		'hero-classic' => 'Zlaark_Hero_Classic_Widget',
 		'hero-bento'   => 'Zlaark_Hero_Bento_Widget',

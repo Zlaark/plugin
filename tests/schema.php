@@ -9,6 +9,7 @@ $GLOBALS['zd_fake_posts'] = 0;
 require __DIR__ . '/elementor-stub.php';
 $P = dirname( __DIR__ ) . '/';
 require $P . 'includes/class-zlaark-deals-computed.php';
+require $P . 'includes/class-zlaark-deals-panel.php';
 require __DIR__ . '/fixtures.php';
 class Zlaark_Deals_Meta {
 	public static function get_deal_data( $p ) { $d = zd_fixture_deals(); return $d[0]; }

@@ -331,7 +331,7 @@ class Zlaark_Index_Widget extends Zlaark_Query_Widget_Base {
 
 					<?php if ( 'yes' === $s['show_sort'] ) : ?>
 						<label class="zd-index__sortwrap">
-							<span class="screen-reader-text"><?php esc_html_e( 'Sort deals', 'zlaark-deals-pro' ); ?></span>
+							<span class="screen-reader-text zd-sr-only"><?php esc_html_e( 'Sort deals', 'zlaark-deals-pro' ); ?></span>
 							<select class="zd-index__sort" data-zd-sort>
 								<option value="saving"><?php esc_html_e( 'Sort: Biggest saving', 'zlaark-deals-pro' ); ?></option>
 								<option value="score"><?php esc_html_e( 'Highest score', 'zlaark-deals-pro' ); ?></option>
@@ -344,7 +344,7 @@ class Zlaark_Index_Widget extends Zlaark_Query_Widget_Base {
 
 					<?php if ( 'yes' === $s['show_search'] ) : ?>
 						<label class="zd-index__searchwrap">
-							<span class="screen-reader-text"><?php esc_html_e( 'Search deals', 'zlaark-deals-pro' ); ?></span>
+							<span class="screen-reader-text zd-sr-only"><?php esc_html_e( 'Search deals', 'zlaark-deals-pro' ); ?></span>
 							<input type="search" class="zd-index__search" data-zd-search
 								placeholder="<?php
 									printf(
@@ -421,7 +421,7 @@ class Zlaark_Index_Widget extends Zlaark_Query_Widget_Base {
 			<?php if ( 'yes' === $s['show_compare'] ) : ?>
 				<label class="zd-row__pick">
 					<input type="checkbox" data-zd-pick value="<?php echo esc_attr( $deal['id'] ); ?>" />
-					<span class="screen-reader-text">
+					<span class="screen-reader-text zd-sr-only">
 						<?php
 						printf(
 							/* translators: %s: deal title. */
