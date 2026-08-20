@@ -185,7 +185,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Eyebrow', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => __( 'How we work', 'zlaark-deals-pro' ),
+				'default'   => __( 'Bought with our own money', 'zlaark-deals-pro' ),
 				'condition' => array( 'show_band' => 'yes' ),
 			)
 		);
@@ -390,12 +390,34 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'nofollow',
+			array(
+				'label'        => __( 'Mark Links Sponsored', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'separator'    => 'before',
+				'description'  => __( 'Adds rel="nofollow sponsored" to every affiliate link on the page. Required disclosure for affiliate links.', 'zlaark-deals-pro' ),
+			)
+		);
+
 		$this->end_controls_section();
 
 		/* -------------------------------------------------- source */
 
 		$this->query_controls( 12 );
+
+		$this->start_controls_section(
+			'section_layout',
+			array(
+				'label' => __( 'Layout', 'zlaark-deals-pro' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
 		$this->max_width_control( '{{WRAPPER}} .zd-home__inner' );
+		$this->end_controls_section();
+
 		$this->animation_controls( false );
 	}
 
@@ -576,7 +598,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		?>
 		<section class="zd-home__sec">
 			<div class="zd-home__inner">
-				<?php $this->section_head( $s['score_title'], __( 'Best right now', 'zlaark-deals-pro' ) ); ?>
+				<?php $this->section_head( $s['score_title'], __( 'Scored and re-checked monthly', 'zlaark-deals-pro' ) ); ?>
 				<div class="zd-home__cards zd-home__cards--4">
 					<?php foreach ( $picks as $i => $deal ) : ?>
 						<article class="zd-home__sc zd-reveal" data-zd-reveal="rise" style="--zd-i:<?php echo (int) $i; ?>">
@@ -704,7 +726,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		?>
 		<section class="zd-home__sec zd-home__tint">
 			<div class="zd-home__inner">
-				<?php $this->section_head( $s['deals_title'], __( 'Live deals', 'zlaark-deals-pro' ) ); ?>
+				<?php $this->section_head( $s['deals_title'], __( 'Every offer we currently rate', 'zlaark-deals-pro' ) ); ?>
 				<div class="zd-home__cards zd-home__cards--3">
 					<?php foreach ( $show as $i => $deal ) : ?>
 						<?php $this->mini_card( $deal, $s, $i ); ?>
@@ -729,7 +751,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		?>
 		<section class="zd-home__sec">
 			<div class="zd-home__inner">
-				<?php $this->section_head( $s['picks_title'], __( 'Ranked', 'zlaark-deals-pro' ) ); ?>
+				<?php $this->section_head( $s['picks_title'], __( 'Ranked by measured score', 'zlaark-deals-pro' ) ); ?>
 				<div class="zd-home__cards zd-home__cards--3">
 					<?php foreach ( $picks as $i => $deal ) : ?>
 						<article class="zd-home__pick zd-reveal" data-zd-reveal="rise" style="--zd-i:<?php echo (int) $i; ?>">

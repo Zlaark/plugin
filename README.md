@@ -2,7 +2,7 @@
 
 Fourteen Elementor widgets plus a **Deals** manager in the WordPress sidebar. One set of deals, entered once, feeds every widget: the homepage scorecard, the deals index, the single-deal offer panel, ranked picks, trust stats and a logo marquee.
 
-Version 3.6.0 · Requires PHP 7.4 · Elementor 3.5+ for the widgets (the Deals manager works without it).
+Version 3.7.1 · Requires PHP 7.4 · Elementor 3.5+ for the widgets (the Deals manager works without it).
 
 ---
 
@@ -135,6 +135,19 @@ Drop **Zlaark Deals Index** on a blank page and set *Number of Deals* high enoug
 - **Comparison Page URL** — where the compare tray sends people. Selected IDs arrive as `?deals=12,34`.
 - Filters, sort and search write to the query string, so a filtered view is linkable and indexable.
 
+### Comparison page
+
+The Deals Index compare tray sends the visitor to a page with `?deals=12,34` on
+the URL. To make that page work:
+
+1. Create a page (`/compare/`) and drop in **Zlaark Comparison**, columns mode.
+2. Under **Comparison Page**, turn on **Accept Deals From The Compare Tray**.
+3. Point the index widget's *Comparison Page URL* at it.
+
+With the toggle on and IDs on the URL, those deals are shown in the order they
+were ticked and the category filter is ignored. Without IDs the widget falls
+back to its normal category behaviour, so the page is never empty.
+
 ### Single deal page
 
 Build an Elementor **single template** for the Deal post type:
@@ -204,6 +217,43 @@ zlaark-deals-pro/
 ├── widgets/                                14 widgets + shared base
 └── assets/                                 frontend + admin CSS/JS
 ```
+
+---
+
+## Tests
+
+No WordPress install needed — these run against stubs.
+
+```
+php tests/register-widgets.php   # controls build + render with defaults
+php tests/render-widgets.php     # render against a populated catalogue
+php tests/schema.php             # JSON-LD output
+php tests/markup.php             # ?deals= parsing + accessibility of the markup
+```
+
+`render-widgets.php` runs three fixture deals through every widget — one fully
+filled, one carrying only the required fields, and one expired — so both sides
+of every `if` branch and every computed value get exercised. It also checks the
+markup comes back tag-balanced.
+
+Loads every widget and runs `register_controls()` the way the Elementor editor
+bootstrap does, then calls `render()` with each control's default. Any fatal,
+warning or notice is a failure.
+
+This matters more than it looks: Elementor calls `_doing_it_wrong()` when a
+control is added while no controls section is open, and that notice is printed
+into the editor's JSON config. The editor then can't parse its own config and
+**hangs on the loading screen forever** — with no error shown. This harness
+catches that, plus duplicate control IDs, unclosed sections and repeaters with
+no fields.
+
+It also reports which widgets hit the database during control registration,
+since that runs on every editor load.
+
+`markup.php` covers the two things the others miss: `?deals=` is parsed from a
+query string, so it is fed SQL injection, script tags, negatives and overlong
+lists; and every widget's emitted markup is checked for missing alt text,
+skipped heading levels, unnamed links and buttons, and unlabelled inputs.
 
 ## Accessibility
 

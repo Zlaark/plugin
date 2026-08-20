@@ -5455,23 +5455,39 @@
 .zd-home__inner { margin-left: auto; margin-right: auto; }
 .zd-home__tint { background: var(--zd-surface); }
 
+/*
+ * The eyebrow is a line of type with a rule, not a mono-caps category label.
+ * It is meant to carry a fact — "Re-scored 18 August", "$8,400 spent testing" —
+ * so it earns its place instead of decorating the heading below it.
+ */
 .zd-home__eyebrow {
-	font-family: var(--zd-font-mono);
-	font-size: 0.72rem;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-family: var(--zd-font-sans);
+	font-size: 0.88rem;
 	font-weight: 500;
-	letter-spacing: 0.13em;
-	text-transform: uppercase;
+	letter-spacing: 0;
 	color: var(--zd-muted);
-	margin: 0 0 10px;
+	margin: 0 0 12px;
+}
+
+.zd-home__eyebrow::before {
+	content: "";
+	width: 22px;
+	height: 1px;
+	background: var(--zd-hairline);
+	flex: none;
 }
 
 .zd-home__head { margin-bottom: 30px; }
 
 .zd-home__head h2 {
 	font-family: var(--zd-font-display);
-	font-size: clamp(1.6rem, 3vw, 2.2rem);
+	font-size: clamp(1.45rem, 2.4vw, 1.8rem);
 	font-weight: 700;
-	line-height: 1.1;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
 	color: var(--zd-heading);
 	margin: 0;
 }
@@ -5482,18 +5498,19 @@
 /* ---- hero ---- */
 
 .zd-home__hero {
-	padding-top: 60px;
-	background: radial-gradient(110% 80% at 88% 6%, var(--zd-accent-tint) 0%, transparent 58%), transparent;
+	padding-top: 68px;
+	padding-bottom: 76px;
 }
 
-.zd-home__herogrid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 52px; align-items: center; }
+.zd-home__herogrid { display: grid; grid-template-columns: 1.18fr 0.82fr; gap: 60px; align-items: start; }
+.zd-home__herogrid > .zd-home__board { margin-top: 48px; }
 
 .zd-home__h1 {
 	font-family: var(--zd-font-display);
-	font-size: clamp(2.3rem, 5vw, 3.9rem);
+	font-size: clamp(2.5rem, 5.6vw, 4.4rem);
 	font-weight: 800;
-	line-height: 0.99;
-	letter-spacing: -0.038em;
+	line-height: 0.95;
+	letter-spacing: -0.045em;
 	color: var(--zd-heading);
 	margin: 16px 0 0;
 }
@@ -5502,28 +5519,32 @@
 .zd-home__lede { margin: 16px 0 0; font-size: 1.1rem; line-height: 1.55; max-width: 46ch; }
 .zd-home__herocta { margin-top: 24px; }
 
+/*
+ * The savings board is a readout, not a card. Square corners, hard rules and a
+ * reversed header keep it visually distinct from every deal card on the page —
+ * if it wore the same chrome it would just read as one more panel.
+ */
 .zd-home__board {
-	border: 1px solid var(--zd-hairline);
-	border-radius: var(--zd-r-lg);
+	border: 1px solid var(--zd-ink);
+	border-radius: 0;
 	overflow: hidden;
-	box-shadow: var(--zd-shadow-hover);
+	box-shadow: none;
 }
 
 .zd-home__boardhead {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	padding: 14px 19px;
-	border-bottom: 1px solid var(--zd-hairline);
-	background: var(--zd-surface);
+	padding: 11px 16px;
+	background: var(--zd-ink);
 }
 
 .zd-home__boardhead b {
 	font-family: var(--zd-font-mono);
-	font-size: 0.7rem;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--zd-heading);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	color: var(--zd-on-accent);
 }
 
 .zd-home__live {
@@ -5578,9 +5599,10 @@
 .zd-home__boardpc {
 	font-family: var(--zd-font-mono);
 	font-variant-numeric: tabular-nums;
-	font-size: 1.02rem;
+	font-size: 1.16rem;
 	font-weight: 600;
-	color: var(--zd-accent);
+	letter-spacing: -0.02em;
+	color: var(--zd-heading);
 }
 
 /* ---- card grids ---- */
@@ -5767,6 +5789,7 @@
 
 .zd-home__band { background: var(--zd-ink); }
 .zd-home__band .zd-home__eyebrow { color: #9fb0a7; }
+.zd-home__band .zd-home__eyebrow::before { background: #9fb0a7; opacity: .5; }
 
 .zd-home__bandtitle {
 	font-family: var(--zd-font-display);

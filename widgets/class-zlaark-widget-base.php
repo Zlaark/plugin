@@ -42,6 +42,26 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 	 * @param string $selector CSS selector for the widget's own inner wrapper.
 	 */
 	protected function max_width_control( $selector, $default = 1240 ) {
+		/*
+		 * Elementor calls _doing_it_wrong() when a control is added while no
+		 * section is open, and that notice is printed into the editor's JSON
+		 * config — which the editor then fails to parse, leaving it stuck on
+		 * the loading screen forever. Open a section here if the caller has
+		 * not, so the control always has somewhere legal to live.
+		 */
+		$needs_section = method_exists( $this, 'get_current_section' )
+			&& null === $this->get_current_section();
+
+		if ( $needs_section ) {
+			$this->start_controls_section(
+				'section_layout',
+				array(
+					'label' => __( 'Layout', 'zlaark-deals-pro' ),
+					'tab'   => Controls_Manager::TAB_STYLE,
+				)
+			);
+		}
+
 		$this->add_responsive_control(
 			'max_width',
 			array(
@@ -58,6 +78,10 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 				),
 			)
 		);
+
+		if ( $needs_section ) {
+			$this->end_controls_section();
+		}
 	}
 
 	/** Motion controls shared by all widgets. */
@@ -248,6 +272,24 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 		return array_values( array_filter( array_map( 'intval', $categories ) ) );
 	}
 
+	/**
+	 * Deal IDs handed over in ?deals=12,34 by the index widget's compare tray.
+	 *
+	 * @return int[] Empty when the parameter is absent or contains nothing usable.
+	 */
+	protected function ids_from_url() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display filter.
+		if ( empty( $_GET['deals'] ) ) {
+			return array();
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$raw = sanitize_text_field( wp_unslash( $_GET['deals'] ) );
+		$ids = array_filter( array_map( 'absint', explode( ',', $raw ) ) );
+
+		return array_slice( array_values( array_unique( $ids ) ), 0, 6 );
+	}
+
 	protected function build_query_args( $s ) {
 		$args = array(
 			'post_type'           => ZLAARK_DEALS_CPT,
@@ -292,6 +334,21 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 					'terms'    => $categories,
 				),
 			);
+		}
+
+		/*
+		 * A comparison page fed by the index widget's compare tray: the visitor
+		 * picked these deals, so they replace the category filter outright and
+		 * keep the order they were ticked in.
+		 */
+		if ( ! empty( $s['accept_url_ids'] ) && 'yes' === $s['accept_url_ids'] ) {
+			$picked = $this->ids_from_url();
+			if ( ! empty( $picked ) ) {
+				$args['post__in']       = $picked;
+				$args['orderby']        = 'post__in';
+				$args['posts_per_page'] = count( $picked );
+				unset( $args['tax_query'], $args['meta_key'] );
+			}
 		}
 
 		/*

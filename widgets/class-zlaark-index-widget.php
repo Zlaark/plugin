@@ -170,7 +170,16 @@ class Zlaark_Index_Widget extends Zlaark_Query_Widget_Base {
 
 		/* ------------------------------------------------ style */
 
+		$this->start_controls_section(
+			'section_layout',
+			array(
+				'label' => __( 'Layout', 'zlaark-deals-pro' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
 		$this->max_width_control( '{{WRAPPER}} .zd-index' );
+		$this->end_controls_section();
+
 		$this->animation_controls( false );
 	}
 

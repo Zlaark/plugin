@@ -33,6 +33,27 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 
 	protected function register_controls() {
 		$this->query_controls( 4 );
+
+		$this->start_controls_section(
+			'section_compare_source',
+			array(
+				'label' => __( 'Comparison Page', 'zlaark-deals-pro' ),
+				'tab'   => Controls_Manager::TAB_CONTENT,
+			)
+		);
+
+		$this->add_control(
+			'accept_url_ids',
+			array(
+				'label'        => __( 'Accept Deals From The Compare Tray', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'description'  => __( 'Turn this on for the page the Deals Index compare tray links to. When the URL carries ?deals=12,34 those deals are shown, in the order they were ticked, and the category filter above is ignored.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->end_controls_section();
 		$this->layout_controls();
 		$this->style_controls();
 		$this->animation_controls( false );

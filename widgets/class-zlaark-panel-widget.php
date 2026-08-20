@@ -138,7 +138,16 @@ class Zlaark_Panel_Widget extends Zlaark_Query_Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->start_controls_section(
+			'section_layout',
+			array(
+				'label' => __( 'Layout', 'zlaark-deals-pro' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
 		$this->max_width_control( '{{WRAPPER}} .zd-panel', 420 );
+		$this->end_controls_section();
+
 		$this->animation_controls( false );
 	}
 
@@ -147,11 +156,18 @@ class Zlaark_Panel_Widget extends Zlaark_Query_Widget_Base {
 		$out   = array();
 		$deals = get_posts(
 			array(
-				'post_type'      => ZLAARK_DEALS_CPT,
-				'post_status'    => 'publish',
-				'posts_per_page' => 200,
-				'orderby'        => 'title',
-				'order'          => 'ASC',
+				'post_type'              => ZLAARK_DEALS_CPT,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 100,
+				'orderby'                => 'title',
+				'order'                  => 'ASC',
+				// This runs on every editor load. Skipping other plugins'
+				// pre_get_posts hooks and the meta/term caches keeps the
+				// editor bootstrap cheap and predictable.
+				'suppress_filters'       => true,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			)
 		);
 		foreach ( $deals as $deal ) {
