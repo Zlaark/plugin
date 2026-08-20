@@ -152,7 +152,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Bar Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6366f1',
+				'default'   => '#0b7a4f',
 				'selectors' => array( '{{WRAPPER}} .zd-compare' => '--zd-accent: {{VALUE}};' ),
 			)
 		);
@@ -172,7 +172,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Bar Track Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#eef0f5',
+				'default'   => '#ebf0ed',
 				'selectors' => array( '{{WRAPPER}} .zd-compare' => '--zd-track: {{VALUE}};' ),
 			)
 		);
@@ -215,7 +215,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Title Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-compare__name' => 'color: {{VALUE}};' ),
 			)
@@ -234,7 +234,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Score Label Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6b7280',
+				'default'   => '#5e6c64',
 				'selectors' => array( '{{WRAPPER}} .zd-score__label' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -244,7 +244,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Score Value Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-score__value' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -306,6 +306,19 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			data-zd-reveal="<?php echo esc_attr( $s['reveal_effect'] ); ?>"
 			style="--zd-i:<?php echo (int) $index; ?>">
 
+			<?php
+			/*
+			 * The verdict cap — "Best overall", "Best value" — is the device that
+			 * makes the reference site's scorecard readable at a glance. It comes
+			 * from the Rank Label field, so it is a stored fact, not a guess.
+			 */
+			?>
+			<?php if ( '' !== $deal['rank_label'] ) : ?>
+				<span class="zd-compare__cap<?php echo 0 === $index ? ' zd-compare__cap--first' : ''; ?>">
+					<?php echo esc_html( $deal['rank_label'] ); ?>
+				</span>
+			<?php endif; ?>
+
 			<div class="zd-compare__top">
 				<?php if ( $deal['image_id'] ) : ?>
 					<div class="zd-compare__logo">
@@ -316,22 +329,56 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 				<div class="zd-compare__ident">
 					<h3 class="zd-compare__name"><?php echo esc_html( $deal['title'] ); ?></h3>
 					<?php if ( '' !== $deal['price'] ) : ?>
-						<p class="zd-compare__price"><?php echo esc_html( $deal['price'] ); ?></p>
+						<p class="zd-compare__price">
+							<span class="zd-compare__pricenow"><?php echo esc_html( $deal['price'] ); ?></span>
+							<?php if ( '' !== $deal['old_price'] ) : ?>
+								<s class="zd-compare__priceold"><?php echo esc_html( $deal['old_price'] ); ?></s>
+							<?php endif; ?>
+						</p>
+					<?php elseif ( '' !== $deal['offer_headline'] ) : ?>
+						<p class="zd-compare__price">
+							<span class="zd-compare__pricenow"><?php echo esc_html( $deal['offer_headline'] ); ?></span>
+						</p>
+					<?php endif; ?>
+					<?php if ( '' !== $deal['renewal_price'] ) : ?>
+						<p class="zd-compare__renewal">
+							<?php
+							printf(
+								/* translators: %s: renewal price. */
+								esc_html__( 'Renews at %s', 'zlaark-deals-pro' ),
+								esc_html( $deal['renewal_price'] )
+							);
+							?>
+						</p>
 					<?php endif; ?>
 				</div>
 
-				<?php if ( 'yes' === $s['show_overall'] && null !== $deal['rating'] ) : ?>
+				<?php
+				// The computed overall wins over the typed rating, so the ring can
+				// never disagree with the bars printed directly beneath it.
+				$overall = ( null !== $deal['overall_score'] ) ? $deal['overall_score'] : $deal['rating'];
+				?>
+				<?php if ( 'yes' === $s['show_overall'] && null !== $overall ) : ?>
 					<div class="zd-compare__overall">
-						<?php $this->render_rating_ring( $deal['rating'], 58 ); ?>
+						<?php $this->render_rating_ring( $overall, 58 ); ?>
 					</div>
 				<?php endif; ?>
 			</div>
 
 			<?php $this->render_scores( $deal['scores'] ); ?>
 
+			<?php if ( '' !== $deal['verified_label'] ) : ?>
+				<p class="zd-compare__verified"><?php echo esc_html( $deal['verified_label'] ); ?></p>
+			<?php endif; ?>
+
 			<?php if ( 'yes' === $s['show_button'] ) : ?>
 				<div class="zd-compare__foot">
 					<?php $this->render_cta( $deal, $s ); ?>
+					<?php if ( '' !== $deal['review_url'] ) : ?>
+						<a class="zd-compare__review" href="<?php echo esc_url( $deal['review_url'] ); ?>">
+							<?php esc_html_e( 'Full review', 'zlaark-deals-pro' ); ?>
+						</a>
+					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 		</div>

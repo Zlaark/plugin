@@ -1,10 +1,23 @@
 <?php
 /**
- * Removes every Zlaark deal, category and option when the plugin is deleted.
+ * Uninstall routine.
+ *
+ * Deals are user-generated content, so by default NOTHING is deleted here — the
+ * plugin can be removed and re-added without losing the catalogue. Destruction
+ * only happens when the site owner has explicitly opted in at
+ * Zlaark Deals → Settings → Data → "On uninstall".
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
+}
+
+$zlaark_settings = get_option( 'zlaark_deals_settings', array() );
+$zlaark_optin    = is_array( $zlaark_settings ) && ! empty( $zlaark_settings['delete_data_on_uninstall'] );
+
+if ( ! $zlaark_optin ) {
+	// Opt-in absent: leave every deal, category and image exactly where it is.
+	return;
 }
 
 $zlaark_cpt = 'zlaark_deal';
@@ -43,3 +56,4 @@ if ( ! is_wp_error( $zlaark_terms ) ) {
 }
 
 delete_option( 'zlaark_deals_defaults_seeded' );
+delete_option( 'zlaark_deals_settings' );

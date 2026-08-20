@@ -256,7 +256,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6b7280',
+				'default'   => '#5e6c64',
 				'selectors' => array( '{{WRAPPER}} .zd-section__title' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -307,7 +307,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Accent Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6366f1',
+				'default'   => '#0b7a4f',
 				'selectors' => array( '{{WRAPPER}} .zd-grid' => '--zd-accent: {{VALUE}};' ),
 			)
 		);
@@ -317,7 +317,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Accent Color 2', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ec4899',
+				'default'   => '#065f42',
 				'selectors' => array( '{{WRAPPER}} .zd-grid' => '--zd-accent-2: {{VALUE}};' ),
 			)
 		);
@@ -433,7 +433,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Title Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-card__title' => 'color: {{VALUE}};' ),
 			)
@@ -452,7 +452,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Tagline Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6b7280',
+				'default'   => '#5e6c64',
 				'condition' => array( 'show_tagline' => 'yes' ),
 				'selectors' => array( '{{WRAPPER}} .zd-card__tagline' => 'color: {{VALUE}};' ),
 			)
@@ -463,7 +463,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Price Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4f46e5',
+				'default'   => '#0b7a4f',
 				'separator' => 'before',
 				'condition' => array( 'show_price' => 'yes' ),
 				'selectors' => array( '{{WRAPPER}} .zd-card__price' => 'color: {{VALUE}};' ),
@@ -515,7 +515,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Background', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-btn--solid' => 'background-color: {{VALUE}};' ),
 			)
 		);
@@ -656,6 +656,22 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 				<span class="zd-card__badge"><?php echo esc_html( $deal['badge'] ); ?></span>
 			<?php endif; ?>
 
+			<?php
+			/*
+			 * One ember element per card, maximum. A real deadline outranks an
+			 * offer-type label, because urgency is the more perishable fact.
+			 */
+			$offer_types = Zlaark_Deals_Meta::offer_types();
+			$type_label  = ( '' !== $deal['offer_type'] && isset( $offer_types[ $deal['offer_type'] ] ) )
+				? $offer_types[ $deal['offer_type'] ]
+				: '';
+			?>
+			<?php if ( '' !== $deal['urgency_label'] ) : ?>
+				<span class="zd-chip zd-chip--ember zd-card__flag"><?php echo esc_html( $deal['urgency_label'] ); ?></span>
+			<?php elseif ( '' !== $type_label ) : ?>
+				<span class="zd-chip zd-chip--neutral zd-card__flag"><?php echo esc_html( $type_label ); ?></span>
+			<?php endif; ?>
+
 			<?php if ( 'yes' === $s['accent_bar'] ) : ?>
 				<span class="zd-card__bar" aria-hidden="true"></span>
 			<?php endif; ?>
@@ -682,8 +698,40 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 					<div class="zd-card__body">
 						<h3 class="zd-card__title"><?php echo esc_html( $deal['title'] ); ?></h3>
 
+						<?php
+						// The score is the mean of the breakdown, so it can never
+						// disagree with the bars shown elsewhere for the same deal.
+						$score_meta = array();
+						if ( '' !== $deal['tested_date'] ) {
+							$score_meta[] = sprintf(
+								/* translators: %s: month and year the deal was tested. */
+								__( 'Tested %s', 'zlaark-deals-pro' ),
+								date_i18n( 'M Y', strtotime( $deal['tested_date'] ) )
+							);
+						}
+						if ( '' !== $deal['refund_window'] ) {
+							$score_meta[] = $deal['refund_window'];
+						}
+						?>
+						<?php if ( null !== $deal['overall_score'] || ! empty( $score_meta ) ) : ?>
+							<p class="zd-card__scoreline">
+								<?php if ( null !== $deal['overall_score'] ) : ?>
+									<span class="zd-card__score zd-score--<?php echo esc_attr( $deal['score_band'] ); ?>">
+										<?php echo esc_html( number_format_i18n( $deal['overall_score'], 1 ) ); ?>
+									</span>
+								<?php endif; ?>
+								<?php if ( ! empty( $score_meta ) ) : ?>
+									<span class="zd-card__scoremeta"><?php echo esc_html( implode( ' · ', $score_meta ) ); ?></span>
+								<?php endif; ?>
+							</p>
+						<?php endif; ?>
+
 						<?php if ( 'yes' === $s['show_tagline'] && '' !== $deal['tagline'] ) : ?>
 							<p class="zd-card__tagline"><?php echo esc_html( $deal['tagline'] ); ?></p>
+						<?php endif; ?>
+
+						<?php if ( '' !== $deal['offer_headline'] && '' === $deal['price'] ) : ?>
+							<p class="zd-card__offerline"><?php echo esc_html( $deal['offer_headline'] ); ?></p>
 						<?php endif; ?>
 					</div>
 
@@ -696,11 +744,83 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 								<?php if ( '' !== $deal['old_price'] ) : ?>
 									<s class="zd-card__old-price"><?php echo esc_html( $deal['old_price'] ); ?></s>
 								<?php endif; ?>
+								<?php if ( null !== $deal['discount_pct'] ) : ?>
+									<span class="zd-card__save">
+										<?php
+										printf(
+											/* translators: %d: discount percentage, rounded down. */
+											esc_html__( 'Save %d%%', 'zlaark-deals-pro' ),
+											(int) $deal['discount_pct']
+										);
+										?>
+									</span>
+								<?php endif; ?>
 							</p>
+						<?php endif; ?>
+
+						<?php if ( '' !== $deal['coupon_code'] ) : ?>
+							<div class="zd-coupon" data-zd-coupon="<?php echo esc_attr( $deal['coupon_code'] ); ?>">
+								<span class="zd-coupon__code"><?php echo esc_html( $deal['coupon_code'] ); ?></span>
+								<button type="button" class="zd-coupon__copy"
+									data-zd-copied="<?php esc_attr_e( 'Copied', 'zlaark-deals-pro' ); ?>">
+									<?php esc_html_e( 'Copy code', 'zlaark-deals-pro' ); ?>
+								</button>
+							</div>
+						<?php endif; ?>
+
+						<?php
+						/*
+						 * The renewal price is the single most trust-building line
+						 * on the card, and the one every competitor hides.
+						 */
+						$terms = array();
+						if ( '' !== $deal['renewal_price'] ) {
+							$terms[] = $deal['term_length'] > 0
+								? sprintf(
+									/* translators: 1: renewal price, 2: term length in months. */
+									__( 'Renews at %1$s after %2$d months', 'zlaark-deals-pro' ),
+									$deal['renewal_price'],
+									(int) $deal['term_length']
+								)
+								: sprintf(
+									/* translators: %s: renewal price. */
+									__( 'Renews at %s', 'zlaark-deals-pro' ),
+									$deal['renewal_price']
+								);
+						}
+						if ( null !== $deal['first_term_total'] ) {
+							$terms[] = sprintf(
+								/* translators: %s: total cost across the first term. */
+								__( '%s first term', 'zlaark-deals-pro' ),
+								number_format_i18n( $deal['first_term_total'], 2 )
+							);
+						}
+						?>
+						<?php if ( ! empty( $terms ) || '' !== $deal['verified_label'] ) : ?>
+							<div class="zd-card__terms">
+								<?php foreach ( $terms as $line ) : ?>
+									<span class="zd-card__term"><?php echo esc_html( $line ); ?></span>
+								<?php endforeach; ?>
+								<?php if ( '' !== $deal['verified_label'] ) : ?>
+									<span class="zd-card__verified"><?php echo esc_html( $deal['verified_label'] ); ?></span>
+								<?php endif; ?>
+							</div>
 						<?php endif; ?>
 
 						<?php if ( 'yes' === $s['show_button'] ) : ?>
 							<?php $this->render_cta( $deal, $s ); ?>
+						<?php endif; ?>
+
+						<?php if ( '' !== $deal['review_url'] ) : ?>
+							<a class="zd-card__review" href="<?php echo esc_url( $deal['review_url'] ); ?>">
+								<?php
+								printf(
+									/* translators: %s: deal title. */
+									esc_html__( 'Read the full %s review', 'zlaark-deals-pro' ),
+									esc_html( $deal['title'] )
+								);
+								?>
+							</a>
 						<?php endif; ?>
 					</div>
 				</div>

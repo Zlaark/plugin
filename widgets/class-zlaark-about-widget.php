@@ -462,7 +462,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 					'px' => array( 'min' => 800, 'max' => 1920 ),
 					'%'  => array( 'min' => 50, 'max' => 100 ),
 				),
-				'default'    => array( 'unit' => 'px', 'size' => 1480 ),
+				'default'    => array( 'unit' => 'px', 'size' => 1240 ),
 				'selectors'  => array( '{{WRAPPER}} .zd-about__inner' => 'max-width: {{SIZE}}{{UNIT}};' ),
 			)
 		);
@@ -526,7 +526,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Accent Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4f46e5',
+				'default'   => '#0b7a4f',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-about' => '--zd-accent: {{VALUE}};' ),
 			)
@@ -558,7 +558,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Eyebrow Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4f46e5',
+				'default'   => '#0b7a4f',
 				'selectors' => array( '{{WRAPPER}} .zd-about__eyebrow' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -576,7 +576,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Title Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-about__title' => 'color: {{VALUE}};' ),
 			)
@@ -610,7 +610,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Description Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4b5563',
+				'default'   => '#4a5a52',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-about__desc' => 'color: {{VALUE}};' ),
 			)
@@ -650,7 +650,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Icon Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4f46e5',
+				'default'   => '#0b7a4f',
 				'selectors' => array( '{{WRAPPER}} .zd-about__point-icon' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -660,7 +660,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Point Title Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-about__point-title' => 'color: {{VALUE}};' ),
 			)
@@ -671,7 +671,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Point Text Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6b7280',
+				'default'   => '#5e6c64',
 				'selectors' => array( '{{WRAPPER}} .zd-about__point-text' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -693,7 +693,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Number Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-about__stat-value' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -703,7 +703,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Label Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6b7280',
+				'default'   => '#5e6c64',
 				'selectors' => array( '{{WRAPPER}} .zd-about__stat-label' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -724,7 +724,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Background', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-about .zd-btn--solid' => 'background-color: {{VALUE}};' ),
 			)
 		);

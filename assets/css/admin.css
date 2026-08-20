@@ -125,3 +125,27 @@
 	text-align: center;
 	color: #a7aaad;
 }
+
+/* Section headings inside the Deal Details box, added with the schema-2 fields. */
+.zlaark-fields .zlaark-section {
+	margin: 26px 0 4px;
+	padding-top: 18px;
+	border-top: 1px solid #dce3df;
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color: #5e6c64;
+}
+
+.zlaark-fields .zlaark-hint--computed {
+	background: #e6f5ee;
+	border: 1px solid rgba(11, 122, 79, .28);
+	border-radius: 8px;
+	padding: 10px 13px;
+	color: #0b7a4f;
+}
+
+.zlaark-fields .zlaark-hint--computed strong {
+	color: #065f42;
+}

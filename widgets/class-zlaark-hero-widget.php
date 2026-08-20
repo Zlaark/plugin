@@ -398,7 +398,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 					'px' => array( 'min' => 800, 'max' => 1920 ),
 					'%'  => array( 'min' => 50, 'max' => 100 ),
 				),
-				'default'    => array( 'unit' => 'px', 'size' => 1480 ),
+				'default'    => array( 'unit' => 'px', 'size' => 1240 ),
 				'selectors'  => array( '{{WRAPPER}} .zd-hero__inner' => 'max-width: {{SIZE}}{{UNIT}};' ),
 			)
 		);
@@ -422,7 +422,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Accent Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6366f1',
+				'default'   => '#0b7a4f',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-hero' => '--zd-accent: {{VALUE}};' ),
 			)
@@ -433,7 +433,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Accent Color 2', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ec4899',
+				'default'   => '#065f42',
 				'selectors' => array( '{{WRAPPER}} .zd-hero' => '--zd-accent-2: {{VALUE}};' ),
 			)
 		);
@@ -455,7 +455,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Eyebrow Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4b5563',
+				'default'   => '#4a5a52',
 				'selectors' => array( '{{WRAPPER}} .zd-hero__eyebrow' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -473,7 +473,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Title Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-hero__title' => 'color: {{VALUE}};' ),
 			)
@@ -492,7 +492,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Description Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4b5563',
+				'default'   => '#4a5a52',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-hero__desc' => 'color: {{VALUE}};' ),
 			)
@@ -570,7 +570,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Primary Background', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-btn--solid' => 'background-color: {{VALUE}};' ),
 			)
@@ -591,7 +591,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Secondary Text Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'condition' => array( 'secondary_text!' => '' ),
 				'selectors' => array(

@@ -307,7 +307,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 					'px' => array( 'min' => 600, 'max' => 1920 ),
 					'%'  => array( 'min' => 50, 'max' => 100 ),
 				),
-				'default'    => array( 'unit' => 'px', 'size' => 1480 ),
+				'default'    => array( 'unit' => 'px', 'size' => 1240 ),
 				'selectors'  => array( '{{WRAPPER}} .zd-nav__inner' => 'max-width: {{SIZE}}{{UNIT}};' ),
 			)
 		);

@@ -488,7 +488,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 					'px' => array( 'min' => 800, 'max' => 1920 ),
 					'%'  => array( 'min' => 50, 'max' => 100 ),
 				),
-				'default'    => array( 'unit' => 'px', 'size' => 1480 ),
+				'default'    => array( 'unit' => 'px', 'size' => 1240 ),
 				'selectors'  => array( '{{WRAPPER}} .zd-hc__inner' => 'max-width: {{SIZE}}{{UNIT}};' ),
 			)
 		);
@@ -596,7 +596,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Accent Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4f46e5',
+				'default'   => '#0b7a4f',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-hc' => '--zd-accent: {{VALUE}};' ),
 			)
@@ -628,7 +628,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Title Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-hc__title' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -685,7 +685,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Description Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4b5563',
+				'default'   => '#4a5a52',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-hc__desc' => 'color: {{VALUE}};' ),
 			)
@@ -738,7 +738,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Primary Background', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-btn--solid' => 'background-color: {{VALUE}};' ),
 			)
 		);
@@ -760,7 +760,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Secondary Text Colour', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'condition' => array( 'secondary_text!' => '' ),
 				'selectors' => array(

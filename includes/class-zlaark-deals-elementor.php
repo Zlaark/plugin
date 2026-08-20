@@ -14,6 +14,7 @@ class Zlaark_Deals_Elementor {
 
 	/** Widget file (without prefix/suffix) => class name. */
 	const WIDGETS = array(
+		'homepage'     => 'Zlaark_Homepage_Widget',
 		'navbar'       => 'Zlaark_Navbar_Widget',
 		'hero'         => 'Zlaark_Hero_Widget',
 		'hero-classic' => 'Zlaark_Hero_Classic_Widget',
@@ -21,8 +22,10 @@ class Zlaark_Deals_Elementor {
 		'hero-fresh'   => 'Zlaark_Hero_Fresh_Widget',
 		'about'        => 'Zlaark_About_Widget',
 		'deals'        => 'Zlaark_Deals_Widget',
+		'index'        => 'Zlaark_Index_Widget',
 		'top-picks'    => 'Zlaark_Top_Picks_Widget',
 		'compare'      => 'Zlaark_Compare_Widget',
+		'panel'        => 'Zlaark_Panel_Widget',
 		'stats'        => 'Zlaark_Stats_Widget',
 		'marquee'      => 'Zlaark_Marquee_Widget',
 	);

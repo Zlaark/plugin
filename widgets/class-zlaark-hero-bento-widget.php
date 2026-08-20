@@ -260,7 +260,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Bloom Colour 1', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#7c5cff',
+				'default'   => '#0b7a4f',
 				'condition' => array( 'bg_blooms' => 'yes' ),
 				'selectors' => array( '{{WRAPPER}} .zd-bento' => '--zd-bloom-1: {{VALUE}};' ),
 			)
@@ -314,7 +314,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'   => __( 'Icon Colour', 'zlaark-deals-pro' ),
 				'type'    => Controls_Manager::COLOR,
-				'default' => '#7c5cff',
+				'default' => '#0b7a4f',
 			)
 		);
 
@@ -330,7 +330,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 					array(
 						'text'   => __( 'SOC 2 Certified', 'zlaark-deals-pro' ),
 						'icon'   => array( 'value' => 'fas fa-shield-alt', 'library' => 'fa-solid' ),
-						'accent' => '#7c5cff',
+						'accent' => '#0b7a4f',
 					),
 					array(
 						'text'   => __( '99.99% Uptime', 'zlaark-deals-pro' ),
@@ -375,7 +375,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Backing Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#f43f8e',
+				'default'   => '#c2410c',
 				'selectors' => array( '{{WRAPPER}} .zd-bento__card--1' => 'background-color: {{VALUE}};' ),
 			)
 		);
@@ -550,7 +550,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 					),
 					array(
 						'icon' => array( 'value' => 'fas fa-chart-bar', 'library' => 'fa-solid' ),
-						'bg'   => '#7c5cff',
+						'bg'   => '#0b7a4f',
 					),
 				),
 			)
@@ -710,7 +710,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 					'px' => array( 'min' => 800, 'max' => 1920 ),
 					'%'  => array( 'min' => 50, 'max' => 100 ),
 				),
-				'default'    => array( 'unit' => 'px', 'size' => 1480 ),
+				'default'    => array( 'unit' => 'px', 'size' => 1240 ),
 				'selectors'  => array( '{{WRAPPER}} .zd-bento__inner' => 'max-width: {{SIZE}}{{UNIT}};' ),
 			)
 		);

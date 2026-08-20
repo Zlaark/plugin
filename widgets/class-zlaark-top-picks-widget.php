@@ -184,7 +184,7 @@ class Zlaark_Top_Picks_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Accent Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6366f1',
+				'default'   => '#0b7a4f',
 				'selectors' => array( '{{WRAPPER}} .zd-picks' => '--zd-accent: {{VALUE}};' ),
 			)
 		);
@@ -271,7 +271,7 @@ class Zlaark_Top_Picks_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Title Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-pick__title' => 'color: {{VALUE}};' ),
 			)
@@ -290,7 +290,7 @@ class Zlaark_Top_Picks_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Price Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-pick__price' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -300,7 +300,7 @@ class Zlaark_Top_Picks_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Body Text Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#4b5563',
+				'default'   => '#4a5a52',
 				'selectors' => array(
 					'{{WRAPPER}} .zd-pick__tagline, {{WRAPPER}} .zd-pick__list' => 'color: {{VALUE}};',
 				),
@@ -312,7 +312,7 @@ class Zlaark_Top_Picks_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'     => __( 'Button Background', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-btn--solid' => 'background-color: {{VALUE}};' ),
 			)

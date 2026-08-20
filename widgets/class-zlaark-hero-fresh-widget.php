@@ -226,7 +226,7 @@ class Zlaark_Hero_Fresh_Widget extends Zlaark_Widget_Base {
 			)
 		);
 
-		$this->max_width_control( '{{WRAPPER}} .zd-hf__inner', 1480 );
+		$this->max_width_control( '{{WRAPPER}} .zd-hf__inner', 1240 );
 
 		$this->add_responsive_control(
 			'gap',

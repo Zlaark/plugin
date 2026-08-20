@@ -12,19 +12,57 @@ class Zlaark_Deals_Meta {
 
 	/** Meta key => sanitize callback. */
 	const FIELDS = array(
-		'_zlaark_image_id'    => 'absint',
-		'_zlaark_tagline'     => 'sanitize_text_field',
-		'_zlaark_price'       => 'sanitize_text_field',
-		'_zlaark_old_price'   => 'sanitize_text_field',
-		'_zlaark_badge'       => 'sanitize_text_field',
-		'_zlaark_rank_label'  => 'sanitize_text_field',
-		'_zlaark_rating'      => 'zlaark_deals_sanitize_rating',
-		'_zlaark_highlights'  => 'sanitize_textarea_field',
-		'_zlaark_scores'      => 'sanitize_textarea_field',
-		'_zlaark_button_text' => 'sanitize_text_field',
-		'_zlaark_button_url'  => 'esc_url_raw',
-		'_zlaark_button_new'  => 'absint',
+		// Identity
+		'_zlaark_image_id'       => 'absint',
+		'_zlaark_tagline'        => 'sanitize_text_field',
+
+		// The offer
+		'_zlaark_offer_type'     => 'sanitize_key',
+		'_zlaark_offer_headline' => 'sanitize_text_field',
+		'_zlaark_price'          => 'sanitize_text_field',
+		'_zlaark_old_price'      => 'sanitize_text_field',
+		'_zlaark_renewal_price'  => 'sanitize_text_field',
+		'_zlaark_term_length'    => 'absint',
+		'_zlaark_coupon_code'    => 'zlaark_deals_sanitize_coupon',
+		'_zlaark_currency'       => 'zlaark_deals_sanitize_currency',
+
+		// Trust
+		'_zlaark_rating'         => 'zlaark_deals_sanitize_rating',
+		'_zlaark_scores'         => 'sanitize_textarea_field',
+		'_zlaark_verdict'        => 'sanitize_textarea_field',
+		'_zlaark_reviewer'       => 'sanitize_text_field',
+		'_zlaark_tested_date'    => 'zlaark_deals_sanitize_date',
+		'_zlaark_last_verified'  => 'zlaark_deals_sanitize_date',
+
+		// Terms & timing
+		'_zlaark_expiry_date'    => 'zlaark_deals_sanitize_date',
+		'_zlaark_refund_window'  => 'sanitize_text_field',
+		'_zlaark_best_for'       => 'sanitize_textarea_field',
+		'_zlaark_not_for'        => 'sanitize_textarea_field',
+		'_zlaark_pros'           => 'sanitize_textarea_field',
+		'_zlaark_cons'           => 'sanitize_textarea_field',
+
+		// Presentation & actions
+		'_zlaark_badge'          => 'sanitize_text_field',
+		'_zlaark_rank_label'     => 'sanitize_text_field',
+		'_zlaark_highlights'     => 'sanitize_textarea_field',
+		'_zlaark_button_text'    => 'sanitize_text_field',
+		'_zlaark_button_url'     => 'esc_url_raw',
+		'_zlaark_button_new'     => 'absint',
+		'_zlaark_review_url'     => 'esc_url_raw',
 	);
+
+	/** Offer types. Key => admin label; drives the neutral card chip. */
+	public static function offer_types() {
+		return array(
+			''           => __( '— none —', 'zlaark-deals-pro' ),
+			'coupon'     => __( 'Coupon', 'zlaark-deals-pro' ),
+			'exclusive'  => __( 'Exclusive', 'zlaark-deals-pro' ),
+			'free_trial' => __( 'Free trial', 'zlaark-deals-pro' ),
+			'free_plan'  => __( 'Free plan', 'zlaark-deals-pro' ),
+			'seasonal'   => __( 'Seasonal', 'zlaark-deals-pro' ),
+		);
+	}
 
 	public static function init() {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
@@ -122,6 +160,145 @@ class Zlaark_Deals_Meta {
 
 			<div class="zlaark-row">
 				<div class="zlaark-field">
+					<label for="zlaark_offer_type"><?php esc_html_e( 'Offer Type', 'zlaark-deals-pro' ); ?></label>
+					<select id="zlaark_offer_type" name="zlaark_offer_type">
+						<?php foreach ( self::offer_types() as $key => $label ) : ?>
+							<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $v['_zlaark_offer_type'], $key ); ?>>
+								<?php echo esc_html( $label ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+					<p class="description"><?php esc_html_e( 'Renders as the neutral chip, and lets the deals page filter by type.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_offer_headline"><?php esc_html_e( 'Offer Headline', 'zlaark-deals-pro' ); ?></label>
+					<input type="text" id="zlaark_offer_headline" name="zlaark_offer_headline" maxlength="40"
+						value="<?php echo esc_attr( $v['_zlaark_offer_headline'] ); ?>"
+						placeholder="<?php esc_attr_e( '60-day free trial', 'zlaark-deals-pro' ); ?>" />
+					<p class="description"><?php esc_html_e( 'For offers that are not a monthly price. Max 40 characters.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_coupon_code"><?php esc_html_e( 'Coupon Code', 'zlaark-deals-pro' ); ?></label>
+					<input type="text" id="zlaark_coupon_code" name="zlaark_coupon_code"
+						value="<?php echo esc_attr( $v['_zlaark_coupon_code'] ); ?>" placeholder="BYN2026" />
+					<p class="description"><?php esc_html_e( 'Shown with a click-to-copy button. Uppercased automatically.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+			</div>
+
+			<div class="zlaark-row">
+				<div class="zlaark-field">
+					<label for="zlaark_renewal_price"><?php esc_html_e( 'Renewal Price', 'zlaark-deals-pro' ); ?></label>
+					<input type="text" id="zlaark_renewal_price" name="zlaark_renewal_price"
+						value="<?php echo esc_attr( $v['_zlaark_renewal_price'] ); ?>" placeholder="$12.99/mo" />
+					<p class="description"><?php esc_html_e( 'What it costs after the intro term. Every competitor hides this — printing it is the most credible thing on the card.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_term_length"><?php esc_html_e( 'Term Length (months)', 'zlaark-deals-pro' ); ?></label>
+					<input type="number" min="0" step="1" id="zlaark_term_length" name="zlaark_term_length"
+						value="<?php echo esc_attr( $v['_zlaark_term_length'] ); ?>" placeholder="36" />
+					<p class="description"><?php esc_html_e( 'Used to compute the first-term total automatically.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_currency"><?php esc_html_e( 'Currency', 'zlaark-deals-pro' ); ?></label>
+					<input type="text" id="zlaark_currency" name="zlaark_currency" maxlength="3"
+						value="<?php echo esc_attr( $v['_zlaark_currency'] ); ?>" placeholder="USD" />
+					<p class="description"><?php esc_html_e( 'Three-letter code, for search-result markup. Leave empty for USD.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+			</div>
+
+			<h3 class="zlaark-section"><?php esc_html_e( 'Trust', 'zlaark-deals-pro' ); ?></h3>
+
+			<div class="zlaark-row">
+				<div class="zlaark-field">
+					<label for="zlaark_tested_date"><?php esc_html_e( 'Tested On', 'zlaark-deals-pro' ); ?></label>
+					<input type="date" id="zlaark_tested_date" name="zlaark_tested_date"
+						value="<?php echo esc_attr( $v['_zlaark_tested_date'] ); ?>" />
+					<p class="description"><?php esc_html_e( 'Printed on the card. This is the competitive position.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_last_verified"><?php esc_html_e( 'Last Verified', 'zlaark-deals-pro' ); ?></label>
+					<input type="date" id="zlaark_last_verified" name="zlaark_last_verified"
+						value="<?php echo esc_attr( $v['_zlaark_last_verified'] ); ?>" />
+					<p class="description"><?php esc_html_e( 'Renders as "Verified 6 days ago". No competitor records this.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_reviewer"><?php esc_html_e( 'Reviewer', 'zlaark-deals-pro' ); ?></label>
+					<input type="text" id="zlaark_reviewer" name="zlaark_reviewer"
+						value="<?php echo esc_attr( $v['_zlaark_reviewer'] ); ?>"
+						placeholder="<?php esc_attr_e( 'Who tested it', 'zlaark-deals-pro' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Attributed as the review author in search results.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+			</div>
+
+			<div class="zlaark-field">
+				<label for="zlaark_verdict"><?php esc_html_e( 'Verdict', 'zlaark-deals-pro' ); ?></label>
+				<textarea id="zlaark_verdict" name="zlaark_verdict" rows="2"
+					placeholder="<?php esc_attr_e( 'One sentence, in your own voice.', 'zlaark-deals-pro' ); ?>"><?php echo esc_textarea( $v['_zlaark_verdict'] ); ?></textarea>
+				<p class="description"><?php esc_html_e( 'Shown above the fold on the deal page, and emitted as Review markup for search results.', 'zlaark-deals-pro' ); ?></p>
+			</div>
+
+			<h3 class="zlaark-section"><?php esc_html_e( 'Terms &amp; timing', 'zlaark-deals-pro' ); ?></h3>
+
+			<div class="zlaark-row">
+				<div class="zlaark-field">
+					<label for="zlaark_expiry_date"><?php esc_html_e( 'Expires On', 'zlaark-deals-pro' ); ?></label>
+					<input type="date" id="zlaark_expiry_date" name="zlaark_expiry_date"
+						value="<?php echo esc_attr( $v['_zlaark_expiry_date'] ); ?>" />
+					<p class="description"><?php esc_html_e( 'Drives the countdown, and removes the deal from every widget once it passes. Leave empty for evergreen offers.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_refund_window"><?php esc_html_e( 'Refund Window', 'zlaark-deals-pro' ); ?></label>
+					<input type="text" id="zlaark_refund_window" name="zlaark_refund_window"
+						value="<?php echo esc_attr( $v['_zlaark_refund_window'] ); ?>" placeholder="30-day money back" />
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_review_url"><?php esc_html_e( 'Full Review URL', 'zlaark-deals-pro' ); ?></label>
+					<input type="url" id="zlaark_review_url" name="zlaark_review_url"
+						value="<?php echo esc_attr( $v['_zlaark_review_url'] ); ?>" placeholder="https://blogyouneed.com/reviews/..." />
+					<p class="description"><?php esc_html_e( 'A second exit that keeps the visitor on the site.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+			</div>
+
+			<div class="zlaark-row">
+				<div class="zlaark-field">
+					<label for="zlaark_best_for"><?php esc_html_e( 'Best For', 'zlaark-deals-pro' ); ?></label>
+					<textarea id="zlaark_best_for" name="zlaark_best_for" rows="3"><?php echo esc_textarea( $v['_zlaark_best_for'] ); ?></textarea>
+					<p class="description"><?php esc_html_e( 'One per line. Who this is right for.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_not_for"><?php esc_html_e( 'Not For', 'zlaark-deals-pro' ); ?></label>
+					<textarea id="zlaark_not_for" name="zlaark_not_for" rows="3"><?php echo esc_textarea( $v['_zlaark_not_for'] ); ?></textarea>
+					<p class="description"><?php esc_html_e( 'Recommending against yourself is the strongest trust signal available. One per line.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+			</div>
+
+			<div class="zlaark-row">
+				<div class="zlaark-field">
+					<label for="zlaark_pros"><?php esc_html_e( 'Pros', 'zlaark-deals-pro' ); ?></label>
+					<textarea id="zlaark_pros" name="zlaark_pros" rows="3"><?php echo esc_textarea( $v['_zlaark_pros'] ); ?></textarea>
+					<p class="description"><?php esc_html_e( 'Deal page only. One per line.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+
+				<div class="zlaark-field">
+					<label for="zlaark_cons"><?php esc_html_e( 'Cons', 'zlaark-deals-pro' ); ?></label>
+					<textarea id="zlaark_cons" name="zlaark_cons" rows="3"><?php echo esc_textarea( $v['_zlaark_cons'] ); ?></textarea>
+					<p class="description"><?php esc_html_e( 'Deal page only. One per line.', 'zlaark-deals-pro' ); ?></p>
+				</div>
+			</div>
+
+			<h3 class="zlaark-section"><?php esc_html_e( 'Presentation', 'zlaark-deals-pro' ); ?></h3>
+
+			<div class="zlaark-row">
+				<div class="zlaark-field">
 					<label for="zlaark_badge"><?php esc_html_e( 'Badge', 'zlaark-deals-pro' ); ?></label>
 					<input type="text" id="zlaark_badge" name="zlaark_badge"
 						value="<?php echo esc_attr( $v['_zlaark_badge'] ); ?>"
@@ -182,6 +359,45 @@ class Zlaark_Deals_Meta {
 				</label>
 			</div>
 
+			<?php
+			// A live readout of the derived values, so the editor can see what the
+			// card will render without saving and hunting for it on the front end.
+			$computed = array();
+			$pct      = Zlaark_Deals_Computed::discount_pct( $v['_zlaark_price'], $v['_zlaark_old_price'] );
+			$total    = Zlaark_Deals_Computed::first_term_total( $v['_zlaark_price'], $v['_zlaark_term_length'] );
+			$overall  = Zlaark_Deals_Computed::overall_score( self::parse_scores( $v['_zlaark_scores'] ), $v['_zlaark_rating'] );
+			$urgency  = Zlaark_Deals_Computed::urgency_label( $v['_zlaark_expiry_date'] );
+			$verified = Zlaark_Deals_Computed::verified_label( $v['_zlaark_last_verified'] );
+
+			if ( null !== $pct ) {
+				/* translators: %d: discount percentage. */
+				$computed[] = sprintf( __( 'Save %d%%', 'zlaark-deals-pro' ), $pct );
+			}
+			if ( null !== $total ) {
+				/* translators: %s: first-term total. */
+				$computed[] = sprintf( __( '%s first term', 'zlaark-deals-pro' ), number_format_i18n( $total, 2 ) );
+			}
+			if ( null !== $overall ) {
+				/* translators: %s: overall score out of ten. */
+				$computed[] = sprintf( __( 'Overall %s/10', 'zlaark-deals-pro' ), $overall );
+			}
+			if ( $urgency ) {
+				$computed[] = $urgency;
+			}
+			if ( $verified ) {
+				$computed[] = $verified;
+			}
+			if ( Zlaark_Deals_Computed::is_expired( $v['_zlaark_expiry_date'] ) ) {
+				$computed[] = __( 'EXPIRED — hidden from every widget', 'zlaark-deals-pro' );
+			}
+			?>
+			<?php if ( ! empty( $computed ) ) : ?>
+				<p class="zlaark-hint zlaark-hint--computed">
+					<strong><?php esc_html_e( 'Computed for you:', 'zlaark-deals-pro' ); ?></strong>
+					<?php echo esc_html( implode( '  ·  ', $computed ) ); ?>
+				</p>
+			<?php endif; ?>
+
 			<p class="zlaark-hint">
 				<?php esc_html_e( 'Assign this deal to a category in the "Deal Categories" box — every Zlaark Elementor widget filters by that category.', 'zlaark-deals-pro' ); ?>
 			</p>
@@ -225,6 +441,8 @@ class Zlaark_Deals_Meta {
 				update_post_meta( $post_id, $meta_key, $value );
 			}
 		}
+
+		update_post_meta( $post_id, '_zlaark_schema', Zlaark_Deals_Settings::SCHEMA );
 	}
 
 	/**
@@ -246,7 +464,7 @@ class Zlaark_Deals_Meta {
 
 		$rating = get_post_meta( $post->ID, '_zlaark_rating', true );
 
-		return array(
+		$data = array(
 			'id'          => $post->ID,
 			'title'       => get_the_title( $post ),
 			'permalink'   => get_permalink( $post ),
@@ -264,6 +482,48 @@ class Zlaark_Deals_Meta {
 			'button_new'  => (bool) get_post_meta( $post->ID, '_zlaark_button_new', true ),
 			'terms'       => wp_get_post_terms( $post->ID, ZLAARK_DEALS_TAX, array( 'fields' => 'all' ) ),
 		);
+
+		/* ---------------- stored, added in schema 2 ---------------- */
+
+		$data['offer_type']     = (string) get_post_meta( $post->ID, '_zlaark_offer_type', true );
+		$data['offer_headline'] = (string) get_post_meta( $post->ID, '_zlaark_offer_headline', true );
+		$data['renewal_price']  = (string) get_post_meta( $post->ID, '_zlaark_renewal_price', true );
+		$data['term_length']    = (int) get_post_meta( $post->ID, '_zlaark_term_length', true );
+		$data['coupon_code']    = (string) get_post_meta( $post->ID, '_zlaark_coupon_code', true );
+		$data['currency']       = (string) get_post_meta( $post->ID, '_zlaark_currency', true );
+		$data['verdict']        = (string) get_post_meta( $post->ID, '_zlaark_verdict', true );
+		$data['reviewer']       = (string) get_post_meta( $post->ID, '_zlaark_reviewer', true );
+		$data['tested_date']    = (string) get_post_meta( $post->ID, '_zlaark_tested_date', true );
+		$data['last_verified']  = (string) get_post_meta( $post->ID, '_zlaark_last_verified', true );
+		$data['expiry_date']    = (string) get_post_meta( $post->ID, '_zlaark_expiry_date', true );
+		$data['refund_window']  = (string) get_post_meta( $post->ID, '_zlaark_refund_window', true );
+		$data['review_url']     = (string) get_post_meta( $post->ID, '_zlaark_review_url', true );
+		$data['best_for']       = self::parse_lines( get_post_meta( $post->ID, '_zlaark_best_for', true ) );
+		$data['not_for']        = self::parse_lines( get_post_meta( $post->ID, '_zlaark_not_for', true ) );
+		$data['pros']           = self::parse_lines( get_post_meta( $post->ID, '_zlaark_pros', true ) );
+		$data['cons']           = self::parse_lines( get_post_meta( $post->ID, '_zlaark_cons', true ) );
+
+		/* ---------------- computed, never typed ---------------- */
+
+		$c = 'Zlaark_Deals_Computed';
+
+		$data['discount_pct']     = call_user_func( array( $c, 'discount_pct' ), $data['price'], $data['old_price'] );
+		$data['annual_saving']    = call_user_func( array( $c, 'annual_saving' ), $data['price'], $data['old_price'] );
+		$data['first_term_total'] = call_user_func( array( $c, 'first_term_total' ), $data['price'], $data['term_length'] );
+		$data['overall_score']    = call_user_func( array( $c, 'overall_score' ), $data['scores'], $data['rating'] );
+		$data['score_band']       = call_user_func( array( $c, 'score_band' ), $data['overall_score'] );
+		$data['days_remaining']   = call_user_func( array( $c, 'days_until' ), $data['expiry_date'] );
+		$data['is_expired']       = call_user_func( array( $c, 'is_expired' ), $data['expiry_date'] );
+		$data['urgency_label']    = call_user_func( array( $c, 'urgency_label' ), $data['expiry_date'] );
+		$data['verified_label']   = call_user_func( array( $c, 'verified_label' ), $data['last_verified'] );
+
+		/**
+		 * Filters the fully assembled deal, after computed values are attached.
+		 *
+		 * @param array   $data
+		 * @param WP_Post $post
+		 */
+		return apply_filters( 'zlaark_deals_deal_data', $data, $post );
 	}
 
 	/** Splits a textarea into trimmed, non-empty lines. */
@@ -298,6 +558,29 @@ class Zlaark_Deals_Meta {
 		}
 		return $out;
 	}
+}
+
+/** ISO date (Y-m-d) or empty. Anything unparseable is discarded rather than stored. */
+function zlaark_deals_sanitize_date( $value ) {
+	$value = trim( (string) $value );
+	if ( '' === $value ) {
+		return '';
+	}
+	$ts = strtotime( $value );
+	return $ts ? gmdate( 'Y-m-d', $ts ) : '';
+}
+
+/** Coupon codes are uppercased and stripped of anything a vendor wouldn't issue. */
+function zlaark_deals_sanitize_coupon( $value ) {
+	$value = strtoupper( trim( (string) $value ) );
+	$value = preg_replace( '/[^A-Z0-9._-]/', '', $value );
+	return substr( (string) $value, 0, 40 );
+}
+
+/** ISO 4217-ish: three letters, uppercased. Defaults to empty (use the site default). */
+function zlaark_deals_sanitize_currency( $value ) {
+	$value = strtoupper( trim( (string) $value ) );
+	return preg_match( '/^[A-Z]{3}$/', $value ) ? $value : '';
 }
 
 /** Keeps the rating between 0 and 10 with one decimal, or empty when cleared. */

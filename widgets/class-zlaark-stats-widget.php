@@ -210,7 +210,7 @@ class Zlaark_Stats_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Accent Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6366f1',
+				'default'   => '#0b7a4f',
 				'selectors' => array( '{{WRAPPER}} .zd-stats' => '--zd-accent: {{VALUE}};' ),
 			)
 		);
@@ -220,7 +220,7 @@ class Zlaark_Stats_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Accent Color 2', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ec4899',
+				'default'   => '#065f42',
 				'selectors' => array( '{{WRAPPER}} .zd-stats' => '--zd-accent-2: {{VALUE}};' ),
 			)
 		);
@@ -281,7 +281,7 @@ class Zlaark_Stats_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Number Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0b1120',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-stat-card__value' => 'color: {{VALUE}};' ),
 			)
@@ -322,7 +322,7 @@ class Zlaark_Stats_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Note Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6b7280',
+				'default'   => '#5e6c64',
 				'selectors' => array( '{{WRAPPER}} .zd-stat-card__note' => 'color: {{VALUE}};' ),
 			)
 		);

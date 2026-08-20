@@ -36,12 +36,12 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 
 	/**
 	 * A "Content Max Width" control, centred with auto margins, so every
-	 * Zlaark section can be lined up to the same width (1480px by default)
+	 * Zlaark section can be lined up to the same width (1240px by default)
 	 * regardless of how wide the Elementor column around it is.
 	 *
 	 * @param string $selector CSS selector for the widget's own inner wrapper.
 	 */
-	protected function max_width_control( $selector, $default = 1480 ) {
+	protected function max_width_control( $selector, $default = 1240 ) {
 		$this->add_responsive_control(
 			'max_width',
 			array(
@@ -94,7 +94,7 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( 'ms' ),
 				'range'      => array( 'ms' => array( 'min' => 0, 'max' => 400, 'step' => 10 ) ),
-				'default'    => array( 'unit' => 'ms', 'size' => 90 ),
+				'default'    => array( 'unit' => 'ms', 'size' => 60 ),
 				'condition'  => array( 'reveal_effect!' => 'none' ),
 				'description' => __( 'Delay added between each item as the group enters the viewport.', 'zlaark-deals-pro' ),
 			)
@@ -106,7 +106,7 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 				array(
 					'label'        => __( '3D Cursor Tilt', 'zlaark-deals-pro' ),
 					'type'         => Controls_Manager::SWITCHER,
-					'default'      => 'yes',
+					'default'      => '',
 					'return_value' => 'yes',
 					'separator'    => 'before',
 					'description'  => __( 'Cards lean towards the pointer and lift on hover.', 'zlaark-deals-pro' ),
@@ -118,7 +118,7 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 				array(
 					'label'        => __( 'Hover Shine Sweep', 'zlaark-deals-pro' ),
 					'type'         => Controls_Manager::SWITCHER,
-					'default'      => 'yes',
+					'default'      => '',
 					'return_value' => 'yes',
 				)
 			);
@@ -128,7 +128,7 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 				array(
 					'label'        => __( 'Animated Border Glow', 'zlaark-deals-pro' ),
 					'type'         => Controls_Manager::SWITCHER,
-					'default'      => 'yes',
+					'default'      => '',
 					'return_value' => 'yes',
 					'description'  => __( 'A conic gradient rotates around the card edge on hover.', 'zlaark-deals-pro' ),
 				)
@@ -291,6 +291,24 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 					'field'    => 'term_id',
 					'terms'    => $categories,
 				),
+			);
+		}
+
+		/*
+		 * Expired deals drop out on their own. A deals site showing a lapsed
+		 * coupon loses trust instantly, and it is the most common failure in
+		 * this category — so it must not depend on anyone remembering.
+		 * Deals with no expiry date are evergreen and always included.
+		 */
+		$expiry = Zlaark_Deals_Computed::not_expired_meta_query();
+
+		if ( empty( $args['meta_query'] ) ) {
+			$args['meta_query'] = $expiry; // phpcs:ignore WordPress.DB.SlowDBQuery
+		} else {
+			$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery
+				'relation' => 'AND',
+				$args['meta_query'],
+				$expiry,
 			);
 		}
 

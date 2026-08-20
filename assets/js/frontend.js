@@ -647,6 +647,339 @@
 
 	/* ----------------------------------------------------------------- boot */
 
+	/* ---------------------------------------------------------- coupon copy */
+
+	function initCoupons( scope ) {
+		each( scope, '.zd-coupon', function ( box ) {
+			if ( ! once( box ) ) {
+				return;
+			}
+
+			var btn  = box.querySelector( '.zd-coupon__copy' );
+			var code = box.getAttribute( 'data-zd-coupon' );
+
+			if ( ! btn || ! code ) {
+				return;
+			}
+
+			btn.addEventListener( 'click', function () {
+				var original = btn.textContent;
+				var done     = function () {
+					btn.textContent = btn.getAttribute( 'data-zd-copied' ) || 'Copied';
+					btn.classList.add( 'is-copied' );
+					window.setTimeout( function () {
+						btn.textContent = original;
+						btn.classList.remove( 'is-copied' );
+					}, 1900 );
+				};
+
+				if ( window.navigator.clipboard && window.navigator.clipboard.writeText ) {
+					window.navigator.clipboard.writeText( code ).then( done, done );
+					return;
+				}
+
+				// Clipboard API is unavailable over plain HTTP; fall back to a
+				// hidden field so the button still works on staging sites.
+				var tmp = document.createElement( 'textarea' );
+				tmp.value = code;
+				tmp.setAttribute( 'readonly', '' );
+				tmp.style.position = 'absolute';
+				tmp.style.left = '-9999px';
+				document.body.appendChild( tmp );
+				tmp.select();
+				try {
+					document.execCommand( 'copy' );
+				} catch ( e ) {} // eslint-disable-line no-empty
+				document.body.removeChild( tmp );
+				done();
+			} );
+		} );
+	}
+
+	/* ------------------------------------------------------- deals index */
+
+	/*
+	 * Filtering and sorting run client-side against data attributes, so the
+	 * markup stays fully cacheable. State is mirrored into the query string
+	 * so a filtered view is linkable and indexable — the reference site's
+	 * index has no filters at all, let alone shareable ones.
+	 */
+	function initIndex( scope ) {
+		each( scope, '[data-zd-index]', function ( root ) {
+			if ( ! once( root ) ) {
+				return;
+			}
+
+			var list     = root.querySelector( '[data-zd-list]' );
+			var empty    = root.querySelector( '[data-zd-empty]' );
+			var moreBtn  = root.querySelector( '[data-zd-more]' );
+			var tray     = root.querySelector( '[data-zd-tray]' );
+			var sortSel  = root.querySelector( '[data-zd-sort]' );
+			var searchEl = root.querySelector( '[data-zd-search]' );
+
+			if ( ! list ) {
+				return;
+			}
+
+			var rows     = [].slice.call( root.querySelectorAll( '[data-zd-row]' ) );
+			var pageSize = parseInt( root.getAttribute( 'data-zd-page' ), 10 ) || 24;
+
+			var state = {
+				cat:    'all',
+				types:  [],
+				sort:   'saving',
+				search: '',
+				shown:  pageSize
+			};
+
+			function num( row, attr ) {
+				return parseFloat( row.getAttribute( attr ) );
+			}
+
+			function matches( row ) {
+				if ( state.cat !== 'all' ) {
+					var cats = ( row.getAttribute( 'data-zd-cats' ) || '' ).split( ',' );
+					if ( cats.indexOf( state.cat ) === -1 ) {
+						return false;
+					}
+				}
+				if ( state.types.length &&
+					state.types.indexOf( row.getAttribute( 'data-zd-type' ) || '' ) === -1 ) {
+					return false;
+				}
+				if ( state.search &&
+					( row.getAttribute( 'data-zd-search' ) || '' ).indexOf( state.search ) === -1 ) {
+					return false;
+				}
+				return true;
+			}
+
+			var comparators = {
+				// Descending: the biggest saving and the best score lead.
+				saving:   function ( a, b ) { return num( b, 'data-zd-saving' ) - num( a, 'data-zd-saving' ); },
+				score:    function ( a, b ) { return num( b, 'data-zd-score' ) - num( a, 'data-zd-score' ); },
+				// Ascending: fewest days since verification, fewest days left.
+				verified: function ( a, b ) { return num( a, 'data-zd-verified' ) - num( b, 'data-zd-verified' ); },
+				ends:     function ( a, b ) { return num( a, 'data-zd-ends' ) - num( b, 'data-zd-ends' ); },
+				name:     function ( a, b ) {
+					return ( a.getAttribute( 'data-zd-name' ) || '' )
+						.localeCompare( b.getAttribute( 'data-zd-name' ) || '' );
+				}
+			};
+
+			function apply() {
+				var visible = rows.filter( matches );
+				var cmp     = comparators[ state.sort ] || comparators.saving;
+
+				visible.sort( cmp );
+
+				// Reorder in a fragment so the list reflows once, not per row.
+				var frag = document.createDocumentFragment();
+				visible.forEach( function ( row, i ) {
+					var over = i >= state.shown;
+					row.hidden = over;
+					row.classList.toggle( 'is-paged', over );
+					frag.appendChild( row );
+				} );
+				rows.forEach( function ( row ) {
+					if ( visible.indexOf( row ) === -1 ) {
+						row.hidden = true;
+						frag.appendChild( row );
+					}
+				} );
+				list.appendChild( frag );
+
+				if ( empty ) {
+					empty.hidden = visible.length > 0;
+				}
+				if ( moreBtn ) {
+					moreBtn.parentNode.hidden = visible.length <= state.shown;
+				}
+
+				syncUrl();
+			}
+
+			function syncUrl() {
+				if ( ! window.history || ! window.history.replaceState ) {
+					return;
+				}
+				var params = new URLSearchParams( window.location.search );
+
+				if ( state.cat !== 'all' ) { params.set( 'cat', state.cat ); } else { params.delete( 'cat' ); }
+				if ( state.types.length ) { params.set( 'type', state.types.join( ',' ) ); } else { params.delete( 'type' ); }
+				if ( state.sort !== 'saving' ) { params.set( 'sort', state.sort ); } else { params.delete( 'sort' ); }
+				if ( state.search ) { params.set( 'q', state.search ); } else { params.delete( 'q' ); }
+
+				var qs = params.toString();
+				window.history.replaceState( null, '', window.location.pathname + ( qs ? '?' + qs : '' ) );
+			}
+
+			function readUrl() {
+				var params = new URLSearchParams( window.location.search );
+
+				if ( params.get( 'cat' ) ) {
+					state.cat = params.get( 'cat' );
+				}
+				if ( params.get( 'type' ) ) {
+					state.types = params.get( 'type' ).split( ',' ).filter( Boolean );
+				}
+				if ( params.get( 'sort' ) && comparators[ params.get( 'sort' ) ] ) {
+					state.sort = params.get( 'sort' );
+					if ( sortSel ) {
+						sortSel.value = state.sort;
+					}
+				}
+				if ( params.get( 'q' ) ) {
+					state.search = params.get( 'q' ).toLowerCase();
+					if ( searchEl ) {
+						searchEl.value = params.get( 'q' );
+					}
+				}
+
+				each( root, '[data-zd-cat]', function ( b ) {
+					var on = b.getAttribute( 'data-zd-cat' ) === state.cat;
+					b.classList.toggle( 'is-on', on );
+					b.setAttribute( 'aria-pressed', String( on ) );
+				} );
+				each( root, '[data-zd-type]', function ( b ) {
+					var on = state.types.indexOf( b.getAttribute( 'data-zd-type' ) ) !== -1;
+					b.classList.toggle( 'is-on', on );
+					b.setAttribute( 'aria-pressed', String( on ) );
+				} );
+			}
+
+			/* ---- category chips: single select ---- */
+			each( root, '[data-zd-cat]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					state.cat   = btn.getAttribute( 'data-zd-cat' );
+					state.shown = pageSize;
+					each( root, '[data-zd-cat]', function ( b ) {
+						var on = b === btn;
+						b.classList.toggle( 'is-on', on );
+						b.setAttribute( 'aria-pressed', String( on ) );
+					} );
+					apply();
+				} );
+			} );
+
+			/* ---- offer-type chips: multi select ---- */
+			each( root, '[data-zd-type]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					var key = btn.getAttribute( 'data-zd-type' );
+					var at  = state.types.indexOf( key );
+					if ( at === -1 ) {
+						state.types.push( key );
+					} else {
+						state.types.splice( at, 1 );
+					}
+					var on = at === -1;
+					btn.classList.toggle( 'is-on', on );
+					btn.setAttribute( 'aria-pressed', String( on ) );
+					state.shown = pageSize;
+					apply();
+				} );
+			} );
+
+			if ( sortSel ) {
+				sortSel.addEventListener( 'change', function () {
+					state.sort = sortSel.value;
+					apply();
+				} );
+			}
+
+			if ( searchEl ) {
+				var timer = null;
+				searchEl.addEventListener( 'input', function () {
+					window.clearTimeout( timer );
+					timer = window.setTimeout( function () {
+						state.search = searchEl.value.trim().toLowerCase();
+						state.shown  = pageSize;
+						apply();
+					}, 160 );
+				} );
+			}
+
+			if ( moreBtn ) {
+				moreBtn.addEventListener( 'click', function () {
+					state.shown += pageSize;
+					apply();
+				} );
+			}
+
+			each( root, '[data-zd-clear]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					state.cat    = 'all';
+					state.types  = [];
+					state.search = '';
+					state.shown  = pageSize;
+					if ( searchEl ) {
+						searchEl.value = '';
+					}
+					each( root, '[data-zd-cat]', function ( b ) {
+						var on = b.getAttribute( 'data-zd-cat' ) === 'all';
+						b.classList.toggle( 'is-on', on );
+						b.setAttribute( 'aria-pressed', String( on ) );
+					} );
+					each( root, '[data-zd-type]', function ( b ) {
+						b.classList.remove( 'is-on' );
+						b.setAttribute( 'aria-pressed', 'false' );
+					} );
+					apply();
+				} );
+			} );
+
+			/* ---- compare tray ---- */
+			if ( tray ) {
+				var count = tray.querySelector( '[data-zd-traycount]' );
+				var go    = tray.querySelector( '[data-zd-traygo]' );
+				var clear = tray.querySelector( '[data-zd-trayclear]' );
+				var base  = root.getAttribute( 'data-zd-compare-url' ) || '';
+
+				var refresh = function () {
+					var picked = [].slice.call( root.querySelectorAll( '[data-zd-pick]:checked' ) )
+						.map( function ( i ) { return i.value; } );
+
+					tray.hidden = picked.length < 2;
+
+					if ( count ) {
+						count.textContent = String( picked.length );
+					}
+					if ( go ) {
+						go.href = base
+							? base + ( base.indexOf( '?' ) === -1 ? '?' : '&' ) + 'deals=' + picked.join( ',' )
+							: '#';
+					}
+				};
+
+				each( root, '[data-zd-pick]', function ( box ) {
+					box.addEventListener( 'change', refresh );
+				} );
+
+				if ( clear ) {
+					clear.addEventListener( 'click', function () {
+						each( root, '[data-zd-pick]', function ( b ) { b.checked = false; } );
+						refresh();
+					} );
+				}
+			}
+
+			readUrl();
+			apply();
+		} );
+	}
+
+	/* ------------------------------------------------- scrollbar gutter */
+
+	/*
+	 * Full-bleed sections are sized from 100vw, which includes the scrollbar
+	 * gutter — so without this the page scrolls sideways by the gutter width.
+	 * Published once on the root so every widget can subtract it.
+	 */
+	function syncScrollbarWidth() {
+		var gutter = window.innerWidth - document.documentElement.clientWidth;
+		document.documentElement.style.setProperty( '--zd-sbw', Math.max( 0, gutter ) + 'px' );
+	}
+
 	function init( scope ) {
 		scope = scope || document;
 		initReveals( scope );
@@ -658,7 +991,16 @@
 		initMarquee( scope );
 		initNavbar( scope );
 		initTabs( scope );
+		initCoupons( scope );
+		initIndex( scope );
+		syncScrollbarWidth();
 	}
+
+	var sbwTimer = null;
+	window.addEventListener( 'resize', function () {
+		window.clearTimeout( sbwTimer );
+		sbwTimer = window.setTimeout( syncScrollbarWidth, 120 );
+	} );
 
 	window.ZlaarkDeals = { init: init };
 
@@ -677,14 +1019,17 @@
 			return;
 		}
 		[
+			'zlaark_homepage',
 			'zlaark_navbar',
 			'zlaark_hero',
 			'zlaark_hero_classic',
 			'zlaark_hero_bento',
 			'zlaark_about',
 			'zlaark_deals',
+			'zlaark_index',
 			'zlaark_top_picks',
 			'zlaark_compare',
+			'zlaark_panel',
 			'zlaark_stats',
 			'zlaark_marquee'
 		].forEach( function ( name ) {

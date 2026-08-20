@@ -1,130 +1,210 @@
 # Zlaark Deals
 
-Six animated Elementor widgets plus a **Deals** manager in the WordPress sidebar. Built as a more polished answer to the ecommerce-platforms.com homepage pattern: ranked top picks, a scorecard comparison, a trust-stat strip and a logo marquee, all driven by one set of deals you enter once.
+Fourteen Elementor widgets plus a **Deals** manager in the WordPress sidebar. One set of deals, entered once, feeds every widget: the homepage scorecard, the deals index, the single-deal offer panel, ranked picks, trust stats and a logo marquee.
+
+Version 3.6.0 · Requires PHP 7.4 · Elementor 3.5+ for the widgets (the Deals manager works without it).
+
+---
+
+## Before you upgrade
+
+**Take a database backup, then export your deals.** Versions before 3.2.0 deleted every deal when the plugin was removed from the Plugins screen. That is now opt-in and off by default, but the safe order is: back up → upgrade → export.
+
+---
 
 ## Install
 
-1. Copy the `zlaark-deals-pro` folder into `wp-content/plugins/`.
+1. Copy the plugin folder into `wp-content/plugins/`.
 2. Activate **Zlaark Deals** in *Plugins*.
 3. Two categories are created for you: **Discount Deals** and **Web Hosting**.
+4. Go to **Zlaark Deals → Settings** and check the two options below.
 
-Elementor 3.5+ is required for the widgets. The Deals manager works without it.
+### Settings
 
-Every widget except the Logo Marquee (which is meant to run edge-to-edge) has a **Content Max Width** control defaulting to **1480px**, so stacking Hero, About, Deals Grid, Top Picks, Comparison, Stats and the Navbar down a page lines every one of them up to the same column width automatically.
-
-## Adding deals
-
-**Zlaark Deals → Add Deal** in the sidebar. One deal feeds every widget:
-
-| Field | Used by |
-|---|---|
-| Title | all widgets |
-| Deal Image / Logo | Deals Grid, Top Picks, Comparison, Marquee |
-| Tagline | Deals Grid, Top Picks, Comparison (rows) |
-| Pricing / Original Price | Deals Grid, Top Picks, Comparison |
-| Badge | Deals Grid (animated corner ribbon) |
-| Rank Label | Top Picks (e.g. *Editor's Choice*) |
-| Rating (0–10) | the animated rating ring |
-| Highlights | Top Picks — one per line, staggered checklist |
-| Score Breakdown | Comparison — `Label\|9.4` per line, drives the bars |
-| Button Text / URL / new tab | all card widgets |
-| Deal Categories | how every widget filters |
-
-Categories live at **Zlaark Deals → Categories**. Use *Page Attributes → Order* for manual sorting.
-
-## The widgets
-
-All widgets sit under the **Zlaark Deals** category in the Elementor panel, and each one has a **Motion** section in the Style tab: scroll-reveal effect (rise / fade / zoom / slide / 3D flip), stagger delay, 3D cursor tilt, hover shine sweep and a rotating conic border glow.
-
-### Zlaark Hero
-Aurora background with drifting colour blooms, a panning grid, five floating orbs, a word-by-word masked title reveal, a gradient highlight phrase with a self-drawing underline, a pulsing status pill, magnetic buttons, counting stat strip, and a counter-rotating double ring behind a parallaxing, bobbing image. Four layouts; every colour, size and motion toggle is exposed.
-
-### Zlaark Hero Classic
-The original text-and-image hero, elevated: eyebrow pill with icon, word-by-word title with a slim gradient underline on the highlight phrase, a feature checklist rendered as frosted pill chips that lift on hover, dual buttons, and a social-proof row with an overlapping avatar stack and star rating. The media sits in a glass panel (with a soft glossy sheen), browser-window chrome or plain frame, on top of an optional blurred accent glow, with a floating stat card and a live badge overlapping its edges, over a drifting gradient mesh and dot grid.
-
-### Zlaark Hero Fresh
-A stripped-down, flat hero: headline (with an optional accent-coloured highlight phrase), a description with an optional highlighted lead-in phrase, and a single image on either side — nothing else by default. No eyebrow, no badges, no gradients, no background motion unless you turn them on. Ships with a **Colour Theme** switch (Monochrome — black & orange, or Fresh — green & yellow; no purple/pink anywhere) plus optional accent-colour overrides. Buttons are entirely optional (one switch turns both off for a pure text + image hero) and, when no image is set, the media side reserves a clean dashed placeholder frame instead of collapsing.
-
-### Zlaark Navbar
-Logo (text or image), a centred capsule menu whose blue indicator pill glides to whichever item the pointer is over and settles back on the active one, plus a text link and a solid CTA. Items come from a repeater or any WordPress menu, with optional auto-detection of the current page. Sticky with a shrink-on-scroll state, a magnetic CTA, a staggered drop-in on load, and a hamburger panel below a width you choose.
-
-### Zlaark Hero Bento
-A collage of floating cards wired together with elbow connectors on one side, oversized display type on the other. Four image cards (portrait, outlined panel with a centre icon and dashed guide, dark tile with a stat pill, wide tile), three colour-coded icon squares, nine outline placeholder tiles, and animated connector wires that draw themselves on scroll. Cards float out of phase, shift by depth under the cursor and pop on hover. Collage can sit left or right.
-
-### Zlaark Deals Grid
-Your deal cards, filtered by category. Optional front-end **category tabs** with a sliding pill indicator. Cards tilt toward the cursor, lift, sweep a shine across, and light a rotating gradient border. Logos push forward in 3D on hover.
-
-Six **Card Layout** options, so the same deals can be shown however suits the row width:
-
-| Layout | Best for | Description |
+| Setting | Default | What it does |
 |---|---|---|
-| Row | 1–2 columns | Logo beside a stacked title/price/button |
-| Stack | 2–3 columns | Logo above everything |
-| Panel | 3–4 columns | Tall card, hairline divider, full-width button pinned to the base |
-| Split | 1–2 wide rows | Details left, price and CTA right behind a divider — reads like a table row |
-| Compact | 1–2 columns | Dense single-line rows — small logo, everything inline, tiny button |
-| Spotlight | 3–4 columns | Full-bleed image card with a dark scrim and white overlay text |
+| **Widget fonts** | on | Loads Bricolage Grotesque, Instrument Sans and IBM Plex Mono. All three are SIL Open Font License — free for commercial use. Turn off only if your theme already loads them. |
+| **Delete all data on uninstall** | **off** | Leave this off. With it on, deleting the plugin permanently removes every deal and category, bypassing the Trash. Deactivating never deletes anything either way. |
 
-**Columns** goes up to 6, or turn on **Auto-fit Columns** to skip a fixed count entirely and let the row pack in as many cards as fit a chosen **Minimum Card Width**. **Equal Card Heights** (default on) stretches every card in a row to the tallest so buttons line up, and **Accent Bar on Card** (default on) grows a gradient rule across the top on hover.
+**Export / Import** lives on the same screen. Export writes every deal, its meta and its categories to JSON — use it as a backup before upgrades, and to move a catalogue between staging and production. Import matches on slug, so re-importing updates rather than duplicating.
 
-### Zlaark About
-A "who we are" section: an image on one side, with an eyebrow, a word-by-word animated title with a gradient highlight, description, a **Mission Points** repeater (icon + title + text, cascading in on scroll), a button and an inline stat row on the other. A floating stat card overlaps the image corner, and a dot-grid backdrop sits behind everything.
+### If the fonts don't appear
 
-Five **Media Style** options:
+The plugin enqueues them directly on `wp_enqueue_scripts` at priority 5, because Elementor resolves widget style dependencies after `wp_head` has printed on some themes. If the widgets still render in the system font, the cause is almost always a theme or add-on setting typography at higher specificity — check for Elementor global fonts and for other Elementor add-on plugins doing their own resets.
 
-| Style | Description |
+To self-host the fonts instead and drop the third-party connection:
+
+```php
+add_filter( 'zlaark_deals_fonts_url', function () {
+    return get_stylesheet_directory_uri() . '/fonts/zlaark-fonts.css';
+} );
+```
+
+---
+
+## Adding a deal
+
+**Zlaark Deals → Add Deal.** The fields are grouped into four blocks. You only need the first seven; the rest make the card carry more than any competitor's.
+
+### Required
+
+| Field | Notes |
 |---|---|
-| Collage | Two overlapping framed photos |
-| Single | One framed image |
-| Stacked | Two layered photos, offset and gently counter-tilted |
-| Shape | One image over a blurred colour blob, ringed by a rotated dashed frame |
-| Grid | Four images in a 2×2 grid, each with its own hover lift |
+| Title | The brand or offer name |
+| Deal Image / Logo | Square lockup reads best |
+| Deal Categories | How every widget filters |
+| Offer Type | Coupon / Exclusive / Free trial / Free plan / Seasonal |
+| Offer Headline | For offers that aren't a monthly price — "60-day free trial". Max 40 chars |
+| Button URL | The affiliate link |
+| Rating **or** Score Breakdown | See *Scores*, below |
 
-**Image Height** (responsive) locks every frame in the chosen style to a fixed height and crops the photo to fill it — leave it empty to size by the image's natural proportion instead. Media side, column width and gap are all controls, and the frames bob gently and parallax with the cursor in every style.
+### Recommended
 
-### Zlaark Top Picks
-Ranked cards with a counter-rotating gradient medal, an animated rating ring that draws its arc and counts its number up, a staggered highlights checklist, and an optional gradient-bordered spotlight on the #1 pick.
+Pricing, Original Price, **Renewal Price**, Term Length, Coupon Code, Tested On, Last Verified, Verdict, Score Breakdown, Highlights, Full Review URL.
 
-### Zlaark Comparison
-Scorecards or compact rows built from the Score Breakdown field. Bars fill on scroll with a travelling sheen, numbers count up, rows lift and logos rotate on hover.
+The renewal price is the single most trust-building line on the card and the one every competitor hides. Fill it in.
 
-### Zlaark Stats
-Trust numbers that roll up from zero when scrolled into view, with an orbiting accent ring and optional animated gradient fill on the digits.
+### Optional
 
-### Zlaark Logo Marquee
-Seamless infinite scroll in either direction, sourced from a deal category or a manual list. Pauses on hover, greyscale until hover, faded edges.
+Expires On, Refund Window, Best For, Not For, Pros, Cons, Reviewer, Badge, Rank Label.
 
-## Differentiating by category
+### Computed for you — never type these
 
-Every widget has a multi-select **Category** control. Drop the Deals Grid twice on a page, pick *Discount Deals* in one and *Web Hosting* in the other, and you get the two-column layout from your reference — leave the Heading empty and each block titles itself from its category.
+Nine values are derived at render time, so they can't go stale or contradict each other. The editor screen shows a live **"Computed for you"** readout as you type.
 
-## Accessibility & performance
+| Value | Derived from |
+|---|---|
+| Discount % | Price + Original Price. **Rounded down** — 61.5% advertises as 61%, never 62% |
+| Annual saving | (Original − Price) × 12 |
+| First-term total | Price × Term Length |
+| Overall score | Mean of the Score Breakdown, falling back to Rating |
+| Score colour | The 0–10 ramp: ≥8.0 green, ≥6.5 amber, below that red |
+| Days remaining | Expires On |
+| "Ends in 6 days" | Expires On — only ever renders inside 14 days |
+| "Verified 6 days ago" | Last Verified |
+| Expired | Expires On — **removes the deal from every widget automatically** |
 
-- Full `prefers-reduced-motion` support: all ambient loops, reveals, tilts and parallax switch off while the layout stays intact.
-- CSS and JS are registered but only enqueued on pages that actually use a widget.
-- Reveals and counters use a single shared `IntersectionObserver`; pointer effects are `requestAnimationFrame`-throttled.
+### Scores
+
+Enter the breakdown as one `Label|9.4` per line:
+
+```
+Speed|9.6
+Uptime|9.4
+Support|8.8
+Value|7.2
+```
+
+The headline score is the **mean of these**, so it can never disagree with the bars printed beneath it. A typed Rating is only used when there's no breakdown.
+
+### Expiry
+
+Leave **Expires On** empty for evergreen offers. Set it and the deal disappears from every widget the day after it passes — a deals site showing a lapsed coupon loses trust instantly, and this must not depend on anyone remembering.
+
+---
+
+## Building the pages
+
+All widgets sit under **Zlaark Deals** in the Elementor panel. Every one has a **Content Max Width** control defaulting to 1240px, so stacking them down a page lines them all up.
+
+### Homepage — one widget
+
+Drop **Zlaark Homepage** on a blank page and the whole architecture renders at once: hero, scorecard, the dark methodology band, live deals, editor's picks, the logo marquee and a closing call to action.
+
+Each section has its own panel in the Elementor sidebar with a **Show This Section** toggle and its own copy. One query feeds every section, so no two blocks can disagree about a price or a score.
+
+| Panel | What it renders |
+|---|---|
+| 01 · Hero | Headline with a highlight phrase, sub-line, CTA, and a **savings scoreboard** built from your four biggest current discounts |
+| 02 · Scorecard | Top deals by score, capped with each deal's **Rank Label**, bars from the Score Breakdown |
+| 03 · Methodology band | The one dark section. Receipts repeater; the first figure can auto-fill from the live deal count |
+| 04 · Live deals | Cards sorted by biggest saving, with coupon, renewal price and verification |
+| 05 · Editor's picks | Three ranked cards with highlights |
+| 06 · Trusted by | Logo marquee, built from deals that have an image |
+| 07 · Closing CTA | Heading, body, and any signup form shortcode |
+
+Sections bleed to the viewport edge automatically, so the dark band and the marquee run full width without needing separate Elementor rows.
+
+**Prefer to build it by hand?** Every individual widget is still there — Hero Fresh, Comparison, Stats, About, Deals Grid, Top Picks and Logo Marquee — and can be stacked in the same order.
+
+### Deals page — `/deals`
+
+Drop **Zlaark Deals Index** on a blank page and set *Number of Deals* high enough to cover the catalogue (it filters client-side, so one query serves every filter).
+
+- **Show At A Time** — 24 is a good default; a "Show more" button appears beyond it.
+- **Comparison Page URL** — where the compare tray sends people. Selected IDs arrive as `?deals=12,34`.
+- Filters, sort and search write to the query string, so a filtered view is linkable and indexable.
+
+### Single deal page
+
+Build an Elementor **single template** for the Deal post type:
+
+- **Zlaark Deal Panel** in a sidebar column, *Deal Source: Current deal*, *Stick On Scroll: on*.
+- Your editorial content in the main column.
+
+Set *Sticky Offset* to clear your header height (96px suits a 72px sticky header).
+
+### Hosting Finder
+
+Use **Zlaark Comparison** in columns mode, not a grid of raw content. Cards must render fields, never post content — that is what made the old Finder render one column thousands of pixels tall.
+
+---
+
+## Theme
+
+The design system is **Verified Green**: a light site with exactly one dark band.
+
+| Token | Value | Use |
+|---|---|---|
+| `--zd-accent` | `#0b7a4f` | Primary buttons, prices, links |
+| `--zd-accent-2` | `#065f42` | Hover and pressed |
+| `--zd-ember` | `#c2410c` | Countdowns only — under 5% of any screen |
+| `--zd-ink` | `#0a1310` | The dark band, display type |
+| `--zd-body` | `#4a5a52` | Body copy |
+| `--zd-score-good/fair/weak` | `#0b7a4f` / `#a16207` / `#b91c1c` | The rating ramp |
+
+Every pairing clears WCAG AA. Three radii only — 8px, 16px, 28px — with 999px reserved for the nav CTA.
+
+Override any of them per-widget from the Elementor Style tab, or globally in your child theme:
+
+```css
+.zd-deals, .zd-index, .zd-panel, .zd-compare {
+    --zd-accent: #0b7a4f;
+}
+```
+
+**Motion.** Scroll reveal and hover lift are on. 3D cursor tilt, hover shine and the rotating border glow default to **off** — ambient motion on a comparison page costs trust. Count-ups and score bars stay, because they animate data. Everything respects `prefers-reduced-motion`.
+
+---
+
+## Search results
+
+Structured data is emitted automatically from the fields above — no extra work:
+
+- **Product + Offer + AggregateRating + Review** on single deal pages
+- **ItemList** on any page rendering two or more deals
+
+`Offer.priceValidUntil` comes from Expires On, so Google knows the deal is live. Validate with Google's Rich Results Test after your first few deals are filled in.
+
+---
 
 ## Structure
 
 ```
 zlaark-deals-pro/
-├── zlaark-deals-pro.php                        bootstrap, constants, assets
-├── uninstall.php
+├── zlaark-deals-pro.php                    bootstrap, fonts, assets
+├── uninstall.php                           gated behind an opt-in setting
 ├── includes/
-│   ├── class-zlaark-deals-post-type.php    CPT, taxonomy, default terms, columns
-│   ├── class-zlaark-deals-meta.php         Deal Details meta box, save, parsers
-│   └── class-zlaark-deals-elementor.php    widget category + registration
-├── widgets/
-│   ├── class-zlaark-widget-base.php        shared motion + query controls
-│   ├── class-zlaark-hero-widget.php
-│   ├── class-zlaark-deals-widget.php
-│   ├── class-zlaark-top-picks-widget.php
-│   ├── class-zlaark-compare-widget.php
-│   ├── class-zlaark-stats-widget.php
-│   └── class-zlaark-marquee-widget.php
-└── assets/
-    ├── css/frontend.css                    layout + the whole motion system
-    ├── css/admin.css
-    ├── js/frontend.js                      reveal/count/tilt/magnetic/tabs runtime
-    └── js/admin.js
+│   ├── class-zlaark-deals-settings.php     settings, JSON export/import
+│   ├── class-zlaark-deals-post-type.php    CPT, taxonomy, admin columns
+│   ├── class-zlaark-deals-computed.php     the nine derived values
+│   ├── class-zlaark-deals-meta.php         Deal Details meta box
+│   ├── class-zlaark-deals-schema.php       JSON-LD
+│   └── class-zlaark-deals-elementor.php    widget registration
+├── widgets/                                14 widgets + shared base
+└── assets/                                 frontend + admin CSS/JS
 ```
+
+## Accessibility
+
+Full `prefers-reduced-motion` support. Touch targets meet 44px on coarse pointers. Every colour pairing is measured against WCAG AA. CSS and JS load only on pages that use a widget; reveals and counters share one `IntersectionObserver`.
