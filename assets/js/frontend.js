@@ -1,11 +1,18 @@
 /* =========================================================================
-   Zlaark Deals — motion runtime
+   Zlaark Deals - motion runtime
    Scroll reveals, count-ups, rating rings, score bars, cursor tilt,
    magnetic buttons, hero parallax and the category filter tabs.
    Everything is idempotent so Elementor can re-render a widget safely.
    ========================================================================= */
 ( function () {
 	'use strict';
+
+	/*
+	 * Reveal animations start from opacity:0, so if this file never executes
+	 * every animated section renders blank. Publish a marker the stylesheet
+	 * can gate on: no marker, no hiding.
+	 */
+	document.documentElement.classList.add( 'zd-js' );
 
 	var DONE = 'zdInit';
 	var reduced = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
@@ -452,7 +459,7 @@
 
 			/* --- collapse ------------------------------------------------ */
 			// The collapse width is a per-widget setting, so it can't live in a
-			// stylesheet media query — it's evaluated here instead.
+			// stylesheet media query - it's evaluated here instead.
 			function syncCollapse() {
 				var collapsed = window.innerWidth <= breakpoint;
 				nav.classList.toggle( 'zd-nav--collapsed', collapsed );
@@ -701,7 +708,7 @@
 	/*
 	 * Filtering and sorting run client-side against data attributes, so the
 	 * markup stays fully cacheable. State is mirrored into the query string
-	 * so a filtered view is linkable and indexable — the reference site's
+	 * so a filtered view is linkable and indexable - the reference site's
 	 * index has no filters at all, let alone shareable ones.
 	 */
 	function initIndex( scope ) {
@@ -972,7 +979,7 @@
 
 	/*
 	 * Full-bleed sections are sized from 100vw, which includes the scrollbar
-	 * gutter — so without this the page scrolls sideways by the gutter width.
+	 * gutter - so without this the page scrolls sideways by the gutter width.
 	 * Published once on the root so every widget can subtract it.
 	 */
 	function syncScrollbarWidth() {
@@ -1012,35 +1019,33 @@
 		init( document );
 	}
 
-	// Elementor re-renders widgets in the editor and lazy-mounts them on the
-	// front end, so re-run against each element as it becomes ready.
+	/*
+	 * Elementor re-renders widgets in the editor and lazy-mounts them on the
+	 * front end. This used to hook a hand-written list of widget names, which
+	 * silently went stale the moment new widgets were added - those widgets
+	 * mounted with their reveals still at opacity:0 and looked broken in the
+	 * editor. 'element_ready/global' fires for every element, so nothing can
+	 * be forgotten.
+	 */
 	window.addEventListener( 'elementor/frontend/init', function () {
 		if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
 			return;
 		}
-		[
-			'zlaark_homepage',
-			'zlaark_navbar',
-			'zlaark_footer',
-			'zlaark_hero',
-			'zlaark_hero_classic',
-			'zlaark_hero_bento',
-			'zlaark_hero_fresh',
-			'zlaark_about',
-			'zlaark_deals',
-			'zlaark_index',
-			'zlaark_top_picks',
-			'zlaark_compare',
-			'zlaark_panel',
-			'zlaark_stats',
-			'zlaark_marquee'
-		].forEach( function ( name ) {
-			window.elementorFrontend.hooks.addAction(
-				'frontend/element_ready/' + name + '.default',
-				function ( $scope ) {
-					init( $scope && $scope[ 0 ] ? $scope[ 0 ] : document );
+
+		window.elementorFrontend.hooks.addAction(
+			'frontend/element_ready/global',
+			function ( $scope ) {
+				var el = ( $scope && $scope[ 0 ] ) ? $scope[ 0 ] : null;
+				if ( ! el || ! el.querySelector ) {
+					return;
 				}
-			);
-		} );
+				// Cheap bail-out: this runs for third-party widgets too.
+				if ( ! el.querySelector( '[class*="zd-"]' ) ) {
+					return;
+				}
+				init( el );
+			}
+		);
 	} );
+
 } )();

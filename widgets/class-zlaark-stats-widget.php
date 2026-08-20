@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Stats — a trust strip of counters that roll up from zero the first
+ * Zlaark Stats - a trust strip of counters that roll up from zero the first
  * time the block scrolls into view, each with an orbiting accent ring.
  */
 
@@ -105,7 +105,7 @@ class Zlaark_Stats_Widget extends Zlaark_Widget_Base {
 				'label'       => __( 'Items', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $repeater->get_controls(),
-				'title_field' => '{{{ prefix }}}{{{ value }}}{{{ suffix }}} — {{{ label }}}',
+				'title_field' => '{{{ prefix }}}{{{ value }}}{{{ suffix }}} - {{{ label }}}',
 				'default'     => array(
 					array(
 						'value'  => 120,
@@ -124,7 +124,7 @@ class Zlaark_Stats_Widget extends Zlaark_Widget_Base {
 						'decimals' => 1,
 						'suffix'   => '/10',
 						'label'    => __( 'Reader rating', 'zlaark-deals-pro' ),
-						'note'     => __( 'From 2,400 responses', 'zlaark-deals-pro' ),
+						'note'     => __( 'From 2,417 reader responses', 'zlaark-deals-pro' ),
 					),
 					array(
 						'value'  => 15,

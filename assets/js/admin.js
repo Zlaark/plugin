@@ -1,4 +1,4 @@
-/* Zlaark Deals — wires the WP media library into the Deal Details meta box. */
+/* Zlaark Deals - wires the WP media library into the Deal Details meta box. */
 ( function ( $ ) {
 	'use strict';
 

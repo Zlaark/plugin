@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Deal Panel — the offer panel for a single deal page.
+ * Zlaark Deal Panel - the offer panel for a single deal page.
  *
  * The live A2 Hosting page shows a logo, the bare figure "$5.00" with no period
  * or context, and then a wall of marketing copy with no call to action anywhere

@@ -154,13 +154,13 @@ class Zlaark_Deals_Post_Type {
 
 	public static function title_placeholder( $title, $post ) {
 		if ( $post && ZLAARK_DEALS_CPT === $post->post_type ) {
-			return __( 'Deal title (e.g. Shopify — Ecommerce Platform)', 'zlaark-deals-pro' );
+			return __( 'Deal title (for example, Shopify Ecommerce Platform)', 'zlaark-deals-pro' );
 		}
 		return $title;
 	}
 
 	/**
-	 * Returns [ term_id => name ] for every deal category — used to build the
+	 * Returns [ term_id => name ] for every deal category - used to build the
 	 * category dropdown inside the Elementor widget controls.
 	 */
 	public static function get_category_options() {

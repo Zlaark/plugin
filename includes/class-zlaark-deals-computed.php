@@ -3,8 +3,8 @@
  * Values derived at render time rather than stored.
  *
  * Nothing in here is ever typed by an editor. Deriving these means a card can
- * carry far more information than the fields behind it, and — more importantly
- * — a headline score can never contradict its own breakdown, and a discount
+ * carry far more information than the fields behind it, and - more importantly
+ * - a headline score can never contradict its own breakdown, and a discount
  * percentage can never disagree with the two prices printed beside it.
  */
 
@@ -190,7 +190,7 @@ class Zlaark_Deals_Computed {
 	}
 
 	/**
-	 * "Ends in 6 days" — but only inside the urgency window, and only when a
+	 * "Ends in 6 days" - but only inside the urgency window, and only when a
 	 * real deadline exists. Permanent urgency reads as fake, so this returns
 	 * an empty string far more often than not.
 	 */

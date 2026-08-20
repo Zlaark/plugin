@@ -1,8 +1,8 @@
 <?php
 /**
- * Zlaark Hero Fresh — a clean, light hero: headline, description and a
+ * Zlaark Hero Fresh - a clean, light hero: headline, description and a
  * single image on either side. No badges, no aurora, no gradients-on-
- * everything — just the content, in one of two flat colour themes
+ * everything - just the content, in one of two flat colour themes
  * (Monochrome + orange, or Green + yellow). Buttons are entirely optional.
  */
 
@@ -57,7 +57,7 @@ class Zlaark_Hero_Fresh_Widget extends Zlaark_Widget_Base {
 				'type'        => Controls_Manager::TEXT,
 				'default'     => '',
 				'label_block' => true,
-				'description' => __( 'Leave empty to hide — the clean layout works without one.', 'zlaark-deals-pro' ),
+				'description' => __( 'Leave empty to hide - the clean layout works without one.', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -115,7 +115,7 @@ class Zlaark_Hero_Fresh_Widget extends Zlaark_Widget_Base {
 				'label'   => __( 'Description', 'zlaark-deals-pro' ),
 				'type'    => Controls_Manager::TEXTAREA,
 				'rows'    => 4,
-				'default' => __( "We're constantly using, reviewing and comparing every tool on the market, then reporting back — so you can make informed decisions and choose the best option for you.", 'zlaark-deals-pro' ),
+				'default' => __( "We're constantly using, reviewing and comparing every tool on the market, then reporting back - so you can make informed decisions and choose the best option for you.", 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -199,7 +199,7 @@ class Zlaark_Hero_Fresh_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'       => __( 'Image', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::MEDIA,
-				'description' => __( 'Leave empty to keep a reserved, empty frame on this side — handy while you source the graphic.', 'zlaark-deals-pro' ),
+				'description' => __( 'Leave empty to keep a reserved frame on this side, handy while you source the graphic.', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -261,8 +261,8 @@ class Zlaark_Hero_Fresh_Widget extends Zlaark_Widget_Base {
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'mono',
 				'options' => array(
-					'mono'  => __( 'Monochrome — black & orange', 'zlaark-deals-pro' ),
-					'green' => __( 'Fresh — green & yellow', 'zlaark-deals-pro' ),
+					'mono'  => __( 'Monochrome - black & orange', 'zlaark-deals-pro' ),
+					'green' => __( 'Fresh - green & yellow', 'zlaark-deals-pro' ),
 				),
 				'description' => __( 'Sets the whole palette in one go. Use the overrides below only if you need a one-off colour.', 'zlaark-deals-pro' ),
 			)
@@ -616,7 +616,7 @@ class Zlaark_Hero_Fresh_Widget extends Zlaark_Widget_Base {
 						<path d="M4 16.5l5-4.5 3.5 3 3.5-4 4 5.5" stroke="currentColor" stroke-width="1.6"
 							stroke-linecap="round" stroke-linejoin="round" />
 					</svg>
-					<span><?php esc_html_e( 'Image space — add your graphic here', 'zlaark-deals-pro' ); ?></span>
+					<span><?php esc_html_e( 'Image space. Add your graphic here', 'zlaark-deals-pro' ); ?></span>
 				</div>
 			<?php endif; ?>
 		</div>

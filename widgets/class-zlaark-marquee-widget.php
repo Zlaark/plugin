@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Marquee — an infinitely scrolling logo/trust strip. Logos can be
+ * Zlaark Marquee - an infinitely scrolling logo/trust strip. Logos can be
  * added manually or pulled straight from a deal category, and the track
  * pauses when the pointer rests on it.
  */
@@ -233,7 +233,7 @@ class Zlaark_Marquee_Widget extends Zlaark_Widget_Base {
 				'range'      => array( 's' => array( 'min' => 8, 'max' => 90, 'step' => 1 ) ),
 				'default'    => array( 'unit' => 's', 'size' => 32 ),
 				'selectors'  => array( '{{WRAPPER}} .zd-marquee' => '--zd-marquee-speed: {{SIZE}}s;' ),
-				'description' => __( 'Seconds for one full loop — higher is slower.', 'zlaark-deals-pro' ),
+				'description' => __( 'Seconds for one full loop - higher is slower.', 'zlaark-deals-pro' ),
 			)
 		);
 

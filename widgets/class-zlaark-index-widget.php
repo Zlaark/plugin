@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Deals Index — the deals page.
+ * Zlaark Deals Index - the deals page.
  *
  * The reference site's /deals index is a flat list of ~40 cards under four
  * headings with no filter, no sort and no search. At 100+ deals that stops
@@ -77,7 +77,7 @@ class Zlaark_Index_Widget extends Zlaark_Query_Widget_Base {
 				'type'         => Controls_Manager::SWITCHER,
 				'default'      => 'yes',
 				'return_value' => 'yes',
-				'description'  => __( 'Live deals, average saving and how many expire this week — all computed.', 'zlaark-deals-pro' ),
+				'description'  => __( 'Live deals, average saving and how many expire this week, all computed.', 'zlaark-deals-pro' ),
 			)
 		);
 

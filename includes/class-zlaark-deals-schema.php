@@ -4,7 +4,7 @@
  *
  * The audit found no Review, AggregateRating, Offer or FAQPage markup anywhere
  * on the site, so the scores and prices published on every deal never reached
- * Google — which is why competitor listings carry stars and this one doesn't.
+ * Google - which is why competitor listings carry stars and this one doesn't.
  *
  * Everything here is serialised from fields the editor already fills in for the
  * card, so it costs no extra data entry.
@@ -157,7 +157,7 @@ class Zlaark_Deals_Schema {
 	}
 
 	/**
-	 * Any page that rendered deals through the widgets gets an ItemList — the
+	 * Any page that rendered deals through the widgets gets an ItemList - the
 	 * ranked-list markup that wins "best web hosting" style carousels.
 	 */
 	public static function print_list_graph() {

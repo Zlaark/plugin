@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Top Picks — ranked "editor's choice" cards with a rotating medal,
+ * Zlaark Top Picks - ranked "editor's choice" cards with a rotating medal,
  * an animated rating ring, a staggered highlights checklist and a featured
  * card that floats above the rest.
  */
@@ -62,7 +62,7 @@ class Zlaark_Top_Picks_Widget extends Zlaark_Query_Widget_Base {
 				'label'       => __( 'Sub-heading', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 2,
-				'default'     => __( 'Every pick is bought, tested and scored by our team — no pay-to-play placements.', 'zlaark-deals-pro' ),
+				'default'     => __( 'Every pick is bought, tested and scored by our team. No pay-to-play placements.', 'zlaark-deals-pro' ),
 				'label_block' => true,
 			)
 		);

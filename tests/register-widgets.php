@@ -32,6 +32,8 @@ class Zlaark_Deals_Meta {
 class Zlaark_Deals_Settings { const SCHEMA = 2; public static function get( $k ) { return 1; } }
 
 require $P . 'widgets/class-zlaark-widget-base.php';
+require $P . 'widgets/class-zlaark-homepage-widget.php';
+require $P . 'widgets/class-zlaark-section-widget-base.php';
 
 $WIDGETS = array(
 	'homepage'     => 'Zlaark_Homepage_Widget',
@@ -49,6 +51,14 @@ $WIDGETS = array(
 	'panel'        => 'Zlaark_Panel_Widget',
 	'stats'        => 'Zlaark_Stats_Widget',
 	'marquee'      => 'Zlaark_Marquee_Widget',
+	'scorecard'    => 'Zlaark_Scorecard_Widget',
+	'band'         => 'Zlaark_Band_Widget',
+	'categories'   => 'Zlaark_Categories_Widget',
+	'expiring'     => 'Zlaark_Expiring_Widget',
+	'method'       => 'Zlaark_Method_Widget',
+	'aboutus'      => 'Zlaark_About_Us_Widget',
+	'faq'          => 'Zlaark_Faq_Widget',
+	'cta'          => 'Zlaark_Cta_Widget',
 );
 
 $fail = 0;

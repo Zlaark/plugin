@@ -1,7 +1,7 @@
 <?php
 /**
  * Shared base for every Zlaark widget: asset dependencies, the animation
- * controls that all widgets expose, and — for the CPT-driven widgets — the
+ * controls that all widgets expose, and - for the CPT-driven widgets - the
  * category/order query controls and the WP_Query builder behind them.
  */
 
@@ -45,7 +45,7 @@ abstract class Zlaark_Widget_Base extends Widget_Base {
 		/*
 		 * Elementor calls _doing_it_wrong() when a control is added while no
 		 * section is open, and that notice is printed into the editor's JSON
-		 * config — which the editor then fails to parse, leaving it stuck on
+		 * config - which the editor then fails to parse, leaving it stuck on
 		 * the loading screen forever. Open a section here if the caller has
 		 * not, so the control always has somewhere legal to live.
 		 */
@@ -354,7 +354,7 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 		/*
 		 * Expired deals drop out on their own. A deals site showing a lapsed
 		 * coupon loses trust instantly, and it is the most common failure in
-		 * this category — so it must not depend on anyone remembering.
+		 * this category - so it must not depend on anyone remembering.
 		 * Deals with no expiry date are evergreen and always included.
 		 */
 		$expiry = Zlaark_Deals_Computed::not_expired_meta_query();
@@ -431,7 +431,7 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 	}
 
 	/**
-	 * The animated rating ring — an SVG circle whose dash offset is driven by
+	 * The animated rating ring - an SVG circle whose dash offset is driven by
 	 * a CSS custom property once the element scrolls into view.
 	 */
 	protected function render_rating_ring( $rating, $size = 62 ) {

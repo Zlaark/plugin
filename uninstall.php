@@ -2,7 +2,7 @@
 /**
  * Uninstall routine.
  *
- * Deals are user-generated content, so by default NOTHING is deleted here — the
+ * Deals are user-generated content, so by default NOTHING is deleted here - the
  * plugin can be removed and re-added without losing the catalogue. Destruction
  * only happens when the site owner has explicitly opted in at
  * Zlaark Deals → Settings → Data → "On uninstall".

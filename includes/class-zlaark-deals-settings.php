@@ -129,11 +129,11 @@ class Zlaark_Deals_Settings {
 									<?php esc_html_e( 'Above the content', 'zlaark-deals-pro' ); ?>
 								</option>
 								<option value="off" <?php selected( $settings['single_panel'], 'off' ); ?>>
-									<?php esc_html_e( 'Off — I will place the widget myself', 'zlaark-deals-pro' ); ?>
+									<?php esc_html_e( 'Off - I will place the widget myself', 'zlaark-deals-pro' ); ?>
 								</option>
 							</select>
 							<p class="description">
-								<?php esc_html_e( 'Adds the offer panel — score, price, savings, coupon, renewal price and verification — to every deal page automatically. Building a single template by hand needs Elementor Pro, so this is on by default. Turn it off if you have Pro and would rather place the Deal Panel widget yourself.', 'zlaark-deals-pro' ); ?>
+								<?php esc_html_e( 'Adds the offer panel - score, price, savings, coupon, renewal price and verification - to every deal page automatically. Building a single template by hand needs Elementor Pro, so this is on by default. Turn it off if you have Pro and would rather place the Deal Panel widget yourself.', 'zlaark-deals-pro' ); ?>
 							</p>
 						</td>
 					</tr>
@@ -198,7 +198,81 @@ class Zlaark_Deals_Settings {
 				</p>
 				<?php submit_button( __( 'Import deals', 'zlaark-deals-pro' ), 'secondary' ); ?>
 			</form>
+
+			<hr>
+
+			<h2 class="title"><?php esc_html_e( 'Widgets', 'zlaark-deals-pro' ); ?></h2>
+			<p class="description" style="max-width:640px">
+				<?php esc_html_e( 'Every widget below should appear in the Elementor panel under the "Zlaark Deals" category. If one is missing there but listed as registered here, the editor is serving a cached widget list - reload the editor with a hard refresh, or run Elementor → Tools → Regenerate Files & Data.', 'zlaark-deals-pro' ); ?>
+			</p>
+			<?php self::render_widget_table(); ?>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Lists what the plugin ships against what Elementor actually holds.
+	 *
+	 * A widget can be absent from the panel for reasons the plugin cannot see
+	 * from here - a cached editor payload, another plugin claiming the same
+	 * widget name, or Elementor's Element Manager hiding it. Printing both
+	 * sides turns "it isn't showing up" into a fact instead of a guess.
+	 */
+	private static function render_widget_table() {
+		if ( ! class_exists( 'Zlaark_Deals_Elementor' ) ) {
+			echo '<p>' . esc_html__( 'Elementor integration not loaded.', 'zlaark-deals-pro' ) . '</p>';
+			return;
+		}
+
+		$failures = get_option( 'zlaark_deals_widget_failures', array() );
+		$live     = array();
+		if ( did_action( 'elementor/loaded' ) && class_exists( '\Elementor\Plugin' ) ) {
+			$manager = \Elementor\Plugin::$instance->widgets_manager;
+			if ( $manager && method_exists( $manager, 'get_widget_types' ) ) {
+				$types = $manager->get_widget_types();
+				if ( is_array( $types ) ) {
+					$live = array_keys( $types );
+				}
+			}
+		}
+		?>
+		<table class="widefat striped" style="max-width:760px">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( 'Widget', 'zlaark-deals-pro' ); ?></th>
+					<th><?php esc_html_e( 'Name', 'zlaark-deals-pro' ); ?></th>
+					<th><?php esc_html_e( 'File', 'zlaark-deals-pro' ); ?></th>
+					<th><?php esc_html_e( 'Registered with Elementor', 'zlaark-deals-pro' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php foreach ( Zlaark_Deals_Elementor::WIDGETS as $slug => $class ) : ?>
+				<?php
+				$file   = ZLAARK_DEALS_PATH . 'widgets/class-zlaark-' . $slug . '-widget.php';
+				$exists = file_exists( $file );
+				$name   = class_exists( $class ) ? ( new $class() )->get_name() : '';
+				$title  = class_exists( $class ) ? ( new $class() )->get_title() : $class;
+				$reg    = ( '' !== $name && in_array( $name, $live, true ) );
+				?>
+				<tr>
+					<td><?php echo esc_html( $title ); ?></td>
+					<td><code><?php echo esc_html( $name ? $name : '-' ); ?></code></td>
+					<td><?php echo $exists ? '&#10003;' : '<strong style="color:#b91c1c">missing</strong>'; ?></td>
+					<td>
+						<?php if ( isset( $failures[ $slug ] ) ) : ?>
+							<strong style="color:#b91c1c"><?php echo esc_html( $failures[ $slug ] ); ?></strong>
+						<?php elseif ( empty( $live ) ) : ?>
+							<em><?php esc_html_e( 'Elementor not loaded on this screen', 'zlaark-deals-pro' ); ?></em>
+						<?php elseif ( $reg ) : ?>
+							&#10003;
+						<?php else : ?>
+							<strong style="color:#b91c1c"><?php esc_html_e( 'registered by the plugin, but Elementor is not holding it. Something removed it after registration - check Elementor > Element Manager, and any optimisation plugin that disables widgets.', 'zlaark-deals-pro' ); ?></strong>
+						<?php endif; ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
 		<?php
 	}
 
@@ -420,7 +494,7 @@ class Zlaark_Deals_Settings {
 				esc_html(
 					sprintf(
 						/* translators: 1: created count, 2: updated count. */
-						__( 'Import finished — %1$d deals created, %2$d updated.', 'zlaark-deals-pro' ),
+						__( 'Import finished. %1$d deals created, %2$d updated.', 'zlaark-deals-pro' ),
 						$created,
 						$updated
 					)

@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Hero — an animated hero section with an aurora background, drifting
+ * Zlaark Hero - an animated hero section with an aurora background, drifting
  * orbs, a rotating conic ring behind the media and a word-by-word title reveal.
  */
 
@@ -129,7 +129,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 				'label'   => __( 'Description', 'zlaark-deals-pro' ),
 				'type'    => Controls_Manager::TEXTAREA,
 				'rows'    => 4,
-				'default' => __( 'Hand-tested discounts on hosting, ecommerce platforms and the tools you already pay for — scored, compared and refreshed every month.', 'zlaark-deals-pro' ),
+				'default' => __( 'Hand-tested discounts on hosting, ecommerce platforms and the tools you already pay for. Scored, compared and refreshed every month.', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -305,15 +305,14 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 				'label'       => __( 'Stats', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $repeater->get_controls(),
-				'title_field' => '{{{ prefix }}}{{{ value }}}{{{ suffix }}} — {{{ label }}}',
+				'title_field' => '{{{ prefix }}}{{{ value }}}{{{ suffix }}} - {{{ label }}}',
 				'default'     => array(
 					array(
-						'value'  => 120,
-						'suffix' => '+',
+						'value'  => 118,
 						'label'  => __( 'Deals tested', 'zlaark-deals-pro' ),
 					),
 					array(
-						'value'  => 40,
+						'value'  => 37,
 						'suffix' => '%',
 						'label'  => __( 'Average saving', 'zlaark-deals-pro' ),
 					),

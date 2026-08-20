@@ -4,7 +4,7 @@
  *
  * Building a single template for the Deal post type needs Pro's Theme Builder.
  * Most sites running this plugin are on free Elementor, so the offer panel is
- * injected into the deal's content directly instead — same markup as the Deal
+ * injected into the deal's content directly instead - same markup as the Deal
  * Panel widget, no Pro required.
  *
  * Sites that DO have Pro can turn this off and place the widget by hand.

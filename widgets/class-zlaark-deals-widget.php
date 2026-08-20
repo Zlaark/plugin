@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Deals Grid — deal cards pulled from the CPT, filtered by category,
+ * Zlaark Deals Grid - deal cards pulled from the CPT, filtered by category,
  * with 3D cursor tilt, a shine sweep, a rotating border glow and optional
  * animated filter tabs.
  */
@@ -172,12 +172,12 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 				'default'   => 'row',
 				'separator' => 'before',
 				'options'   => array(
-					'row'       => __( 'Row — logo beside content', 'zlaark-deals-pro' ),
-					'stack'     => __( 'Stack — logo above content', 'zlaark-deals-pro' ),
-					'panel'     => __( 'Panel — tall card, button at the base', 'zlaark-deals-pro' ),
-					'split'     => __( 'Split — details left, price and CTA right', 'zlaark-deals-pro' ),
-					'compact'   => __( 'Compact — dense single-line rows', 'zlaark-deals-pro' ),
-					'spotlight' => __( 'Spotlight — full-bleed image with overlay text', 'zlaark-deals-pro' ),
+					'row'       => __( 'Row - logo beside content', 'zlaark-deals-pro' ),
+					'stack'     => __( 'Stack - logo above content', 'zlaark-deals-pro' ),
+					'panel'     => __( 'Panel - tall card, button at the base', 'zlaark-deals-pro' ),
+					'split'     => __( 'Split - details left, price and CTA right', 'zlaark-deals-pro' ),
+					'compact'   => __( 'Compact - dense single-line rows', 'zlaark-deals-pro' ),
+					'spotlight' => __( 'Spotlight - full-bleed image with overlay text', 'zlaark-deals-pro' ),
 				),
 				'description' => __( 'Panel and Spotlight suit 3–4 columns; Split and Compact suit 1–2 wide rows.', 'zlaark-deals-pro' ),
 			)

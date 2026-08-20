@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Zlaark Deals
- * Description: Premium animated Elementor widgets — Hero, Deals Grid, Top Picks, Comparison, Stats and Logo Marquee — powered by a Deals manager with categories in the WordPress sidebar.
- * Version:     4.3.0
+ * Description: Premium animated Elementor widgets - Hero, Deals Grid, Top Picks, Comparison, Stats and Logo Marquee - powered by a Deals manager with categories in the WordPress sidebar.
+ * Version:     4.6.0
  * Author:      Zlaark
  * Text Domain: zlaark-deals-pro
  * Requires PHP: 7.4
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZLAARK_DEALS_VERSION', '4.3.0' );
+define( 'ZLAARK_DEALS_VERSION', '4.6.0' );
 define( 'ZLAARK_DEALS_FILE', __FILE__ );
 define( 'ZLAARK_DEALS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZLAARK_DEALS_URL', plugin_dir_url( __FILE__ ) );
@@ -57,7 +57,7 @@ final class Zlaark_Deals {
 	}
 
 	/**
-	 * Registered, not enqueued — every widget declares these through
+	 * Registered, not enqueued - every widget declares these through
 	 * get_style_depends()/get_script_depends(), so pages without a Zlaark
 	 * widget never load them.
 	 */
@@ -65,7 +65,7 @@ final class Zlaark_Deals {
 	 * The Google Fonts URL. Filterable so a site can self-host the three
 	 * families and drop the third-party connection from the critical path.
 	 *
-	 * All three faces are SIL Open Font License — free for commercial use.
+	 * All three faces are SIL Open Font License - free for commercial use.
 	 */
 	public function fonts_url() {
 		$url = 'https://fonts.googleapis.com/css2'

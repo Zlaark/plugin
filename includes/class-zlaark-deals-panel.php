@@ -3,7 +3,7 @@
  * The offer panel markup, in one place.
  *
  * Both the Deal Panel widget and the single-deal page injector render through
- * this, so the two can never drift apart — and the injector works without
+ * this, so the two can never drift apart - and the injector works without
  * Elementor Pro, or without Elementor at all.
  */
 

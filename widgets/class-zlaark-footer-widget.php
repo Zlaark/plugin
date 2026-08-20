@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Footer — the site footer.
+ * Zlaark Footer - the site footer.
  *
  * Built to close the page the way the methodology band opens it: a dark ground,
  * four labelled columns, and the affiliate disclosure as a titled block rather
@@ -161,7 +161,7 @@ class Zlaark_Footer_Widget extends Zlaark_Widget_Base {
 				'label'       => __( 'Figures', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $figs->get_controls(),
-				'title_field' => '{{{ value }}} — {{{ label }}}',
+				'title_field' => '{{{ value }}} - {{{ label }}}',
 				'default'     => array(
 					array( 'value' => '102', 'label' => __( 'deals live', 'zlaark-deals-pro' ) ),
 					array( 'value' => '$8,400', 'label' => __( 'spent testing', 'zlaark-deals-pro' ) ),
@@ -252,7 +252,7 @@ class Zlaark_Footer_Widget extends Zlaark_Widget_Base {
 				'label'     => __( 'Text', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::TEXTAREA,
 				'rows'      => 3,
-				'default'   => __( 'Some links here are affiliate links, and we earn a commission if you buy through them — at no extra cost to you. It never changes a score. We buy every product we test.', 'zlaark-deals-pro' ),
+				'default'   => __( 'Some links here are affiliate links, and we earn a commission if you buy through them, at no extra cost to you. It never changes a score. We buy every product we test.', 'zlaark-deals-pro' ),
 				'condition' => array( 'show_money' => 'yes' ),
 			)
 		);

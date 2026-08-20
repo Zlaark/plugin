@@ -29,6 +29,20 @@ class Zlaark_Deals_Elementor {
 		'panel'        => 'Zlaark_Panel_Widget',
 		'stats'        => 'Zlaark_Stats_Widget',
 		'marquee'      => 'Zlaark_Marquee_Widget',
+
+		/*
+		 * Standalone sections. Each is one panel of the Homepage widget, so a
+		 * page can be built a block at a time. They subclass the Homepage widget
+		 * - it must be required first, which the ordering above guarantees.
+		 */
+		'scorecard'    => 'Zlaark_Scorecard_Widget',
+		'band'         => 'Zlaark_Band_Widget',
+		'categories'   => 'Zlaark_Categories_Widget',
+		'expiring'     => 'Zlaark_Expiring_Widget',
+		'method'       => 'Zlaark_Method_Widget',
+		'aboutus'      => 'Zlaark_About_Us_Widget',
+		'faq'          => 'Zlaark_Faq_Widget',
+		'cta'          => 'Zlaark_Cta_Widget',
 	);
 
 	public static function init() {
@@ -62,11 +76,48 @@ class Zlaark_Deals_Elementor {
 
 	public static function register_widgets( $widgets_manager ) {
 		require_once ZLAARK_DEALS_PATH . 'widgets/class-zlaark-widget-base.php';
+		require_once ZLAARK_DEALS_PATH . 'widgets/class-zlaark-homepage-widget.php';
+		require_once ZLAARK_DEALS_PATH . 'widgets/class-zlaark-section-widget-base.php';
+
+		/*
+		 * A widget that fails to register disappears from the panel silently:
+		 * Elementor keeps going, the editor loads, and the only symptom is a
+		 * gap in the widget list. Record why instead, so Deals > Settings can
+		 * say what happened rather than leaving it to guesswork.
+		 */
+		$failures = array();
 
 		foreach ( self::WIDGETS as $slug => $class ) {
-			require_once ZLAARK_DEALS_PATH . 'widgets/class-zlaark-' . $slug . '-widget.php';
-			$widgets_manager->register( new $class() );
+			$file = ZLAARK_DEALS_PATH . 'widgets/class-zlaark-' . $slug . '-widget.php';
+
+			if ( ! file_exists( $file ) ) {
+				$failures[ $slug ] = 'file missing: ' . basename( $file );
+				continue;
+			}
+
+			require_once $file;
+
+			if ( ! class_exists( $class ) ) {
+				$failures[ $slug ] = 'class ' . $class . ' not defined in ' . basename( $file );
+				continue;
+			}
+
+			try {
+				$widget = new $class();
+				$name   = $widget->get_name();
+
+				if ( $widgets_manager->get_widget_types( $name ) ) {
+					$failures[ $slug ] = 'widget name "' . $name . '" is already taken by another plugin or theme';
+					continue;
+				}
+
+				$widgets_manager->register( $widget );
+			} catch ( \Throwable $e ) {
+				$failures[ $slug ] = get_class( $e ) . ': ' . $e->getMessage();
+			}
 		}
+
+		update_option( 'zlaark_deals_widget_failures', $failures, false );
 	}
 
 	public static function notice_missing_elementor() {

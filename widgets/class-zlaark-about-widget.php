@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark About — a two-column "who we are" section: framed image collage
+ * Zlaark About - a two-column "who we are" section: framed image collage
  * with an overlapping stat card on one side, eyebrow/title/copy, a mission
  * checklist and an inline stat row on the other.
  */
@@ -200,7 +200,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 					array(
 						'icon'  => array( 'value' => 'fas fa-ban', 'library' => 'fa-solid' ),
 						'title' => __( 'No paid placements', 'zlaark-deals-pro' ),
-						'text'  => __( 'Ranking is never for sale — sponsors get labeled, not ranked higher.', 'zlaark-deals-pro' ),
+						'text'  => __( 'Ranking is never for sale. Sponsors get labeled, not ranked higher.', 'zlaark-deals-pro' ),
 					),
 					array(
 						'icon'  => array( 'value' => 'fas fa-rotate', 'library' => 'fa-solid' ),
@@ -264,7 +264,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 				'label'       => __( 'Stats', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $repeater->get_controls(),
-				'title_field' => '{{{ value }}}{{{ suffix }}} — {{{ label }}}',
+				'title_field' => '{{{ value }}}{{{ suffix }}} - {{{ label }}}',
 				'condition'   => array( 'show_stats' => 'yes' ),
 				'default'     => array(
 					array(
@@ -301,11 +301,11 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'collage',
 				'options' => array(
-					'collage' => __( 'Collage — two overlapping images', 'zlaark-deals-pro' ),
+					'collage' => __( 'Collage - two overlapping images', 'zlaark-deals-pro' ),
 					'single'  => __( 'Single framed image', 'zlaark-deals-pro' ),
-					'stacked' => __( 'Stacked — two layered photos', 'zlaark-deals-pro' ),
-					'shape'   => __( 'Shape — single image on a blurred blob with a dashed frame', 'zlaark-deals-pro' ),
-					'grid'    => __( 'Grid — four images in a 2×2 grid', 'zlaark-deals-pro' ),
+					'stacked' => __( 'Stacked - two layered photos', 'zlaark-deals-pro' ),
+					'shape'   => __( 'Shape - single image on a blurred blob with a dashed frame', 'zlaark-deals-pro' ),
+					'grid'    => __( 'Grid, four images in a 2x2 grid', 'zlaark-deals-pro' ),
 				),
 			)
 		);

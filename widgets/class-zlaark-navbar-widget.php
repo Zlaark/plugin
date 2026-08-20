@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Navbar — logo, a centred pill menu with a sliding active indicator,
+ * Zlaark Navbar - logo, a centred pill menu with a sliding active indicator,
  * and a text link plus solid CTA on the right.
  *
  * Menu items come either from a repeater or from any WordPress menu; both
@@ -711,7 +711,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 		?>
 		<?php
 		// The collapse width is a widget setting, so a media query in the
-		// stylesheet can't reach it — the script toggles .zd-nav--collapsed
+		// stylesheet can't reach it - the script toggles .zd-nav--collapsed
 		// against this value instead.
 		?>
 		<nav class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"

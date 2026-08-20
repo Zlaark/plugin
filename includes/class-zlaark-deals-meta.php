@@ -1,6 +1,6 @@
 <?php
 /**
- * The "Deal Details" meta box — image, tagline, pricing, rating, highlights,
+ * The "Deal Details" meta box - image, tagline, pricing, rating, highlights,
  * score breakdown and button. Every Zlaark widget reads from these fields.
  */
 
@@ -55,7 +55,7 @@ class Zlaark_Deals_Meta {
 	/** Offer types. Key => admin label; drives the neutral card chip. */
 	public static function offer_types() {
 		return array(
-			''           => __( '— none —', 'zlaark-deals-pro' ),
+			''           => __( '- none -', 'zlaark-deals-pro' ),
 			'coupon'     => __( 'Coupon', 'zlaark-deals-pro' ),
 			'exclusive'  => __( 'Exclusive', 'zlaark-deals-pro' ),
 			'free_trial' => __( 'Free trial', 'zlaark-deals-pro' ),
@@ -147,7 +147,7 @@ class Zlaark_Deals_Meta {
 					<label for="zlaark_price"><?php esc_html_e( 'Pricing', 'zlaark-deals-pro' ); ?></label>
 					<input type="text" id="zlaark_price" name="zlaark_price"
 						value="<?php echo esc_attr( $v['_zlaark_price'] ); ?>" placeholder="$2.59/mo" />
-					<p class="description"><?php esc_html_e( 'Free text — "$20.00/mo", "From $29.95", "Free Forever".', 'zlaark-deals-pro' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Free text - "$20.00/mo", "From $29.95", "Free Forever".', 'zlaark-deals-pro' ); ?></p>
 				</div>
 
 				<div class="zlaark-field">
@@ -192,7 +192,7 @@ class Zlaark_Deals_Meta {
 					<label for="zlaark_renewal_price"><?php esc_html_e( 'Renewal Price', 'zlaark-deals-pro' ); ?></label>
 					<input type="text" id="zlaark_renewal_price" name="zlaark_renewal_price"
 						value="<?php echo esc_attr( $v['_zlaark_renewal_price'] ); ?>" placeholder="$12.99/mo" />
-					<p class="description"><?php esc_html_e( 'What it costs after the intro term. Every competitor hides this — printing it is the most credible thing on the card.', 'zlaark-deals-pro' ); ?></p>
+					<p class="description"><?php esc_html_e( 'What it costs after the intro term. Every competitor hides this - printing it is the most credible thing on the card.', 'zlaark-deals-pro' ); ?></p>
 				</div>
 
 				<div class="zlaark-field">
@@ -388,7 +388,7 @@ class Zlaark_Deals_Meta {
 				$computed[] = $verified;
 			}
 			if ( Zlaark_Deals_Computed::is_expired( $v['_zlaark_expiry_date'] ) ) {
-				$computed[] = __( 'EXPIRED — hidden from every widget', 'zlaark-deals-pro' );
+				$computed[] = __( 'EXPIRED, hidden from every widget', 'zlaark-deals-pro' );
 			}
 			?>
 			<?php if ( ! empty( $computed ) ) : ?>
@@ -399,7 +399,7 @@ class Zlaark_Deals_Meta {
 			<?php endif; ?>
 
 			<p class="zlaark-hint">
-				<?php esc_html_e( 'Assign this deal to a category in the "Deal Categories" box — every Zlaark Elementor widget filters by that category.', 'zlaark-deals-pro' ); ?>
+				<?php esc_html_e( 'Assign this deal to a category in the "Deal Categories" box - every Zlaark Elementor widget filters by that category.', 'zlaark-deals-pro' ); ?>
 			</p>
 		</div>
 		<?php

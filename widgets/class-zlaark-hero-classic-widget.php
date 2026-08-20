@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Hero Classic — the original text-and-image hero, rebuilt to a
+ * Zlaark Hero Classic - the original text-and-image hero, rebuilt to a
  * premium standard: glass media frame, overlapping stat cards, a feature
  * checklist and a social-proof row, over a soft gradient backdrop.
  */
@@ -133,7 +133,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 				'label'   => __( 'Description', 'zlaark-deals-pro' ),
 				'type'    => Controls_Manager::TEXTAREA,
 				'rows'    => 4,
-				'default' => __( 'Hand-tested discounts on hosting, ecommerce platforms and the software your team runs on — scored, compared and refreshed every month.', 'zlaark-deals-pro' ),
+				'default' => __( 'Hand-tested discounts on hosting, ecommerce platforms and the software your team runs on. Scored, compared and refreshed every month.', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -308,7 +308,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'       => __( 'Proof Text', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::TEXT,
-				'default'     => __( 'Trusted by 2,400+ teams', 'zlaark-deals-pro' ),
+				'default'     => __( 'Read by 18,400 people last month', 'zlaark-deals-pro' ),
 				'label_block' => true,
 				'condition'   => array( 'show_proof' => 'yes' ),
 			)
@@ -339,7 +339,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'plain',
 				'options' => array(
-					'plain'  => __( 'Plain image — no card, no shadow', 'zlaark-deals-pro' ),
+					'plain'  => __( 'Plain image - no card, no shadow', 'zlaark-deals-pro' ),
 					'glass'  => __( 'Glass panel', 'zlaark-deals-pro' ),
 					'window' => __( 'Browser window', 'zlaark-deals-pro' ),
 				),

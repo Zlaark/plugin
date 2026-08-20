@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Homepage — the whole homepage as one widget.
+ * Zlaark Homepage - the whole homepage as one widget.
  *
  * Rather than assembling eight widgets by hand and keeping their settings in
  * sync, this renders the full eight-section architecture from a single drop:
@@ -37,7 +37,22 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	}
 
 	protected function register_controls() {
+		$this->controls_hero();
+		$this->controls_scorecard();
+		$this->controls_band();
+		$this->controls_deals();
+		$this->controls_picks();
+		$this->controls_mq();
+		$this->controls_cats();
+		$this->controls_exp();
+		$this->controls_method();
+		$this->controls_about();
+		$this->controls_faq();
+		$this->controls_cta();
+		$this->controls_shared();
+	}
 
+	protected function controls_hero() {
 		/* ------------------------------------------------------ 01 hero */
 
 		$this->start_controls_section(
@@ -88,7 +103,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 				'label'       => __( 'Sub-line', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 3,
-				'default'     => __( 'Hand-tested discounts on hosting, ecommerce platforms and the software your team runs on — scored out of ten, compared, and re-checked every month.', 'zlaark-deals-pro' ),
+				'default'     => __( 'Hand-tested discounts on hosting, ecommerce platforms and the software your team runs on. Scored out of ten, compared, and re-checked every month.', 'zlaark-deals-pro' ),
 				'condition'   => array( 'show_hero' => 'yes' ),
 			)
 		);
@@ -126,7 +141,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_scorecard() {
 		/* ------------------------------------------------ 02 scorecard */
 
 		$this->start_controls_section(
@@ -163,14 +180,16 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			'score_note',
 			array(
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => __( 'Columns are capped with each deal\'s <strong>Rank Label</strong> — set one per deal ("Best overall", "Best value").', 'zlaark-deals-pro' ),
+				'raw'             => __( 'Columns are capped with each deal\'s <strong>Rank Label</strong> - set one per deal ("Best overall", "Best value").', 'zlaark-deals-pro' ),
 				'content_classes' => 'elementor-descriptor',
 				'condition'       => array( 'show_score' => 'yes' ),
 			)
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_band() {
 		/* ---------------------------------------------- 03 methodology */
 
 		$this->start_controls_section(
@@ -236,7 +255,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 				'label'       => __( 'Receipts', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $stats->get_controls(),
-				'title_field' => '{{{ value }}} — {{{ label }}}',
+				'title_field' => '{{{ value }}} - {{{ label }}}',
 				'condition'   => array( 'show_band' => 'yes' ),
 				'default'     => array(
 					array( 'value' => '102', 'label' => __( 'deals bought and tested', 'zlaark-deals-pro' ) ),
@@ -260,7 +279,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_deals() {
 		/* -------------------------------------------------- 04 deals */
 
 		$this->start_controls_section(
@@ -314,7 +335,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_picks() {
 		/* -------------------------------------------------- 05 picks */
 
 		$this->start_controls_section(
@@ -336,7 +359,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_mq() {
 		/* ------------------------------------------------ 06 marquee */
 
 		$this->start_controls_section(
@@ -347,7 +372,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		$this->add_control( 'show_mq', $this->toggle( true ) );
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_cats() {
 		/* ------------------------------------------- 06b categories */
 
 		$this->start_controls_section(
@@ -369,7 +396,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_exp() {
 		/* -------------------------------------------- 06c expiring */
 
 		$this->start_controls_section(
@@ -404,7 +433,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_method() {
 		/* ------------------------------------------- 06d how we test */
 
 		$this->start_controls_section(
@@ -465,7 +496,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_about() {
 		/* --------------------------------------------- 06f about us */
 
 		$this->start_controls_section(
@@ -526,7 +559,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 				'label'       => __( 'People', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $people->get_controls(),
-				'title_field' => '{{{ name }}} — {{{ role }}}',
+				'title_field' => '{{{ name }}} - {{{ role }}}',
 				'condition'   => array( 'show_about' => 'yes' ),
 				'default'     => array(
 					array(
@@ -563,7 +596,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_faq() {
 		/* ------------------------------------------------- 06e faq */
 
 		$this->start_controls_section(
@@ -632,7 +667,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_cta() {
 		/* ---------------------------------------------------- 07 cta */
 
 		$this->start_controls_section(
@@ -688,7 +725,9 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->end_controls_section();
+	}
 
+	protected function controls_shared() {
 		/* -------------------------------------------------- source */
 
 		$this->query_controls( 12 );
@@ -727,7 +766,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			array(
 				'label'       => __( 'Accent tint', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::COLOR,
-				'description' => __( 'Ground behind savings pills and score badges. Keep it pale — text sits on it.', 'zlaark-deals-pro' ),
+				'description' => __( 'Ground behind savings pills and score badges. Keep it pale - text sits on it.', 'zlaark-deals-pro' ),
 				'selectors'   => array( '{{WRAPPER}} .zd-home' => '--zd-accent-tint: {{VALUE}};' ),
 			)
 		);
@@ -819,7 +858,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		$this->animation_controls( false );
 	}
 
-	private function toggle( $on ) {
+	protected function toggle( $on ) {
 		return array(
 			'label'        => __( 'Show This Section', 'zlaark-deals-pro' ),
 			'type'         => Controls_Manager::SWITCHER,
@@ -829,7 +868,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	}
 
 	/** One query feeds every section, so no two blocks can disagree. */
-	private function fetch( $s ) {
+	protected function fetch( $s ) {
 		$args                   = $this->build_query_args( $s );
 		$args['posts_per_page'] = 60;
 
@@ -871,7 +910,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			return;
 		}
 
-		// Biggest saving first — the ordering the whole page argues from.
+		// Biggest saving first - the ordering the whole page argues from.
 		$by_saving = $deals;
 		usort(
 			$by_saving,
@@ -953,7 +992,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ---------------------------------------------------- 01 hero */
 
-	private function section_hero( $s, $deals ) {
+	protected function section_hero( $s, $deals ) {
 		$url = ! empty( $s['hero_cta_url']['url'] ) ? $s['hero_cta_url']['url'] : '';
 		$top = array_slice(
 			array_values(
@@ -1020,7 +1059,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ----------------------------------------------- 02 scorecard */
 
-	private function section_scorecard( $s, $deals ) {
+	protected function section_scorecard( $s, $deals ) {
 		$picks = array_slice( $deals, 0, max( 2, (int) $s['score_count'] ) );
 		if ( count( $picks ) < 2 ) {
 			return;
@@ -1060,7 +1099,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* --------------------------------------------- 03 methodology */
 
-	private function section_band( $s, $deals ) {
+	protected function section_band( $s, $deals ) {
 		$stats = is_array( $s['band_stats'] ) ? $s['band_stats'] : array();
 
 		// The first figure comes from the live catalogue, so it cannot go stale.
@@ -1095,7 +1134,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* --------------------------------------------------- 04 deals */
 
-	private function section_deals( $s, $deals ) {
+	protected function section_deals( $s, $deals ) {
 		$show = array_slice( $deals, 0, max( 3, (int) $s['deals_count'] ) );
 		$url  = ! empty( $s['deals_more_url']['url'] ) ? $s['deals_more_url']['url'] : '';
 		?>
@@ -1121,7 +1160,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* --------------------------------------------------- 05 picks */
 
-	private function section_picks( $s, $deals ) {
+	protected function section_picks( $s, $deals ) {
 		$picks = array_slice( $deals, 0, 3 );
 		if ( count( $picks ) < 2 ) {
 			return;
@@ -1162,7 +1201,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ------------------------------------------------- 06 marquee */
 
-	private function section_marquee( $deals ) {
+	protected function section_marquee( $deals ) {
 		$logos = array_values(
 			array_filter(
 				$deals,
@@ -1193,7 +1232,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ----------------------------------------------------- 07 cta */
 
-	private function section_cta( $s ) {
+	protected function section_cta( $s ) {
 		?>
 		<section class="zd-home__sec">
 			<div class="zd-home__inner">
@@ -1217,7 +1256,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* -------------------------------------------------- fragments */
 
-	private function section_head( $title, $eyebrow ) {
+	protected function section_head( $title, $eyebrow ) {
 		if ( '' === trim( (string) $title ) ) {
 			return;
 		}
@@ -1238,7 +1277,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	 *
 	 * @return string One of bars|ticks|text|'' so the caller can decide layout.
 	 */
-	private function card_body( $deal, $max_bars = 4 ) {
+	protected function card_body( $deal, $max_bars = 4 ) {
 		$bars = array();
 		if ( ! empty( $deal['scores'] ) ) {
 			foreach ( $deal['scores'] as $row ) {
@@ -1286,7 +1325,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	}
 
 	/** Price, struck original and the savings, kept together on one line. */
-	private function card_price( $deal ) {
+	protected function card_price( $deal ) {
 		if ( '' === $deal['price'] && '' === $deal['offer_headline'] ) {
 			return;
 		}
@@ -1316,7 +1355,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	}
 
 	/** Logo, name, one meta line, and the score anchoring the right edge. */
-	private function card_brand( $deal ) {
+	protected function card_brand( $deal ) {
 		$types = Zlaark_Deals_Meta::offer_types();
 		$type  = ( '' !== $deal['offer_type'] && isset( $types[ $deal['offer_type'] ] ) )
 			? $types[ $deal['offer_type'] ]
@@ -1359,7 +1398,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	}
 
 	/** Renewal, first-term total, refund window and the verification line. */
-	private function card_terms( $deal ) {
+	protected function card_terms( $deal ) {
 		$terms = array();
 
 		if ( '' !== $deal['renewal_price'] ) {
@@ -1397,7 +1436,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ------------------------------------------- 08 browse by category */
 
-	private function section_categories( $s, $deals ) {
+	protected function section_categories( $s, $deals ) {
 		$cats  = array();
 		$total = max( 1, count( $deals ) );
 
@@ -1481,7 +1520,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ------------------------------------------------- 09 ending soon */
 
-	private function section_expiring( $s, $deals ) {
+	protected function section_expiring( $s, $deals ) {
 		$within = max( 1, (int) $s['exp_days'] );
 		$ending = array();
 
@@ -1568,7 +1607,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ------------------------------------------------ 10 how we test */
 
-	private function section_method( $s ) {
+	protected function section_method( $s ) {
 		$steps = is_array( $s['method_steps'] ) ? $s['method_steps'] : array();
 		if ( empty( $steps ) ) {
 			return;
@@ -1597,7 +1636,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* ----------------------------------------------------- 11 about us */
 
-	private function section_about( $s ) {
+	protected function section_about( $s ) {
 		$people = is_array( $s['about_people'] ) ? $s['about_people'] : array();
 		$people = array_values(
 			array_filter(
@@ -1661,7 +1700,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 	/* -------------------------------------------------- 11 questions */
 
-	private function section_faq( $s ) {
+	protected function section_faq( $s ) {
 		$items = is_array( $s['faq_items'] ) ? $s['faq_items'] : array();
 		$items = array_values(
 			array_filter(
@@ -1719,7 +1758,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		}
 	}
 
-	private function mini_card( $deal, $s, $index ) {
+	protected function mini_card( $deal, $s, $index ) {
 		?>
 		<article class="zd-card zd-card--deal zd-reveal" data-zd-reveal="rise" style="--zd-i:<?php echo (int) $index; ?>">
 

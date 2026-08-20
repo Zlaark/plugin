@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Comparison — a scorecard table built from each deal's "Score
+ * Zlaark Comparison - a scorecard table built from each deal's "Score
  * Breakdown" field, with bars that fill on scroll and rows that highlight
  * as the pointer travels down the table.
  */
@@ -329,7 +329,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 
 			<?php
 			/*
-			 * The verdict cap — "Best overall", "Best value" — is the device that
+			 * The verdict cap - "Best overall", "Best value" - is the device that
 			 * makes the reference site's scorecard readable at a glance. It comes
 			 * from the Rank Label field, so it is a stored fact, not a guess.
 			 */
@@ -406,7 +406,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 		<?php
 	}
 
-	/** Compact horizontal row — logo, name, inline bars, CTA. */
+	/** Compact horizontal row - logo, name, inline bars, CTA. */
 	private function render_row( $deal, $s, $index ) {
 		if ( empty( $deal ) ) {
 			return;

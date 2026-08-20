@@ -1,6 +1,6 @@
 <?php
 /**
- * Zlaark Hero Bento — a collage hero: floating cards wired together with
+ * Zlaark Hero Bento - a collage hero: floating cards wired together with
  * elbow connectors on one side, oversized display type on the other.
  *
  * The collage is laid out inside a fixed 540x700 stage. Every card is placed
@@ -205,7 +205,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 
 	/**
 	 * Ambient background layers plus the floating chips that sit around the
-	 * text column — the depth that keeps the composition from feeling flat.
+	 * text column - the depth that keeps the composition from feeling flat.
 	 */
 	private function decor_controls() {
 		$this->start_controls_section(
@@ -333,7 +333,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 						'accent' => '#0b7a4f',
 					),
 					array(
-						'text'   => __( '99.99% Uptime', 'zlaark-deals-pro' ),
+						'text'   => __( 'Prices re-checked monthly', 'zlaark-deals-pro' ),
 						'icon'   => array( 'value' => 'fas fa-bolt', 'library' => 'fa-solid' ),
 						'accent' => '#f59e0b',
 					),
@@ -356,7 +356,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 		$this->add_control(
 			'heading_card1',
 			array(
-				'label' => __( 'Card 1 — Portrait', 'zlaark-deals-pro' ),
+				'label' => __( 'Card 1 - Portrait', 'zlaark-deals-pro' ),
 				'type'  => Controls_Manager::HEADING,
 			)
 		);
@@ -384,7 +384,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 		$this->add_control(
 			'heading_card2',
 			array(
-				'label'     => __( 'Card 2 — Large Panel', 'zlaark-deals-pro' ),
+				'label'     => __( 'Card 2 - Large Panel', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::HEADING,
 				'separator' => 'before',
 			)
@@ -425,7 +425,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 		$this->add_control(
 			'heading_card3',
 			array(
-				'label'     => __( 'Card 3 — Stat Tile', 'zlaark-deals-pro' ),
+				'label'     => __( 'Card 3 - Stat Tile', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::HEADING,
 				'separator' => 'before',
 			)
@@ -474,7 +474,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 		$this->add_control(
 			'heading_card4',
 			array(
-				'label'     => __( 'Card 4 — Wide Tile', 'zlaark-deals-pro' ),
+				'label'     => __( 'Card 4 - Wide Tile', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::HEADING,
 				'separator' => 'before',
 			)
@@ -621,7 +621,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 				'label'       => __( 'Stats', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $repeater->get_controls(),
-				'title_field' => '{{{ value }}}{{{ suffix }}} — {{{ label }}}',
+				'title_field' => '{{{ value }}}{{{ suffix }}} - {{{ label }}}',
 				'default'     => array(
 					array(
 						'value'  => 100,
@@ -1095,7 +1095,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 	 *
 	 * @param array $rect  [ left, top, width, height ] in stage units.
 	 * @param int   $index Animation phase offset.
-	 * @param float $depth Parallax multiplier — bigger moves further.
+	 * @param float $depth Parallax multiplier - bigger moves further.
 	 */
 	private function place( $rect, $index = 0, $depth = 1 ) {
 		return sprintf(
