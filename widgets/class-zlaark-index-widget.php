@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Elementor\Controls_Manager;
 
-class Zlaark_Index_Widget extends Zlaark_Widget_Base {
+class Zlaark_Index_Widget extends Zlaark_Query_Widget_Base {
 
 	public function get_name() {
 		return 'zlaark_index';
