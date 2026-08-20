@@ -1,0 +1,127 @@
+/* Zlaark Deals — admin meta box styles. */
+
+.zlaark-fields {
+	padding: 4px 0 8px;
+}
+
+.zlaark-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+}
+
+.zlaark-row .zlaark-field {
+	flex: 1 1 220px;
+	min-width: 0;
+}
+
+.zlaark-field {
+	margin-bottom: 20px;
+}
+
+.zlaark-field > label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: 600;
+}
+
+.zlaark-field input[type="text"],
+.zlaark-field input[type="url"],
+.zlaark-field input[type="number"],
+.zlaark-field textarea {
+	width: 100%;
+	max-width: 520px;
+}
+
+.zlaark-field textarea {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.zlaark-field .description {
+	margin-top: 4px;
+}
+
+.zlaark-checkbox {
+	font-weight: 400 !important;
+}
+
+.zlaark-image-box {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.zlaark-image-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 92px;
+	height: 92px;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	background: #f6f7f7;
+	overflow: hidden;
+}
+
+.zlaark-image-preview img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+
+.zlaark-image-preview.is-empty span {
+	padding: 6px;
+	color: #8c8f94;
+	font-size: 11px;
+	text-align: center;
+	line-height: 1.3;
+}
+
+.zlaark-image-actions {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+.zlaark-remove-image {
+	color: #b32d2e;
+}
+
+.zlaark-hint {
+	margin: 4px 0 0;
+	padding: 10px 12px;
+	border-left: 4px solid #2271b1;
+	background: #f0f6fc;
+	color: #3c434a;
+}
+
+/* List table columns */
+.column-zlaark_image {
+	width: 64px;
+}
+
+.column-zlaark_price {
+	width: 150px;
+}
+
+.column-zlaark_rating {
+	width: 90px;
+}
+
+.zlaark-col-thumb {
+	display: inline-block;
+	width: 48px;
+	height: 48px;
+	border-radius: 6px;
+	object-fit: contain;
+	background: #f6f7f7;
+}
+
+.zlaark-col-thumb--empty {
+	line-height: 48px;
+	text-align: center;
+	color: #a7aaad;
+}
