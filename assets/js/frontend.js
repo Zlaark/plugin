@@ -1024,6 +1024,7 @@
 			'zlaark_hero',
 			'zlaark_hero_classic',
 			'zlaark_hero_bento',
+			'zlaark_hero_fresh',
 			'zlaark_about',
 			'zlaark_deals',
 			'zlaark_index',
