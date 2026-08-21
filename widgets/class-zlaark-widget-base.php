@@ -452,4 +452,211 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 		</div>
 		<?php
 	}
+
+	/**
+	 * Five-star rating, drawn as one filled row clipped over one empty row so
+	 * any fraction lands exactly - 4.5 shows half a star, not a rounded 5.
+	 *
+	 * Ratings are stored 0-10 (see the Rating field on the deal editor) and the
+	 * star row is a five-point scale, so the value is halved here rather than
+	 * in every caller.
+	 *
+	 * @param float|null $rating     Stored 0-10 value.
+	 * @param bool       $show_value Print the numeric value beside the stars.
+	 */
+	protected function render_stars( $rating, $show_value = false ) {
+		if ( null === $rating ) {
+			return;
+		}
+
+		$out_of_five = max( 0, min( 5, (float) $rating / 2 ) );
+		$pct         = ( $out_of_five / 5 ) * 100;
+		$label       = sprintf(
+			/* translators: %s: rating out of five. */
+			__( '%s out of 5', 'zlaark-deals-pro' ),
+			number_format_i18n( $out_of_five, 1 )
+		);
+		?>
+		<span class="zd-stars" role="img" aria-label="<?php echo esc_attr( $label ); ?>">
+			<span class="zd-stars__row zd-stars__row--empty" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+			<span class="zd-stars__row zd-stars__row--fill" aria-hidden="true"
+				style="--zd-stars-pct:<?php echo esc_attr( round( $pct, 2 ) ); ?>%">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+			<?php if ( $show_value ) : ?>
+				<span class="zd-stars__value"><?php echo esc_html( number_format_i18n( $out_of_five, 1 ) ); ?></span>
+			<?php endif; ?>
+		</span>
+		<?php
+	}
+
+	/**
+	 * "Full review" text link with a sliding arrow. Renders nothing when the
+	 * deal has no review URL, so it never leaves a dead link on the card.
+	 */
+	protected function render_review_link( $deal, $label = '' ) {
+		if ( empty( $deal['review_url'] ) ) {
+			return;
+		}
+		$label = ( '' !== $label ) ? $label : __( 'Full Review', 'zlaark-deals-pro' );
+		?>
+		<a class="zd-reviewlink" href="<?php echo esc_url( $deal['review_url'] ); ?>">
+			<span><?php echo esc_html( $label ); ?></span>
+			<svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+				<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+		</a>
+		<?php
+	}
+
+	/* ---------------------------------------------------- article source */
+
+	/**
+	 * Source controls for an editorial strip - reviews, comparisons, anything
+	 * that is a written post rather than a deal. Prefixed so one widget can
+	 * carry several independent strips.
+	 *
+	 * @param string $prefix    Control name prefix, e.g. "rev".
+	 * @param array  $condition Extra condition applied to every control.
+	 * @param int    $limit     Default number of articles.
+	 */
+	protected function article_source_controls( $prefix, $condition = array(), $limit = 3 ) {
+		$type = $this->article_picker_type( $prefix );
+
+		/*
+		 * The two pickers cost a term query and a post query to populate, and
+		 * nothing on the front end reads them - a saved SELECT2 value comes
+		 * from the settings, not from the options list. So they are only built
+		 * where the panel is actually drawn.
+		 */
+		$panel      = is_admin() || $this->is_editor();
+		$categories = $panel ? Zlaark_Deals_Articles::category_options( $type ) : array();
+		$articles   = $panel ? Zlaark_Deals_Articles::post_options( $type ) : array();
+
+		$this->add_control(
+			$prefix . '_post_type',
+			array(
+				'label'       => __( 'Content Type', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'post',
+				'options'     => Zlaark_Deals_Articles::post_type_options(),
+				'condition'   => $condition,
+				'description' => __( 'Reviews and comparisons are ordinary posts. Point this at a custom post type if you keep them apart.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			$prefix . '_source',
+			array(
+				'label'     => __( 'Pick Articles By', 'zlaark-deals-pro' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'category',
+				'options'   => array(
+					'category' => __( 'Category', 'zlaark-deals-pro' ),
+					'manual'   => __( 'Hand-picked', 'zlaark-deals-pro' ),
+					'latest'   => __( 'Latest published', 'zlaark-deals-pro' ),
+				),
+				'condition' => $condition,
+			)
+		);
+
+		$this->add_control(
+			$prefix . '_categories',
+			array(
+				'label'       => __( 'Categories', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => Zlaark_Deals_Articles::category_options( $type ),
+				'default'     => array(),
+				'description' => __( 'Leave empty to pull from every category. Reload the editor after changing Content Type to refresh this list.', 'zlaark-deals-pro' ),
+				'condition'   => array_merge( $condition, array( $prefix . '_source' => 'category' ) ),
+			)
+		);
+
+		$this->add_control(
+			$prefix . '_ids',
+			array(
+				'label'       => __( 'Articles', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => $articles,
+				'default'     => array(),
+				'description' => __( 'Shown in the order you pick them.', 'zlaark-deals-pro' ),
+				'condition'   => array_merge( $condition, array( $prefix . '_source' => 'manual' ) ),
+			)
+		);
+
+		$this->add_control(
+			$prefix . '_limit',
+			array(
+				'label'     => __( 'How Many', 'zlaark-deals-pro' ),
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 1,
+				'max'       => 24,
+				'default'   => $limit,
+				'condition' => $condition,
+			)
+		);
+
+		$this->add_control(
+			$prefix . '_orderby',
+			array(
+				'label'     => __( 'Order By', 'zlaark-deals-pro' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'date',
+				'options'   => array(
+					'date'       => __( 'Date published', 'zlaark-deals-pro' ),
+					'title'      => __( 'Title', 'zlaark-deals-pro' ),
+					'menu_order' => __( 'Manual order (page attributes)', 'zlaark-deals-pro' ),
+					'rand'       => __( 'Random', 'zlaark-deals-pro' ),
+				),
+				'condition' => array_merge( $condition, array( $prefix . '_source!' => 'manual' ) ),
+			)
+		);
+
+		$this->add_control(
+			$prefix . '_excerpt',
+			array(
+				'label'       => __( 'Excerpt Length', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::NUMBER,
+				'min'         => 6,
+				'max'         => 60,
+				'default'     => 24,
+				'condition'   => $condition,
+				'description' => __( 'Words. Falls back to the post content when no excerpt is set.', 'zlaark-deals-pro' ),
+			)
+		);
+	}
+
+	/**
+	 * The post type the option lists are built from. Elementor builds control
+	 * options once, at registration, so this reads the saved value directly -
+	 * otherwise the category and article pickers would always list posts.
+	 */
+	protected function article_picker_type( $prefix ) {
+		$settings = $this->get_settings();
+		$saved    = isset( $settings[ $prefix . '_post_type' ] ) ? $settings[ $prefix . '_post_type' ] : '';
+
+		return ( '' !== $saved && post_type_exists( $saved ) ) ? $saved : 'post';
+	}
+
+	/** Runs the strip query for one prefixed source block. */
+	protected function fetch_articles( $s, $prefix ) {
+		$get = function ( $key, $fallback ) use ( $s, $prefix ) {
+			return isset( $s[ $prefix . '_' . $key ] ) ? $s[ $prefix . '_' . $key ] : $fallback;
+		};
+
+		return Zlaark_Deals_Articles::fetch(
+			array(
+				'post_type'  => $get( 'post_type', 'post' ),
+				'source'     => $get( 'source', 'category' ),
+				'categories' => (array) $get( 'categories', array() ),
+				'ids'        => (array) $get( 'ids', array() ),
+				'limit'      => (int) $get( 'limit', 3 ),
+				'orderby'    => $get( 'orderby', 'date' ),
+				'excerpt'    => (int) $get( 'excerpt', 24 ),
+			)
+		);
+	}
 }

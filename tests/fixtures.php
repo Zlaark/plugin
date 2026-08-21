@@ -6,6 +6,8 @@ if ( ! class_exists( 'ZD_Fake_Post' ) ) {
 		public $ID = 1;
 		public $post_title = 'A2 Hosting';
 		public $post_name = 'a2-hosting';
+		public $post_type = 'post';
+		public $post_content = 'In this review I will cover everything a store owner needs to know.';
 		public function __construct( $id ) { $this->ID = $id; }
 	}
 }

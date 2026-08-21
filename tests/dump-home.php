@@ -6,6 +6,7 @@ require __DIR__ . '/elementor-stub.php';
 $P = dirname( __DIR__ ) . '/';
 require $P . 'includes/class-zlaark-deals-computed.php';
 require $P . 'includes/class-zlaark-deals-panel.php';
+require $P . 'includes/class-zlaark-deals-articles.php';
 require __DIR__ . '/fixtures.php';
 class Zlaark_Deals_Settings { const SCHEMA = 2; public static function get( $k ) { return 1; } }
 
@@ -41,6 +42,7 @@ class Zlaark_Deals_Meta {
 		$t = new stdClass();
 		$t->term_id = crc32( $cats[ $id ] ) % 1000;
 		$t->name    = $cats[ $id ];
+		$t->slug    = sanitize_title( $cats[ $id ] );
 		$d['terms'] = array( $t );
 
 		// two of them close inside the week

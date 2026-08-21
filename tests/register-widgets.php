@@ -17,6 +17,7 @@ require __DIR__ . '/elementor-stub.php';
 
 $P = dirname( __DIR__ ) . '/';
 require $P . 'includes/class-zlaark-deals-computed.php';
+require $P . 'includes/class-zlaark-deals-articles.php';
 
 // Meta is needed by several widgets; stub the parts that touch the DB.
 class Zlaark_Deals_Meta {

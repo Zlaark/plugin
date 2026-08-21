@@ -56,7 +56,14 @@ function get_bloginfo( $x ) { return 'Test'; }
 function home_url() { return 'https://example.com'; }
 function is_admin() { return true; }
 function wp_count_posts( $t = 'post' ) { $o = new stdClass(); $o->publish = 102; $o->draft = 0; return $o; }
-function get_option( $k, $d = false ) { return 'j F Y'; }
+$GLOBALS['zd_options'] = array();
+function get_option( $k, $d = false ) {
+	if ( array_key_exists( $k, $GLOBALS['zd_options'] ) ) { return $GLOBALS['zd_options'][ $k ]; }
+	// Date-format lookups are the only ones the widgets make; keep the old answer.
+	return ( false === $d ) ? 'j F Y' : $d;
+}
+function update_option( $k, $v, $a = null ) { $GLOBALS['zd_options'][ $k ] = $v; return true; }
+function delete_option( $k ) { unset( $GLOBALS['zd_options'][ $k ] ); return true; }
 function wp_list_pluck( $a, $f ) { return array_map( function ( $x ) use ( $f ) { return is_object( $x ) ? $x->$f : $x[ $f ]; }, $a ); }
 function wp_get_attachment_image( $id, $s = 'full', $i = false, $a = array() ) { return '<img src="x.png" alt="">'; }
 function wp_get_attachment_image_url( $id, $s = 'full' ) { return 'https://example.com/x.png'; }
@@ -73,6 +80,37 @@ function get_queried_object_id() { return 0; }
 function wp_json_encode( $d, $f = 0 ) { return json_encode( $d, $f ); }
 function wp_strip_all_tags( $t ) { return strip_tags( (string) $t ); }
 function mb_substr_safe( $s, $a, $b ) { return substr( $s, $a, $b ); }
+
+/* ---- editorial article source (reviews / comparisons strips) ---- */
+function get_post_types( $args = array(), $output = 'names' ) {
+	$GLOBALS['zd_calls'][] = 'get_post_types';
+	// One public custom type, so the Content Type picker has a real choice.
+	$obj         = new stdClass();
+	$obj->labels = (object) array( 'name' => 'Reviews' );
+	return ( 'objects' === $output ) ? array( 'zd_review' => $obj ) : array( 'zd_review' );
+}
+function post_type_exists( $t ) { return in_array( $t, array( 'post', 'zd_review', ZLAARK_DEALS_CPT ), true ); }
+function get_object_taxonomies( $type, $output = 'names' ) {
+	$tax = (object) array( 'public' => true, 'hierarchical' => true );
+	return ( 'objects' === $output ) ? array( 'category' => $tax ) : array( 'category' );
+}
+function get_terms( $args = array() ) {
+	$GLOBALS['zd_calls'][] = 'get_terms';
+	return array(
+		(object) array( 'term_id' => 4, 'name' => 'Ecommerce', 'slug' => 'ecommerce', 'count' => 6 ),
+		(object) array( 'term_id' => 5, 'name' => 'AI Store Builders', 'slug' => 'ai-store-builders', 'count' => 3 ),
+	);
+}
+function has_excerpt( $p = null ) { return false; }
+function get_the_excerpt( $p = null ) { return 'An excerpt.'; }
+function strip_shortcodes( $c ) { return (string) $c; }
+function wp_trim_words( $text, $n = 55, $more = null ) {
+	$words = preg_split( '/\s+/', trim( (string) $text ) );
+	return ( count( $words ) <= $n )
+		? implode( ' ', $words )
+		: implode( ' ', array_slice( $words, 0, $n ) ) . ( null === $more ? '…' : $more );
+}
+function get_the_date( $format = '', $p = null ) { return '21 August 2026'; }
 
 /** The call the harness is really interested in. */
 function get_posts( $args = array() ) {
@@ -104,7 +142,18 @@ class WP_Query {
 	public function __construct( $args = array() ) {
 		$GLOBALS['zd_calls'][] = 'WP_Query';
 		$n = isset( $GLOBALS['zd_fake_posts'] ) ? $GLOBALS['zd_fake_posts'] : 0;
-		for ( $k = 1; $k <= $n; $k++ ) { $this->posts[] = $k; }
+
+		/*
+		 * Deal widgets walk the loop with the_post() and only ever use the id,
+		 * so they get ints. The editorial strips read $query->posts directly,
+		 * the way WordPress hands back WP_Post objects, so they get objects.
+		 */
+		$type = isset( $args['post_type'] ) ? $args['post_type'] : ZLAARK_DEALS_CPT;
+		$editorial = ( ZLAARK_DEALS_CPT !== $type );
+
+		for ( $k = 1; $k <= $n; $k++ ) {
+			$this->posts[] = $editorial ? new ZD_Fake_Post( $k ) : $k;
+		}
 	}
 	public function have_posts() { return $this->i < count( $this->posts ); }
 	public function the_post() { $GLOBALS['zd_current'] = $this->posts[ $this->i ]; $this->i++; }

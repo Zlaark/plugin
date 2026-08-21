@@ -6870,3 +6870,712 @@
 	opacity: 1;
 	translate: none;
 }
+
+/* =========================================================================
+   Homepage catalogue rows
+   The row itself is `.zd-row`, shared with the deals index so both pages
+   read as one design. This only supplies the stack around it, and a hover
+   that firms the edge rather than lifting the row out of the column.
+   ========================================================================= */
+
+.zd-home__rows {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.zd-home__rows .zd-row {
+	/*
+	 * .zd-row is written for the deals index, whose first column is a compare
+	 * checkbox. There is no checkbox here, so every child shifted one track
+	 * left: the title landed in the 56px logo column and wrapped, while the
+	 * flags column inherited the 1fr and opened a hole down the middle of the
+	 * section. Declare the columns this markup actually has.
+	 */
+	grid-template-columns: 56px minmax(0, 1fr) auto auto;
+	align-items: center;
+	padding: 14px 18px;
+	background: #fff;
+}
+
+.zd-home__rows .zd-row:hover {
+	border-color: var(--zd-accent);
+	transform: none;
+}
+
+.zd-home__rows .zd-row__end {
+	flex-direction: row;
+	align-items: center;
+	gap: 16px;
+}
+
+.zd-home__rows .zd-row__pricing {
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 2px 8px;
+}
+
+.zd-home__rows .zd-row__save {
+	white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+	.zd-home__rows .zd-row__end {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 10px;
+	}
+	.zd-home__rows .zd-row__pricing { justify-content: flex-start; }
+	.zd-home__rows .zd-row .zd-btn { width: 100%; }
+}
+
+/* The meta line is a single row of facts, not a wrapping paragraph. */
+.zd-home__rows .zd-row__meta {
+	flex-wrap: nowrap;
+	white-space: nowrap;
+}
+
+.zd-home__rows .zd-row__title { white-space: nowrap; }
+
+@media (max-width: 860px) {
+	.zd-home__rows .zd-row {
+		grid-template-columns: 48px minmax(0, 1fr);
+		row-gap: 12px;
+		align-items: start;
+	}
+	.zd-home__rows .zd-row__flags,
+	.zd-home__rows .zd-row__end { grid-column: 2 / -1; }
+	.zd-home__rows .zd-row__meta { white-space: normal; flex-wrap: wrap; }
+	.zd-home__rows .zd-row__title { white-space: normal; }
+}
+
+/*
+ * A list only beats a grid if the eye can run straight down the prices. With
+ * an `auto` track each row sized to its own content, so a deal with no struck
+ * price sat 200px further right than the one above it. Reserve the column.
+ */
+.zd-home__rows .zd-row__end {
+	display: grid;
+	grid-template-columns: 300px auto;
+	align-items: center;
+	gap: 18px;
+}
+
+.zd-home__rows .zd-row__pricing {
+	justify-content: flex-start;
+	align-items: baseline;
+}
+
+.zd-home__rows .zd-row .zd-btn { justify-self: end; }
+
+@media (max-width: 1100px) {
+	.zd-home__rows .zd-row__end { grid-template-columns: auto auto; }
+}
+
+/* =========================================================================
+   Category lineup, review & comparison strips
+   Three sections that share one idea: the colour carries meaning by
+   position, never by brand, so re-ranking a deal never repaints the page.
+   ========================================================================= */
+
+.zd-lineup,
+.zd-lineup *,
+.zd-lineup *::before,
+.zd-lineup *::after,
+.zd-strip,
+.zd-strip *,
+.zd-strip *::before,
+.zd-strip *::after {
+	box-sizing: border-box;
+}
+
+.zd-lineup {
+	--zd-cap-1: #f2e73d;
+	--zd-cap-2: #d8e46d;
+	--zd-cap-3: #cbe7f7;
+	--zd-cap-4: #fbdcb6;
+}
+
+/* ------------------------------------------------------------ tab rail */
+
+.zd-tabs--rail {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	margin: 0 auto 30px;
+	padding: 5px;
+	background: transparent;
+}
+
+.zd-tabs--rail .zd-tabs__scroll {
+	position: relative;
+	display: flex;
+	gap: 4px;
+	overflow-x: auto;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+	padding: 5px;
+	border-radius: 999px;
+	background: rgba(10, 19, 16, 0.045);
+	/* The fade tells you there is more to the right without a scrollbar. */
+	-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+	mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+
+.zd-tabs--rail .zd-tabs__scroll::-webkit-scrollbar {
+	display: none;
+}
+
+.zd-tabs--rail.is-at-start .zd-tabs__scroll,
+.zd-tabs--rail.is-at-end .zd-tabs__scroll {
+	-webkit-mask-image: none;
+	mask-image: none;
+}
+
+.zd-tabs--rail .zd-tabs__btn {
+	flex: 0 0 auto;
+	white-space: nowrap;
+}
+
+.zd-tabs--rail .zd-tabs__btn:focus-visible {
+	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline-offset: 2px;
+}
+
+.zd-tabs__arrow {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	padding: 0;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--zd-muted, #5e6c64);
+	cursor: pointer;
+	transition: color 0.25s ease, background-color 0.25s ease, opacity 0.25s ease;
+}
+
+.zd-tabs__arrow:hover {
+	color: var(--zd-ink, #0a1310);
+	background: rgba(10, 19, 16, 0.06);
+}
+
+.zd-tabs__arrow:focus-visible {
+	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline-offset: 2px;
+}
+
+/* Disabled rather than hidden, so the rail never changes width mid-scroll. */
+.zd-tabs__arrow[disabled] {
+	opacity: 0.25;
+	cursor: default;
+	pointer-events: none;
+}
+
+/* ------------------------------------------------------------ the grid */
+
+.zd-lineup__grid {
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	gap: 22px;
+	align-items: stretch;
+}
+
+@media (min-width: 620px) {
+	.zd-lineup__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+	.zd-lineup__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.zd-lcard.is-filtered-out {
+	display: none;
+}
+
+/* --------------------------------------------------------- the card */
+
+.zd-lcard {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	/* Room for the cap, which sits half outside the card. */
+	margin-top: 17px;
+	padding: 34px 22px 22px;
+	border: 1px solid rgba(10, 19, 16, 0.08);
+	border-radius: 20px;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(10, 19, 16, 0.04), 0 14px 34px -22px rgba(10, 19, 16, 0.4);
+	transition: transform 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+		box-shadow 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+		border-color 0.45s ease;
+}
+
+/*
+ * A wash of the cap colour bleeding down from the top edge. It ties the cap
+ * to the card body without tinting the text underneath it.
+ */
+.zd-lcard::before {
+	content: '';
+	position: absolute;
+	inset: 0 0 auto;
+	height: 120px;
+	border-radius: 20px 20px 0 0;
+	background: linear-gradient(180deg, var(--zd-cap, #f2e73d) 0%, transparent 100%);
+	opacity: 0.16;
+	pointer-events: none;
+	transition: opacity 0.45s ease;
+}
+
+.zd-lcard:hover {
+	transform: translateY(-6px);
+	border-color: rgba(10, 19, 16, 0.14);
+	box-shadow: 0 2px 4px rgba(10, 19, 16, 0.05), 0 26px 50px -26px rgba(10, 19, 16, 0.5);
+}
+
+.zd-lcard:hover::before {
+	opacity: 0.3;
+}
+
+.zd-lcard__cap {
+	position: absolute;
+	top: -17px;
+	left: 50%;
+	transform: translateX(-50%);
+	max-width: calc(100% - 32px);
+	padding: 8px 20px;
+	border-radius: 999px;
+	background: var(--zd-cap, #f2e73d);
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+	color: #0a1310;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	box-shadow: 0 6px 16px -10px rgba(10, 19, 16, 0.7);
+}
+
+.zd-lcard__head {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+	min-width: 0;
+}
+
+.zd-lcard__logo {
+	flex: 0 0 auto;
+	display: grid;
+	place-items: center;
+	width: 62px;
+	height: 62px;
+	border-radius: 16px;
+	/* Falls back to a neutral tile where color-mix is unsupported. */
+	background: #f3f5f4;
+	background: color-mix(in srgb, var(--zd-cap, #f2e73d) 38%, #fff);
+	overflow: hidden;
+}
+
+.zd-lcard__logo img {
+	width: 78%;
+	height: 78%;
+	object-fit: contain;
+	display: block;
+}
+
+.zd-lcard__logo i {
+	font-style: normal;
+	font-size: 20px;
+	font-weight: 800;
+	color: #0a1310;
+	text-transform: uppercase;
+}
+
+.zd-lcard__id {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	min-width: 0;
+}
+
+.zd-lcard__name {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 800;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	color: var(--zd-ink, #0a1310);
+	overflow-wrap: anywhere;
+}
+
+.zd-lcard__blurb {
+	margin: 0;
+	font-size: 15px;
+	line-height: 1.55;
+	color: var(--zd-muted, #4a5a52);
+	/* Keeps four cards on one baseline when the blurbs differ in length. */
+	flex: 1 1 auto;
+}
+
+.zd-lcard__foot {
+	margin-top: auto;
+}
+
+/* --------------------------------------------------------- star row */
+
+.zd-stars {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 17px;
+	line-height: 1;
+	letter-spacing: 2px;
+}
+
+.zd-stars__row {
+	display: block;
+	white-space: nowrap;
+}
+
+.zd-stars__row--empty {
+	color: rgba(10, 19, 16, 0.18);
+}
+
+/*
+ * The filled row is clipped to the exact percentage over the empty row, so
+ * 4.5 out of 5 renders as a true half star rather than a rounded one.
+ */
+.zd-stars__row--fill {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: var(--zd-stars-pct, 0%);
+	overflow: hidden;
+	color: #f5a524;
+	pointer-events: none;
+}
+
+.zd-stars__value {
+	margin-left: calc(2px + 0.35em);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0;
+	color: var(--zd-muted, #5e6c64);
+}
+
+/* ---------------------------------------------------- full review link */
+
+.zd-reviewlink {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.2;
+	color: var(--zd-accent, #0b7a4f);
+	text-decoration: none;
+	transition: gap 0.3s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.25s ease;
+}
+
+.zd-reviewlink svg {
+	transition: transform 0.3s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.zd-reviewlink:hover {
+	gap: 10px;
+}
+
+.zd-reviewlink:hover svg {
+	transform: translateX(2px);
+}
+
+.zd-reviewlink:focus-visible {
+	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
+/* =========================================================================
+   Editorial strips - reviews and comparisons
+   ========================================================================= */
+
+.zd-strip__title {
+	margin: 0 0 30px;
+	font-size: clamp(28px, 4vw, 42px);
+	font-weight: 800;
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+	text-align: center;
+	color: var(--zd-ink, #0a1310);
+}
+
+.zd-strip__title .zd-home__hl {
+	font-style: normal;
+	color: var(--zd-accent, #0b7a4f);
+}
+
+.zd-rail {
+	position: relative;
+}
+
+.zd-rail__track {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: minmax(260px, 1fr);
+	gap: 24px;
+	overflow-x: auto;
+	scroll-behavior: smooth;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	/* Breathing room so hover lift and focus rings are not clipped. */
+	padding: 6px 4px 18px;
+	margin: -6px -4px 0;
+}
+
+.zd-rail__track::-webkit-scrollbar {
+	display: none;
+}
+
+@media (min-width: 900px) {
+	.zd-rail__track {
+		grid-auto-columns: minmax(0, calc((100% - 48px) / 3));
+	}
+}
+
+.zd-rail__nav {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.zd-rail__btn {
+	display: grid;
+	place-items: center;
+	width: 42px;
+	height: 42px;
+	padding: 0;
+	border: 1px solid rgba(10, 19, 16, 0.12);
+	border-radius: 999px;
+	background: #fff;
+	color: var(--zd-ink, #0a1310);
+	cursor: pointer;
+	transition: transform 0.3s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+		border-color 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.zd-rail__btn:hover {
+	transform: translateY(-2px);
+	border-color: var(--zd-accent, #0b7a4f);
+	color: var(--zd-accent, #0b7a4f);
+}
+
+.zd-rail__btn:focus-visible {
+	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline-offset: 2px;
+}
+
+.zd-rail__btn[disabled] {
+	opacity: 0.3;
+	cursor: default;
+	pointer-events: none;
+}
+
+/* ------------------------------------------------------ article card */
+
+.zd-acard {
+	scroll-snap-align: start;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid rgba(10, 19, 16, 0.08);
+	border-radius: 22px;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(10, 19, 16, 0.04), 0 14px 34px -22px rgba(10, 19, 16, 0.4);
+	overflow: hidden;
+	transition: transform 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+		box-shadow 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+		border-color 0.45s ease;
+}
+
+.zd-acard:hover {
+	transform: translateY(-6px);
+	border-color: rgba(10, 19, 16, 0.14);
+	box-shadow: 0 2px 4px rgba(10, 19, 16, 0.05), 0 26px 50px -26px rgba(10, 19, 16, 0.5);
+}
+
+.zd-acard__cover {
+	position: relative;
+	display: grid;
+	place-items: center;
+	aspect-ratio: 16 / 10;
+	margin: 14px 14px 0;
+	border-radius: 16px;
+	background:
+		radial-gradient(120% 120% at 15% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 55%),
+		linear-gradient(140deg, var(--zd-accent, #0b7a4f) 0%, var(--zd-accent-2, #22d3ee) 130%);
+	overflow: hidden;
+	text-decoration: none;
+	isolation: isolate;
+}
+
+/* The diagonal sheen the reference paints into every cover, done in CSS so
+   no editor has to produce artwork for it. */
+.zd-acard__cover::after {
+	content: '';
+	position: absolute;
+	top: -20%;
+	right: -30%;
+	width: 65%;
+	height: 150%;
+	transform: skewX(-12deg);
+	background: rgba(255, 255, 255, 0.08);
+	pointer-events: none;
+}
+
+.zd-acard__shot {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	opacity: 0.32;
+	transition: transform 0.6s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.zd-acard:hover .zd-acard__shot {
+	transform: scale(1.05);
+}
+
+.zd-acard__plate {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 18px;
+	text-align: center;
+}
+
+.zd-acard__side {
+	font-size: clamp(17px, 2.4vw, 21px);
+	font-weight: 800;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	color: #fff;
+	text-shadow: 0 1px 12px rgba(10, 19, 16, 0.28);
+	overflow-wrap: anywhere;
+}
+
+.zd-acard__vs {
+	padding: 3px 10px;
+	border-radius: 6px;
+	background: #4ade9b;
+	font-size: 12px;
+	font-weight: 800;
+	line-height: 1.4;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #06281b;
+}
+
+.zd-acard__tag {
+	padding: 4px 12px;
+	border-radius: 8px;
+	background: #f2e73d;
+	font-size: 12px;
+	font-weight: 800;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #0a1310;
+}
+
+.zd-acard__body {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 20px 22px 0;
+	flex: 1 1 auto;
+}
+
+.zd-acard__title {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 800;
+	line-height: 1.2;
+	letter-spacing: -0.02em;
+}
+
+.zd-acard__title a {
+	color: var(--zd-ink, #0a1310);
+	text-decoration: none;
+	background-image: linear-gradient(var(--zd-accent, #0b7a4f), var(--zd-accent, #0b7a4f));
+	background-repeat: no-repeat;
+	background-position: 0 100%;
+	background-size: 0 2px;
+	transition: background-size 0.4s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)), color 0.3s ease;
+}
+
+.zd-acard:hover .zd-acard__title a,
+.zd-acard__title a:focus-visible {
+	background-size: 100% 2px;
+	color: var(--zd-accent, #0b7a4f);
+}
+
+.zd-acard__excerpt {
+	margin: 0;
+	font-size: 15px;
+	line-height: 1.6;
+	color: var(--zd-muted, #4a5a52);
+}
+
+.zd-acard__foot {
+	display: flex;
+	justify-content: flex-end;
+	padding: 18px 22px 22px;
+	margin-top: auto;
+}
+
+.zd-acard__read {
+	min-width: 118px;
+	justify-content: center;
+}
+
+/* ------------------------------------------------------------- motion */
+
+@media (prefers-reduced-motion: reduce) {
+	.zd-lcard,
+	.zd-lcard::before,
+	.zd-acard,
+	.zd-acard__shot,
+	.zd-acard__title a,
+	.zd-rail__btn,
+	.zd-reviewlink,
+	.zd-reviewlink svg {
+		transition: none;
+	}
+
+	.zd-lcard:hover,
+	.zd-acard:hover,
+	.zd-rail__btn:hover {
+		transform: none;
+	}
+
+	.zd-rail__track,
+	.zd-tabs--rail .zd-tabs__scroll {
+		scroll-behavior: auto;
+	}
+}
+
+.zd-rail.is-static .zd-rail__nav {
+	display: none;
+}

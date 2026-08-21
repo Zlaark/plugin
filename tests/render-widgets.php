@@ -26,6 +26,7 @@ require __DIR__ . '/elementor-stub.php';
 $P = dirname( __DIR__ ) . '/';
 require $P . 'includes/class-zlaark-deals-computed.php';
 require $P . 'includes/class-zlaark-deals-panel.php';
+require $P . 'includes/class-zlaark-deals-articles.php';
 
 class Zlaark_Deals_Settings { const SCHEMA = 2; public static function get( $k ) { return 1; } }
 

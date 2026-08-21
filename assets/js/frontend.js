@@ -602,29 +602,90 @@
 		indicator.style.transform = 'translateX(' + btn.offsetLeft + 'px)';
 	}
 
+	/**
+	 * Which element the tabs filter. `data-zd-tabs-target` names a selector
+	 * looked up inside the widget root; without it we fall back to the deals
+	 * grid, which is what the original filter tabs shipped against.
+	 */
+	function tabsTarget( tabs ) {
+		var selector = tabs.getAttribute( 'data-zd-tabs-target' );
+
+		if ( selector ) {
+			var root = tabs.closest( '.zd-home' ) || tabs.parentNode;
+			return root ? root.querySelector( selector ) : null;
+		}
+
+		var deals = tabs.closest( '.zd-deals' );
+		return deals ? deals.querySelector( '.zd-grid' ) : null;
+	}
+
+	/** Greys out an arrow once the rail cannot travel any further that way. */
+	function syncArrows( tabs, scroll ) {
+		var prev = tabs.querySelector( '.zd-tabs__arrow--prev' );
+		var next = tabs.querySelector( '.zd-tabs__arrow--next' );
+
+		if ( ! prev && ! next ) {
+			return;
+		}
+
+		var max = scroll.scrollWidth - scroll.clientWidth;
+		var at = scroll.scrollLeft;
+
+		// Sub-pixel layout means the ends rarely land on an exact integer.
+		var atStart = at <= 1;
+		var atEnd = at >= max - 1;
+
+		if ( prev ) {
+			prev.disabled = atStart;
+		}
+		if ( next ) {
+			next.disabled = atEnd;
+		}
+
+		tabs.classList.toggle( 'is-at-start', atStart );
+		tabs.classList.toggle( 'is-at-end', atEnd );
+	}
+
 	function initTabs( scope ) {
 		each( scope, '.zd-tabs', function ( tabs ) {
 			if ( ! once( tabs ) ) {
 				return;
 			}
 
-			var deals = tabs.closest( '.zd-deals' );
-			var grid = deals ? deals.querySelector( '.zd-grid' ) : null;
+			var scroll = tabs.querySelector( '.zd-tabs__scroll' ) || tabs;
+			var grid = tabsTarget( tabs );
 			var buttons = tabs.querySelectorAll( '.zd-tabs__btn' );
+			var cardSelector = grid && grid.classList.contains( 'zd-lineup__grid' ) ? '.zd-lcard' : '.zd-card';
 
 			var active = tabs.querySelector( '.zd-tabs__btn.is-active' ) || buttons[ 0 ];
 			if ( active ) {
 				// Fonts can still be loading, which would size the pill wrong.
 				requestAnimationFrame( function () {
-					moveIndicator( tabs, active );
+					moveIndicator( scroll, active );
+					syncArrows( tabs, scroll );
 				} );
 			}
 
 			window.addEventListener( 'resize', function () {
 				var current = tabs.querySelector( '.zd-tabs__btn.is-active' );
 				if ( current ) {
-					moveIndicator( tabs, current );
+					moveIndicator( scroll, current );
 				}
+				syncArrows( tabs, scroll );
+			} );
+
+			if ( scroll !== tabs ) {
+				scroll.addEventListener( 'scroll', function () {
+					syncArrows( tabs, scroll );
+				} );
+			}
+
+			each( tabs, '.zd-tabs__arrow', function ( arrow ) {
+				arrow.addEventListener( 'click', function () {
+					var back = arrow.classList.contains( 'zd-tabs__arrow--prev' );
+					var step = Math.max( 120, Math.round( scroll.clientWidth * 0.7 ) );
+					scroll.scrollLeft += back ? -step : step;
+				} );
 			} );
 
 			Array.prototype.forEach.call( buttons, function ( btn ) {
@@ -635,20 +696,82 @@
 					} );
 					btn.classList.add( 'is-active' );
 					btn.setAttribute( 'aria-selected', 'true' );
-					moveIndicator( tabs, btn );
+					moveIndicator( scroll, btn );
+
+					// A tab reached with the keyboard can sit outside the rail.
+					if ( scroll !== tabs && btn.scrollIntoView ) {
+						btn.scrollIntoView( { block: 'nearest', inline: 'nearest' } );
+					}
 
 					if ( ! grid ) {
 						return;
 					}
 
 					var filter = btn.getAttribute( 'data-zd-filter' );
-					each( grid, '.zd-card', function ( card ) {
+					each( grid, cardSelector, function ( card ) {
 						var terms = ( card.getAttribute( 'data-zd-terms' ) || '' ).split( /\s+/ );
 						var show = filter === 'all' || terms.indexOf( filter ) !== -1;
 						card.classList.toggle( 'is-filtered-out', ! show );
 					} );
+
+					grid.setAttribute( 'data-zd-active', filter );
 				} );
 			} );
+		} );
+	}
+
+	/* ------------------------------------------------------ editorial rails */
+
+	function initRails( scope ) {
+		each( scope, '.zd-rail', function ( rail ) {
+			if ( ! once( rail ) ) {
+				return;
+			}
+
+			var track = rail.querySelector( '.zd-rail__track' );
+			var prev = rail.querySelector( '.zd-rail__btn--prev' );
+			var next = rail.querySelector( '.zd-rail__btn--next' );
+
+			if ( ! track ) {
+				return;
+			}
+
+			function sync() {
+				var max = track.scrollWidth - track.clientWidth;
+
+				// Nothing to scroll: hide the controls rather than show two
+				// permanently dead buttons.
+				var scrollable = max > 1;
+				rail.classList.toggle( 'is-static', ! scrollable );
+
+				if ( prev ) {
+					prev.disabled = ! scrollable || track.scrollLeft <= 1;
+				}
+				if ( next ) {
+					next.disabled = ! scrollable || track.scrollLeft >= max - 1;
+				}
+			}
+
+			function step( back ) {
+				var card = track.querySelector( '.zd-acard' );
+				var width = card ? card.offsetWidth + 24 : Math.round( track.clientWidth * 0.8 );
+				track.scrollLeft += back ? -width : width;
+			}
+
+			if ( prev ) {
+				prev.addEventListener( 'click', function () {
+					step( true );
+				} );
+			}
+			if ( next ) {
+				next.addEventListener( 'click', function () {
+					step( false );
+				} );
+			}
+
+			track.addEventListener( 'scroll', sync );
+			window.addEventListener( 'resize', sync );
+			requestAnimationFrame( sync );
 		} );
 	}
 
@@ -998,6 +1121,7 @@
 		initMarquee( scope );
 		initNavbar( scope );
 		initTabs( scope );
+		initRails( scope );
 		initCoupons( scope );
 		initIndex( scope );
 		syncScrollbarWidth();

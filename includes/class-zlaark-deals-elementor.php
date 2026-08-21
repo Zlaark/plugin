@@ -106,8 +106,22 @@ class Zlaark_Deals_Elementor {
 				$widget = new $class();
 				$name   = $widget->get_name();
 
-				if ( $widgets_manager->get_widget_types( $name ) ) {
-					$failures[ $slug ] = 'widget name "' . $name . '" is already taken by another plugin or theme';
+				/*
+				 * Report a name clash, but only a real one. This action can
+				 * fire more than once per request, and on the second pass our
+				 * own widgets are already in the manager - treating that as a
+				 * collision would skip re-registration and fill the diagnostic
+				 * with false alarms. A different class holding the name is the
+				 * only thing worth flagging.
+				 */
+				$held = $widgets_manager->get_widget_types( $name );
+
+				if ( $held && ! ( $held instanceof $class ) ) {
+					$failures[ $slug ] = sprintf(
+						'name "%s" is already held by %s',
+						$name,
+						get_class( $held )
+					);
 					continue;
 				}
 
@@ -117,7 +131,10 @@ class Zlaark_Deals_Elementor {
 			}
 		}
 
-		update_option( 'zlaark_deals_widget_failures', $failures, false );
+		// Only touch the DB when the picture actually changed.
+		if ( get_option( 'zlaark_deals_widget_failures' ) !== $failures ) {
+			update_option( 'zlaark_deals_widget_failures', $failures, false );
+		}
 	}
 
 	public static function notice_missing_elementor() {

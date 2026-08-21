@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zlaark Deals
  * Description: Premium animated Elementor widgets - Hero, Deals Grid, Top Picks, Comparison, Stats and Logo Marquee - powered by a Deals manager with categories in the WordPress sidebar.
- * Version:     4.6.0
+ * Version:     4.7.0
  * Author:      Zlaark
  * Text Domain: zlaark-deals-pro
  * Requires PHP: 7.4
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZLAARK_DEALS_VERSION', '4.6.0' );
+define( 'ZLAARK_DEALS_VERSION', '4.7.0' );
 define( 'ZLAARK_DEALS_FILE', __FILE__ );
 define( 'ZLAARK_DEALS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZLAARK_DEALS_URL', plugin_dir_url( __FILE__ ) );
@@ -25,6 +25,7 @@ require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-settings.php';
 require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-post-type.php';
 require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-computed.php';
 require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-meta.php';
+require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-articles.php';
 require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-panel.php';
 require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-single.php';
 require_once ZLAARK_DEALS_PATH . 'includes/class-zlaark-deals-schema.php';
