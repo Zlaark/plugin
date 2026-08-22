@@ -980,7 +980,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 			<?php foreach ( $s['stats'] as $i => $stat ) : ?>
 				<div class="zd-about__stat" style="--zd-i:<?php echo (int) $i; ?>">
 					<p class="zd-about__stat-value">
-						<span data-zd-count="<?php echo esc_attr( $stat['value'] ); ?>">0</span><?php echo esc_html( $stat['suffix'] ); ?>
+						<span data-zd-count="<?php echo esc_attr( $stat['value'] ); ?>"><?php echo esc_html( $stat['value'] ); ?></span><?php echo esc_html( $stat['suffix'] ); ?>
 					</p>
 					<p class="zd-about__stat-label"><?php echo esc_html( $stat['label'] ); ?></p>
 				</div>
@@ -1057,7 +1057,7 @@ class Zlaark_About_Widget extends Zlaark_Widget_Base {
 					<?php endif; ?>
 					<span class="zd-about__statcard-body">
 						<span class="zd-about__statcard-value">
-							<span data-zd-count="<?php echo esc_attr( $s['stat_value'] ); ?>">0</span><?php echo esc_html( $s['stat_suffix'] ); ?>
+							<span data-zd-count="<?php echo esc_attr( $s['stat_value'] ); ?>"><?php echo esc_html( $s['stat_value'] ); ?></span><?php echo esc_html( $s['stat_suffix'] ); ?>
 						</span>
 						<span class="zd-about__statcard-label"><?php echo esc_html( $s['stat_label'] ); ?></span>
 					</span>

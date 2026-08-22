@@ -95,7 +95,15 @@
 .zd-index,
 .zd-panel,
 .zd-home,
-.zd-footer {
+.zd-footer,
+/*
+ * Widgets that render their own root rather than sitting inside .zd-home.
+ * Anything missing from this list gets no tokens at all, which does not fail
+ * loudly - it renders unstyled text where a button should be.
+ */
+.zd-byline,
+.zd-verdict,
+.zd-obar {
 	/* Type - all three faces are SIL Open Font License (free, self-hostable). */
 	--zd-font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	--zd-font-display: 'Bricolage Grotesque', 'Instrument Sans', -apple-system, 'Segoe UI', sans-serif;
@@ -447,7 +455,13 @@
 .zd-score__bar {
 	position: absolute;
 	inset: 0 auto 0 0;
-	width: 0;
+	/*
+	 * The measured width is the default, so a document with no scripting shows
+	 * the score instead of an empty track. When scripting is alive the runtime
+	 * collapses this to 0 inline at init and animates back up, which beats this
+	 * rule on specificity without needing !important.
+	 */
+	width: var(--zd-bar, 0);
 	border-radius: 999px;
 	background: linear-gradient(90deg, var(--zd-accent), var(--zd-accent-2));
 	transition: width 1.2s var(--zd-ease);
@@ -5322,7 +5336,13 @@
 .zd-panel__barfill {
 	display: block;
 	height: 100%;
-	width: 0;
+	/*
+	 * The measured width is the default, so a document with no scripting shows
+	 * the score instead of an empty track. When scripting is alive the runtime
+	 * collapses this to 0 inline at init and animates back up, which beats this
+	 * rule on specificity without needing !important.
+	 */
+	width: var(--zd-bar, 0);
 	border-radius: 3px;
 	background: var(--zd-accent);
 	transition: width 0.9s var(--zd-ease);
@@ -5479,12 +5499,13 @@
 
 .zd-home__head h2 {
 	font-family: var(--zd-font-display);
-	font-size: clamp(1.45rem, 2.4vw, 1.8rem);
-	font-weight: 700;
-	line-height: 1.15;
-	letter-spacing: -0.02em;
+	font-size: clamp(1.75rem, 3.2vw, 2.6rem);
+	font-weight: 800;
+	line-height: 1.08;
+	letter-spacing: -0.03em;
 	color: var(--zd-heading);
 	margin: 0;
+	text-wrap: balance;
 }
 
 .zd-home__block { width: 100%; }
@@ -6167,6 +6188,15 @@
 	font-size: 0.84rem;
 }
 
+/*
+ * The badge owns the corner. When a deal carries both a badge and an urgency
+ * flag they were laid on top of each other, clipping whichever lost - so the
+ * flag steps below the badge only when there is a badge to step below.
+ */
+.zd-card__badge ~ .zd-card__flag {
+	top: 42px;
+}
+
 .zd-card__flag {
 	position: absolute;
 	top: 16px;
@@ -6340,7 +6370,13 @@
 .zd-cbar__fill {
 	display: block;
 	height: 100%;
-	width: 0;
+	/*
+	 * The measured width is the default, so a document with no scripting shows
+	 * the score instead of an empty track. When scripting is alive the runtime
+	 * collapses this to 0 inline at init and animates back up, which beats this
+	 * rule on specificity without needing !important.
+	 */
+	width: var(--zd-bar, 0);
 	border-radius: 3px;
 	background: var(--zd-accent);
 	transition: width 0.9s var(--zd-ease);
@@ -6998,13 +7034,19 @@
 
 /* ------------------------------------------------------------ tab rail */
 
+/*
+ * The pill hugs its tabs and the whole rail centres under the heading. Letting
+ * the track stretch to the container put three tabs at the left end of a
+ * 1240px grey bar, which read as a broken element rather than a control.
+ */
 .zd-tabs--rail {
 	display: grid;
-	grid-template-columns: auto minmax(0, 1fr) auto;
+	grid-template-columns: auto minmax(0, max-content) auto;
+	justify-content: center;
 	align-items: center;
 	gap: 6px;
-	width: 100%;
-	margin: 0 auto 30px;
+	max-width: 100%;
+	margin: 0 auto 34px;
 	padding: 5px;
 	background: transparent;
 }
@@ -7040,7 +7082,7 @@
 }
 
 .zd-tabs--rail .zd-tabs__btn:focus-visible {
-	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline: 2px solid var(--zd-accent);
 	outline-offset: 2px;
 }
 
@@ -7051,20 +7093,20 @@
 	height: 38px;
 	padding: 0;
 	border: 0;
-	border-radius: 999px;
+	border-radius: 50%;
 	background: transparent;
-	color: var(--zd-muted, #5e6c64);
+	color: var(--zd-muted);
 	cursor: pointer;
 	transition: color 0.25s ease, background-color 0.25s ease, opacity 0.25s ease;
 }
 
 .zd-tabs__arrow:hover {
-	color: var(--zd-ink, #0a1310);
+	color: var(--zd-ink);
 	background: rgba(10, 19, 16, 0.06);
 }
 
 .zd-tabs__arrow:focus-visible {
-	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline: 2px solid var(--zd-accent);
 	outline-offset: 2px;
 }
 
@@ -7077,19 +7119,30 @@
 
 /* ------------------------------------------------------------ the grid */
 
+/*
+ * The track count follows how many cards the active tab actually has. A
+ * category with one deal used to sit in the far-left quarter of a four-column
+ * grid with three empty columns beside it, which reads as a broken layout
+ * rather than a short list.
+ */
 .zd-lineup__grid {
 	display: grid;
 	grid-template-columns: repeat(1, minmax(0, 1fr));
+	justify-content: center;
 	gap: 22px;
 	align-items: stretch;
 }
 
 @media (min-width: 620px) {
-	.zd-lineup__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.zd-lineup__grid {
+		grid-template-columns: repeat(min(2, var(--zd-cols, 4)), minmax(0, 1fr));
+	}
 }
 
 @media (min-width: 1024px) {
-	.zd-lineup__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.zd-lineup__grid {
+		grid-template-columns: repeat(var(--zd-cols, 4), minmax(0, 1fr));
+	}
 }
 
 .zd-lcard.is-filtered-out {
@@ -7098,6 +7151,13 @@
 
 /* --------------------------------------------------------- the card */
 
+/*
+ * Two card treatments on this page, deliberately unequal. The lineup card is
+ * flat and bordered - its rank colour is the elevation, so a drop shadow would
+ * only be saying the same thing twice. The article card below keeps real
+ * elevation. Giving both the same shadow is what made them read as one
+ * repeated component.
+ */
 .zd-lcard {
 	position: relative;
 	display: flex;
@@ -7105,40 +7165,61 @@
 	gap: 16px;
 	/* Room for the cap, which sits half outside the card. */
 	margin-top: 17px;
-	padding: 34px 22px 22px;
-	border: 1px solid rgba(10, 19, 16, 0.08);
-	border-radius: 20px;
+	padding: 38px 24px 24px;
+	/* Caps a lone card at roughly the width it would have had in a full row,
+	   so a category with one deal centres instead of stretching. */
+	width: 100%;
+	max-width: 340px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-md);
 	background: #fff;
-	box-shadow: 0 1px 2px rgba(10, 19, 16, 0.04), 0 14px 34px -22px rgba(10, 19, 16, 0.4);
-	transition: transform 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-		box-shadow 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-		border-color 0.45s ease;
+	/* No overflow clip here - the cap deliberately sits outside the top edge.
+	   The wash below carries its own radius instead. */
+	transition: border-color 0.45s ease;
 }
 
 /*
- * A wash of the cap colour bleeding down from the top edge. It ties the cap
- * to the card body without tinting the text underneath it.
+ * A wash of the cap colour bleeding down from the top edge. On hover it rises
+ * to fill the card: the pick colouring itself in, rather than the card lifting
+ * off the page like every other card on the internet.
+ */
+/*
+ * No colour wash. It duplicated the one thing the cap chip already says, and
+ * on the yellow card the chip disappeared into its own tint - the ornament
+ * cancelling the information. The card carries colour in exactly two places
+ * now: the chip that names the rank, and the tile behind the logo.
  */
 .zd-lcard::before {
 	content: '';
 	position: absolute;
-	inset: 0 0 auto;
-	height: 120px;
-	border-radius: 20px 20px 0 0;
-	background: linear-gradient(180deg, var(--zd-cap, #f2e73d) 0%, transparent 100%);
-	opacity: 0.16;
+	inset: 0;
+	border-radius: var(--zd-r-md);
+	background: var(--zd-cap, #f2e73d);
+	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.45s ease;
 }
 
-.zd-lcard:hover {
-	transform: translateY(-6px);
-	border-color: rgba(10, 19, 16, 0.14);
-	box-shadow: 0 2px 4px rgba(10, 19, 16, 0.05), 0 26px 50px -26px rgba(10, 19, 16, 0.5);
+
+@media (hover: hover) {
+	.zd-lcard:hover {
+		border-color: var(--zd-cap, #f2e73d);
+	}
+
+	.zd-lcard:hover::before {
+		opacity: 0.09;
+	}
 }
 
-.zd-lcard:hover::before {
-	opacity: 0.3;
+/* Keyboard users get the same read as the mouse. */
+.zd-lcard:focus-within {
+	border-color: var(--zd-cap, #f2e73d);
+}
+
+.zd-lcard:focus-within::before {
+	opacity: 0.09;
 }
 
 .zd-lcard__cap {
@@ -7150,23 +7231,31 @@
 	padding: 8px 20px;
 	border-radius: 999px;
 	background: var(--zd-cap, #f2e73d);
-	font-size: 13px;
+	/* Sits half outside the card, so it needs its own edge against the page. */
+	box-shadow: 0 0 0 4px #fff;
+	font-size: 12.5px;
 	font-weight: 800;
 	line-height: 1.2;
-	letter-spacing: -0.01em;
+	letter-spacing: 0.005em;
 	color: #0a1310;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	box-shadow: 0 6px 16px -10px rgba(10, 19, 16, 0.7);
+	/* No shadow: the system has two, and a solid colour chip on white does not
+	   need a third to separate from the card behind it. */
 }
 
 .zd-lcard__head {
 	position: relative;
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	gap: 14px;
 	min-width: 0;
+	/* Hairline under the identity block: it separates who from what without
+	   another surface, and it gives the card an internal rhythm the earlier
+	   version got from an accidental gradient edge. */
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--zd-hairline);
 }
 
 .zd-lcard__logo {
@@ -7175,7 +7264,7 @@
 	place-items: center;
 	width: 62px;
 	height: 62px;
-	border-radius: 16px;
+	border-radius: var(--zd-r-md);
 	/* Falls back to a neutral tile where color-mix is unsupported. */
 	background: #f3f5f4;
 	background: color-mix(in srgb, var(--zd-cap, #f2e73d) 38%, #fff);
@@ -7201,7 +7290,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 6px;
+	gap: 5px;
 	min-width: 0;
 }
 
@@ -7211,7 +7300,7 @@
 	font-weight: 800;
 	line-height: 1.15;
 	letter-spacing: -0.02em;
-	color: var(--zd-ink, #0a1310);
+	color: var(--zd-ink);
 	overflow-wrap: anywhere;
 }
 
@@ -7219,7 +7308,7 @@
 	margin: 0;
 	font-size: 15px;
 	line-height: 1.55;
-	color: var(--zd-muted, #4a5a52);
+	color: var(--zd-body);
 	/* Keeps four cards on one baseline when the blurbs differ in length. */
 	flex: 1 1 auto;
 }
@@ -7235,9 +7324,9 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	font-size: 17px;
+	font-size: 19px;
 	line-height: 1;
-	letter-spacing: 2px;
+	letter-spacing: 2.5px;
 }
 
 .zd-stars__row {
@@ -7252,6 +7341,14 @@
 /*
  * The filled row is clipped to the exact percentage over the empty row, so
  * 4.5 out of 5 renders as a true half star rather than a rounded one.
+ *
+ * It also fills left to right the first time it is seen, on the same easing as
+ * the score bars and the count-ups. Nothing on this plugin prints a quantity
+ * it has not measured out on screen first, and a rating is a quantity.
+ *
+ * The collapsed start is scoped to .zd-js - the runtime sets that class on its
+ * first line - so with scripting off the stars render at their real value
+ * instead of sitting empty forever.
  */
 .zd-stars__row--fill {
 	position: absolute;
@@ -7261,6 +7358,11 @@
 	overflow: hidden;
 	color: #f5a524;
 	pointer-events: none;
+	transition: width 0.85s var(--zd-ease) 0.12s;
+}
+
+.zd-js .zd-reveal:not(.is-in) .zd-stars__row--fill {
+	width: 0;
 }
 
 .zd-stars__value {
@@ -7268,7 +7370,7 @@
 	font-size: 13px;
 	font-weight: 700;
 	letter-spacing: 0;
-	color: var(--zd-muted, #5e6c64);
+	color: var(--zd-muted);
 }
 
 /* ---------------------------------------------------- full review link */
@@ -7280,13 +7382,13 @@
 	font-size: 14px;
 	font-weight: 700;
 	line-height: 1.2;
-	color: var(--zd-accent, #0b7a4f);
+	color: var(--zd-accent);
 	text-decoration: none;
-	transition: gap 0.3s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.25s ease;
+	transition: gap 0.3s var(--zd-ease), opacity 0.25s ease;
 }
 
 .zd-reviewlink svg {
-	transition: transform 0.3s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1));
+	transition: transform 0.3s var(--zd-ease);
 }
 
 .zd-reviewlink:hover {
@@ -7298,9 +7400,9 @@
 }
 
 .zd-reviewlink:focus-visible {
-	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline: 2px solid var(--zd-accent);
 	outline-offset: 3px;
-	border-radius: 4px;
+	border-radius: var(--zd-r-sm);
 }
 
 /* =========================================================================
@@ -7314,12 +7416,12 @@
 	line-height: 1.1;
 	letter-spacing: -0.03em;
 	text-align: center;
-	color: var(--zd-ink, #0a1310);
+	color: var(--zd-ink);
 }
 
 .zd-strip__title .zd-home__hl {
 	font-style: normal;
-	color: var(--zd-accent, #0b7a4f);
+	color: var(--zd-accent);
 }
 
 .zd-rail {
@@ -7363,23 +7465,23 @@
 	width: 42px;
 	height: 42px;
 	padding: 0;
-	border: 1px solid rgba(10, 19, 16, 0.12);
-	border-radius: 999px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: 50%;
 	background: #fff;
-	color: var(--zd-ink, #0a1310);
+	color: var(--zd-ink);
 	cursor: pointer;
-	transition: transform 0.3s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+	transition: transform 0.3s var(--zd-ease),
 		border-color 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
 }
 
 .zd-rail__btn:hover {
 	transform: translateY(-2px);
-	border-color: var(--zd-accent, #0b7a4f);
-	color: var(--zd-accent, #0b7a4f);
+	border-color: var(--zd-accent);
+	color: var(--zd-accent);
 }
 
 .zd-rail__btn:focus-visible {
-	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline: 2px solid var(--zd-accent);
 	outline-offset: 2px;
 }
 
@@ -7395,20 +7497,23 @@
 	scroll-snap-align: start;
 	display: flex;
 	flex-direction: column;
-	border: 1px solid rgba(10, 19, 16, 0.08);
-	border-radius: 22px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-md);
 	background: #fff;
-	box-shadow: 0 1px 2px rgba(10, 19, 16, 0.04), 0 14px 34px -22px rgba(10, 19, 16, 0.4);
+	box-shadow: var(--zd-shadow-rest);
 	overflow: hidden;
-	transition: transform 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-		box-shadow 0.45s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+	transition: transform 0.45s var(--zd-ease),
+		box-shadow 0.45s var(--zd-ease),
 		border-color 0.45s ease;
 }
 
-.zd-acard:hover {
-	transform: translateY(-6px);
-	border-color: rgba(10, 19, 16, 0.14);
-	box-shadow: 0 2px 4px rgba(10, 19, 16, 0.05), 0 26px 50px -26px rgba(10, 19, 16, 0.5);
+@media (hover: hover) {
+	.zd-acard:hover,
+	.zd-acard:focus-within {
+		transform: translateY(var(--zd-lift));
+		border-color: var(--zd-hairline);
+		box-shadow: var(--zd-shadow-hover);
+	}
 }
 
 .zd-acard__cover {
@@ -7416,11 +7521,21 @@
 	display: grid;
 	place-items: center;
 	aspect-ratio: 16 / 10;
-	margin: 14px 14px 0;
-	border-radius: 16px;
+	/*
+	 * Concentric corners: the card is --zd-r-md (16px), the inset is 8px, so
+	 * the cover takes --zd-r-sm (8px). 16 - 8 = 8, and the two curves stay
+	 * parallel instead of the inner one bulging past the outer at the corner.
+	 */
+	margin: 8px 8px 0;
+	border-radius: var(--zd-r-sm);
+	/*
+	 * Angle and highlight are driven off the card index, so a rail of covers
+	 * reads as a set of related artworks instead of one image repeated. Same
+	 * two brand colours throughout - only the light moves.
+	 */
 	background:
-		radial-gradient(120% 120% at 15% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 55%),
-		linear-gradient(140deg, var(--zd-accent, #0b7a4f) 0%, var(--zd-accent-2, #22d3ee) 130%);
+		radial-gradient(120% 120% at calc(14% + var(--zd-v, 0) * 24%) 0%, rgba(255, 255, 255, 0.24) 0%, transparent 55%),
+		linear-gradient(calc(138deg + var(--zd-v, 0) * 15deg), var(--zd-accent, #0b7a4f) 0%, var(--zd-accent-2, #22d3ee) 130%);
 	overflow: hidden;
 	text-decoration: none;
 	isolation: isolate;
@@ -7432,12 +7547,15 @@
 	content: '';
 	position: absolute;
 	top: -20%;
-	right: -30%;
+	right: calc(-34% + var(--zd-v, 0) * 9%);
 	width: 65%;
 	height: 150%;
 	transform: skewX(-12deg);
 	background: rgba(255, 255, 255, 0.08);
 	pointer-events: none;
+	/* Sweeps across on hover: the light moving over the plate, rather than the
+	   card simply getting bigger. */
+	transition: transform 0.75s var(--zd-ease);
 }
 
 .zd-acard__shot {
@@ -7447,11 +7565,19 @@
 	height: 100%;
 	object-fit: cover;
 	opacity: 0.32;
-	transition: transform 0.6s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1));
+	transition: transform 0.6s var(--zd-ease);
 }
 
-.zd-acard:hover .zd-acard__shot {
-	transform: scale(1.05);
+@media (hover: hover) {
+	.zd-acard:hover .zd-acard__shot,
+	.zd-acard:focus-within .zd-acard__shot {
+		transform: scale(1.05);
+	}
+
+	.zd-acard:hover .zd-acard__cover::after,
+	.zd-acard:focus-within .zd-acard__cover::after {
+		transform: skewX(-12deg) translateX(-190%);
+	}
 }
 
 .zd-acard__plate {
@@ -7477,7 +7603,7 @@
 
 .zd-acard__vs {
 	padding: 3px 10px;
-	border-radius: 6px;
+	border-radius: var(--zd-r-sm);
 	background: #4ade9b;
 	font-size: 12px;
 	font-weight: 800;
@@ -7489,7 +7615,7 @@
 
 .zd-acard__tag {
 	padding: 4px 12px;
-	border-radius: 8px;
+	border-radius: var(--zd-r-sm);
 	background: #f2e73d;
 	font-size: 12px;
 	font-weight: 800;
@@ -7516,26 +7642,26 @@
 }
 
 .zd-acard__title a {
-	color: var(--zd-ink, #0a1310);
+	color: var(--zd-ink);
 	text-decoration: none;
 	background-image: linear-gradient(var(--zd-accent, #0b7a4f), var(--zd-accent, #0b7a4f));
 	background-repeat: no-repeat;
 	background-position: 0 100%;
 	background-size: 0 2px;
-	transition: background-size 0.4s var(--zd-ease, cubic-bezier(0.22, 1, 0.36, 1)), color 0.3s ease;
+	transition: background-size 0.4s var(--zd-ease), color 0.3s ease;
 }
 
 .zd-acard:hover .zd-acard__title a,
 .zd-acard__title a:focus-visible {
 	background-size: 100% 2px;
-	color: var(--zd-accent, #0b7a4f);
+	color: var(--zd-accent);
 }
 
 .zd-acard__excerpt {
 	margin: 0;
 	font-size: 15px;
 	line-height: 1.6;
-	color: var(--zd-muted, #4a5a52);
+	color: var(--zd-body);
 }
 
 .zd-acard__foot {
@@ -7552,22 +7678,64 @@
 
 /* ------------------------------------------------------------- motion */
 
+/* ------------------------------------------------------------ pressed states */
+
+/*
+ * A card is a target you click, so it should acknowledge the press. Without
+ * :active the whole strip feels like an image of an interface.
+ */
+.zd-rail__btn:active,
+.zd-tabs__arrow:active:not([disabled]) {
+	transform: scale(0.92);
+	transition-duration: 0.1s;
+}
+
+.zd-tabs__btn:active { transform: scale(0.97); }
+.zd-acard__read:active,
+.zd-lcard .zd-btn:active { transform: translateY(1px) scale(0.99); }
+
+/* Selection picks up the section's own colour rather than the browser's blue. */
+.zd-lineup ::selection {
+	background: var(--zd-cap-1, #f2e73d);
+	color: #0a1310;
+}
+
+.zd-strip ::selection {
+	background: #d8ede2;
+	background: color-mix(in srgb, var(--zd-accent, #0b7a4f) 26%, #fff);
+	color: #0a1310;
+}
+
+/* ------------------------------------------------------------------- motion */
+
 @media (prefers-reduced-motion: reduce) {
 	.zd-lcard,
 	.zd-lcard::before,
 	.zd-acard,
 	.zd-acard__shot,
+	.zd-acard__cover::after,
 	.zd-acard__title a,
 	.zd-rail__btn,
 	.zd-reviewlink,
-	.zd-reviewlink svg {
+	.zd-reviewlink svg,
+	.zd-stars__row--fill {
 		transition: none;
 	}
 
-	.zd-lcard:hover,
+	/* The wash still tracks hover, it just arrives without travelling. */
 	.zd-acard:hover,
-	.zd-rail__btn:hover {
+	.zd-acard:focus-within,
+	.zd-rail__btn:hover,
+	.zd-rail__btn:active,
+	.zd-tabs__arrow:active,
+	.zd-tabs__btn:active,
+	.zd-acard__read:active {
 		transform: none;
+	}
+
+	.zd-acard:hover .zd-acard__cover::after,
+	.zd-acard:focus-within .zd-acard__cover::after {
+		transform: skewX(-12deg);
 	}
 
 	.zd-rail__track,
@@ -7578,4 +7746,784 @@
 
 .zd-rail.is-static .zd-rail__nav {
 	display: none;
+}
+
+/* =========================================================================
+   Articles grid & testimonials
+   Three card treatments now share this page, and they are deliberately
+   unequal: the lineup card is flat and colour-washed, the article card is
+   elevated, the quote card is quiet. Same tokens, different weight.
+   ========================================================================= */
+
+.zd-agrid,
+.zd-agrid *,
+.zd-agrid *::before,
+.zd-agrid *::after,
+.zd-quotes,
+.zd-quotes *,
+.zd-quotes *::before,
+.zd-quotes *::after {
+	box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------- 02e grid */
+
+.zd-agrid--tint {
+	background: var(--zd-surface);
+}
+
+/*
+ * Heading left, link right, on one baseline. The link is the section's only
+ * outbound route, so it sits in the header where a reader looks for it rather
+ * than buried under the last card.
+ */
+.zd-agrid__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px 24px;
+	margin-bottom: 30px;
+}
+
+.zd-agrid__title {
+	margin: 0;
+	font-family: var(--zd-font-display);
+	font-size: clamp(26px, 3.4vw, 38px);
+	font-weight: 800;
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+	color: var(--zd-heading);
+	text-wrap: balance;
+}
+
+.zd-agrid__title .zd-home__hl {
+	font-style: normal;
+	color: var(--zd-accent);
+}
+
+.zd-agrid__all {
+	flex: 0 0 auto;
+}
+
+.zd-agrid__list {
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	gap: 22px;
+	align-items: stretch;
+}
+
+@media (min-width: 640px) {
+	.zd-agrid__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1040px) {
+	.zd-agrid__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/*
+ * The grid card runs denser than the rail card: a shorter cover, a title that
+ * is allowed more lines, and a text link instead of a fourth filled pill.
+ */
+.zd-acard--grid .zd-acard__cover {
+	aspect-ratio: 16 / 9;
+}
+
+.zd-acard--grid .zd-acard__title {
+	font-size: 18px;
+	line-height: 1.28;
+}
+
+.zd-acard--grid .zd-acard__body {
+	padding: 18px 20px 0;
+}
+
+.zd-acard--grid .zd-acard__foot {
+	justify-content: flex-start;
+	padding: 16px 20px 20px;
+}
+
+/* On a tinted ground the hairline does the separating, not a drop shadow. */
+.zd-agrid--tint .zd-acard {
+	box-shadow: none;
+}
+
+/* --------------------------------------------------- 09b testimonials */
+
+.zd-quotes__head {
+	margin-bottom: 30px;
+}
+
+.zd-quotes__title {
+	margin: 0;
+	font-family: var(--zd-font-display);
+	font-size: clamp(26px, 3.4vw, 38px);
+	font-weight: 800;
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+	color: var(--zd-heading);
+	text-wrap: balance;
+}
+
+.zd-quotes__title .zd-home__hl {
+	font-style: normal;
+	color: var(--zd-accent);
+}
+
+.zd-rail__track--quotes {
+	grid-auto-columns: minmax(280px, 1fr);
+}
+
+@media (min-width: 900px) {
+	.zd-rail__track--quotes {
+		grid-auto-columns: minmax(0, calc((100% - 48px) / 3));
+	}
+}
+
+.zd-quotes__foot {
+	margin-top: 26px;
+}
+
+/*
+ * Quiet by design. Two loud card treatments already run above this section,
+ * and a testimonial that shouts is a testimonial nobody believes.
+ */
+.zd-quote {
+	position: relative;
+	scroll-snap-align: start;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	margin: 0;
+	padding: 24px 26px 26px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-md);
+	background: #fff;
+	transition: border-color var(--zd-dur-hover) ease;
+}
+
+@media (hover: hover) {
+	.zd-quote:hover {
+		border-color: var(--zd-accent);
+	}
+}
+
+/*
+ * The section's only ornament, and it is type rather than an icon anyone has
+ * to supply. It leads the quote instead of sitting behind it: as a background
+ * glyph it overlapped the first two lines on every card wider than a column,
+ * which reads as a rendering fault rather than a flourish.
+ */
+.zd-quote__mark {
+	display: block;
+	margin-bottom: -14px;
+	font-family: var(--zd-font-display);
+	font-size: 52px;
+	font-weight: 800;
+	line-height: 1;
+	color: var(--zd-accent);
+	opacity: 0.32;
+	pointer-events: none;
+	user-select: none;
+}
+
+.zd-quote__text {
+	position: relative;
+	margin: 0;
+	flex: 1 1 auto;
+	font-size: 17px;
+	line-height: 1.6;
+	color: var(--zd-body);
+	text-wrap: pretty;
+}
+
+.zd-quote__by {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding-top: 18px;
+	border-top: 1px solid var(--zd-hairline);
+}
+
+.zd-quote__photo {
+	flex: 0 0 auto;
+	width: 46px;
+	height: 46px;
+	border-radius: var(--zd-r-sm);
+	object-fit: cover;
+	display: block;
+}
+
+.zd-quote__photo--initial {
+	display: grid;
+	place-items: center;
+	background: var(--zd-surface);
+	font-family: var(--zd-font-display);
+	font-size: 19px;
+	font-weight: 800;
+	color: var(--zd-muted);
+	text-transform: uppercase;
+}
+
+.zd-quote__who {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+
+.zd-quote__name {
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.3;
+	color: var(--zd-heading);
+}
+
+.zd-quote__role {
+	font-size: 14px;
+	line-height: 1.3;
+	color: var(--zd-muted);
+}
+
+/*
+ * The receipt. Everything else on this page argues from measured evidence, so
+ * an unattributed quote would be the one soft claim in the whole design.
+ */
+.zd-quote__source {
+	margin-top: 4px;
+	font-size: 11.5px;
+	font-weight: 600;
+	line-height: 1.3;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-quotes ::selection {
+	background: #d8ede2;
+	background: color-mix(in srgb, var(--zd-accent) 26%, #fff);
+	color: var(--zd-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.zd-quote {
+		transition: none;
+	}
+}
+
+/* =========================================================================
+   Byline, verdict and offer bar
+   Three components that read data the plugin already stored and never showed.
+   All three stay quiet: they carry evidence, and evidence does not need to
+   shout to be believed.
+   ========================================================================= */
+
+.zd-byline,
+.zd-byline *,
+.zd-byline *::before,
+.zd-byline *::after,
+.zd-verdict,
+.zd-verdict *,
+.zd-verdict *::before,
+.zd-verdict *::after,
+.zd-obar,
+.zd-obar *,
+.zd-obar *::before,
+.zd-obar *::after {
+	box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------- review byline */
+
+.zd-byline {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	/* A credit line has a natural measure; without this it stretches to the
+	   container and the three facts drift far apart from the name. */
+	max-width: 760px;
+	font-family: var(--zd-font-sans);
+	color: var(--zd-body);
+}
+
+.zd-byline--boxed {
+	padding: 22px 24px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-md);
+	background: var(--zd-surface);
+}
+
+.zd-byline__photo {
+	flex: 0 0 auto;
+	width: 52px;
+	height: 52px;
+	border-radius: var(--zd-r-sm);
+	object-fit: cover;
+	display: block;
+}
+
+.zd-byline__photo--initial {
+	display: grid;
+	place-items: center;
+	background: var(--zd-accent);
+	font-family: var(--zd-font-display);
+	font-size: 21px;
+	font-weight: 800;
+	color: var(--zd-on-accent, #fff);
+	text-transform: uppercase;
+}
+
+.zd-byline__body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+}
+
+.zd-byline__line {
+	margin: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px 8px;
+	font-size: 15px;
+	line-height: 1.4;
+}
+
+.zd-byline__by {
+	color: var(--zd-muted);
+}
+
+.zd-byline__name {
+	font-family: var(--zd-font-display);
+	font-size: 16px;
+	font-weight: 800;
+	letter-spacing: -0.015em;
+	color: var(--zd-heading);
+}
+
+.zd-byline__role::before {
+	content: '·';
+	margin-right: 8px;
+	color: var(--zd-hairline);
+}
+
+.zd-byline__role {
+	color: var(--zd-muted);
+}
+
+.zd-byline__bio {
+	margin: 0;
+	max-width: 62ch;
+	font-size: 15px;
+	line-height: 1.6;
+	color: var(--zd-body);
+	text-wrap: pretty;
+}
+
+/*
+ * The facts read as a spec strip rather than prose: label above value, hairline
+ * dividers between. Dates are what make a byline checkable, so they get the
+ * emphasis and a real <time> element under them.
+ */
+.zd-byline__facts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 22px;
+	margin: 4px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.zd-byline__fact {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	padding-left: 14px;
+	border-left: 1px solid var(--zd-hairline);
+}
+
+.zd-byline__fact:first-child {
+	padding-left: 0;
+	border-left: 0;
+}
+
+.zd-byline__flabel {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-byline__fvalue {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--zd-heading);
+	font-variant-numeric: tabular-nums;
+}
+
+.zd-byline__method {
+	margin-top: 2px;
+}
+
+@media (max-width: 520px) {
+	.zd-byline {
+		flex-direction: column;
+	}
+}
+
+/* --------------------------------------------------------------- verdict */
+
+.zd-verdict {
+	display: flex;
+	flex-direction: column;
+	gap: 26px;
+	font-family: var(--zd-font-sans);
+	color: var(--zd-body);
+}
+
+/*
+ * The conclusion, set larger than the evidence under it. A reader who takes
+ * one line from this widget should take the answer, not the working.
+ */
+.zd-verdict__lede {
+	margin: 0;
+	padding-left: 18px;
+	border-left: 3px solid var(--zd-accent);
+	font-family: var(--zd-font-display);
+	font-size: clamp(18px, 2.2vw, 22px);
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: -0.015em;
+	color: var(--zd-heading);
+	text-wrap: pretty;
+}
+
+.zd-verdict__split {
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	gap: 22px;
+}
+
+@media (min-width: 700px) {
+	.zd-verdict__split {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/*
+ * Pros and cons are bare lists - the marks carry the polarity. Best-for and
+ * not-for are panelled, because they are advice rather than observation and
+ * the change in treatment is what tells them apart at a glance.
+ */
+.zd-verdict__split--fit .zd-vcol {
+	padding: 20px 22px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-md);
+	background: var(--zd-surface);
+}
+
+.zd-vcol {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.zd-vcol__title {
+	position: relative;
+	margin: 0;
+	padding-bottom: 10px;
+	font-family: var(--zd-font-display);
+	font-size: 15px;
+	font-weight: 800;
+	letter-spacing: 0.02em;
+	color: var(--zd-heading);
+}
+
+/* Only on the bare pair - the panelled pair is already framed. */
+.zd-verdict__split:not(.zd-verdict__split--fit) .zd-vcol__title::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 34px;
+	height: 2px;
+	border-radius: 2px;
+	background: var(--zd-accent);
+}
+
+/* Matches the specificity of the rule above, or the green wins on the
+   negative column and the polarity reads backwards. */
+.zd-verdict__split:not(.zd-verdict__split--fit) .zd-vcol--con .zd-vcol__title::after {
+	background: var(--zd-ember);
+}
+
+.zd-vcol__list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.zd-vcol__list li {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	font-size: 15px;
+	line-height: 1.55;
+	text-wrap: pretty;
+}
+
+.zd-vcol__mark {
+	flex: 0 0 auto;
+	display: grid;
+	place-items: center;
+	width: 20px;
+	height: 20px;
+	margin-top: 1px;
+	border-radius: 50%;
+	background: var(--zd-accent-tint, #e6f4ee);
+	color: var(--zd-accent);
+}
+
+.zd-vcol--con .zd-vcol__mark,
+.zd-vcol--not .zd-vcol__mark {
+	background: var(--zd-ember-tint, #fff1e6);
+	color: var(--zd-ember);
+}
+
+.zd-vcol--con .zd-vcol__title,
+.zd-vcol--not .zd-vcol__title {
+	color: var(--zd-ember);
+}
+
+/* ------------------------------------------------------------- offer bar */
+
+.zd-obar {
+	--zd-obar-bg: var(--zd-ink);
+	--zd-obar-fg: #fff;
+	font-family: var(--zd-font-sans);
+}
+
+.zd-obar__inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 12px 22px;
+	padding: 13px 14px 13px 28px;
+	/* The one place --zd-r-lg earns its keep: a bar this shallow needs the
+	   largest radius in the system to read as a pill rather than a box. */
+	border-radius: var(--zd-r-lg);
+	background: var(--zd-obar-bg);
+	color: var(--zd-obar-fg);
+	box-shadow: var(--zd-shadow-hover);
+}
+
+.zd-obar__msg {
+	margin: 0;
+	/* Takes the slack so the close button is pushed to the far edge instead of
+	   sitting on the CTA's shoulder. */
+	flex: 1 1 auto;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.4;
+	text-wrap: balance;
+}
+
+.zd-obar__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 15px;
+	font-weight: 800;
+	line-height: 1.2;
+	color: inherit;
+	text-decoration: none;
+	/* Underline as the affordance, so the link reads as a link on any ground
+	   the editor picks - a filled button inside a filled bar is two buttons. */
+	text-decoration: underline;
+	text-underline-offset: 4px;
+	text-decoration-thickness: 2px;
+	transition: gap var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-obar__cta svg {
+	transition: transform var(--zd-dur-hover) var(--zd-ease);
+}
+
+@media (hover: hover) {
+	.zd-obar__cta:hover { gap: 11px; }
+	.zd-obar__cta:hover svg { transform: translateX(2px); }
+}
+
+.zd-obar__cta:focus-visible,
+.zd-obar__close:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+	border-radius: var(--zd-r-sm);
+}
+
+.zd-obar__close {
+	display: grid;
+	place-items: center;
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	margin-left: 2px;
+	opacity: 0.7;
+	cursor: pointer;
+	transition: opacity var(--zd-dur-hover) ease, background-color var(--zd-dur-hover) ease;
+}
+
+.zd-obar__close:hover {
+	opacity: 1;
+	background: rgb(255 255 255 / 0.14);
+}
+
+.zd-obar__close:active { transform: scale(0.9); }
+
+/* ---- pinned variants ---- */
+
+.zd-obar--bottom,
+.zd-obar--top {
+	position: fixed;
+	left: 50%;
+	z-index: 60;
+	width: min(720px, calc(100vw - 32px));
+	transform: translateX(-50%);
+	/* Off-screen until the script says otherwise, so a slow page never flashes
+	   the bar in place before its delay has run. */
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.45s var(--zd-ease), translate 0.45s var(--zd-ease);
+}
+
+.zd-obar--bottom {
+	bottom: max(16px, env(safe-area-inset-bottom, 0px));
+	translate: 0 130%;
+}
+
+.zd-obar--top {
+	top: 16px;
+	translate: 0 -130%;
+}
+
+.zd-obar--bottom.is-in,
+.zd-obar--top.is-in {
+	opacity: 1;
+	translate: 0 0;
+	pointer-events: auto;
+}
+
+.zd-obar--inline .zd-obar__inner {
+	max-width: var(--zd-container, 1240px);
+	margin: 0 auto;
+}
+
+@media (max-width: 560px) {
+	.zd-obar__inner {
+		padding: 14px 16px;
+		border-radius: var(--zd-r-md);
+	}
+
+	.zd-obar__msg {
+		flex: 1 1 100%;
+		text-align: center;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.zd-obar--bottom,
+	.zd-obar--top,
+	.zd-obar__cta,
+	.zd-obar__cta svg,
+	.zd-obar__close {
+		transition: none;
+	}
+
+	.zd-obar__close:active { transform: none; }
+}
+
+/* ---------------------------------------------- lineup criteria table */
+
+/*
+ * Label left, score right, hairline between. No bars: at nine rows a bar chart
+ * turns into texture you scan past, and the colour already carries the verdict
+ * that a bar length would have carried.
+ */
+.zd-lcard__scores {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+}
+
+.zd-lscore {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 14px;
+	padding: 7px 0;
+	border-bottom: 1px solid var(--zd-hairline);
+}
+
+.zd-lscore:last-child {
+	border-bottom: 0;
+}
+
+.zd-lscore__label {
+	margin: 0;
+	font-size: 14.5px;
+	line-height: 1.35;
+	color: var(--zd-body);
+}
+
+.zd-lscore__value {
+	margin: 0;
+	flex: 0 0 auto;
+	font-size: 14.5px;
+	font-weight: 800;
+	line-height: 1.35;
+	/* Nine right-aligned numbers only read as a column if the digits align. */
+	font-variant-numeric: tabular-nums;
+	color: var(--zd-score-good);
+}
+
+/*
+ * The band classes live earlier in this file, so at equal specificity the rule
+ * above wins on source order and every score prints green - which is the one
+ * thing a scorecard must never do. Two classes each, so the band wins.
+ */
+.zd-lscore__value.zd-score--good { color: var(--zd-score-good); }
+.zd-lscore__value.zd-score--fair { color: var(--zd-score-fair); }
+.zd-lscore__value.zd-score--weak { color: var(--zd-score-weak); }
+
+.zd-lcard__more {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding-top: 16px;
+	border-top: 1px solid var(--zd-hairline);
+	flex: 1 1 auto;
+}
+
+.zd-lcard__morelabel {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 800;
+	letter-spacing: 0.01em;
+	color: var(--zd-heading);
+}
+
+/* The blurb no longer needs to absorb the slack once it sits inside __more. */
+.zd-lcard__more .zd-lcard__blurb {
+	flex: 0 1 auto;
 }

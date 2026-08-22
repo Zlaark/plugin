@@ -42,6 +42,8 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		$this->controls_lineup();
 		$this->controls_reviews();
 		$this->controls_comparisons();
+		$this->controls_grid();
+		$this->controls_testimonials();
 		$this->controls_band();
 		$this->controls_deals();
 		$this->controls_picks();
@@ -180,6 +182,18 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->add_control(
+			'score_tabs',
+			array(
+				'label'        => __( 'Filter By Category', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'condition'    => array( 'show_score' => 'yes' ),
+				'description'  => __( 'Adds the scrolling category rail above the cards, capped per category. Needs at least two categories with deals in them, or it stays hidden.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
 			'score_note',
 			array(
 				'type'            => Controls_Manager::RAW_HTML,
@@ -271,6 +285,34 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 				'return_value' => 'yes',
 				'condition'    => array( 'show_lineup' => 'yes' ),
 				'description'  => __( 'Halves the stored 0-10 rating onto a five-star row.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'lineup_scores',
+			array(
+				'label'        => __( 'Show Score Breakdown', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'show_lineup' => 'yes' ),
+				'description'  => __( 'Each deal\'s Score Breakdown as a criteria table, coloured by value. The criteria are whatever you typed on the deal, so a hosting card and an ecommerce card can be judged on different things.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'lineup_score_count',
+			array(
+				'label'       => __( 'Max Criteria', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::NUMBER,
+				'min'         => 3,
+				'max'         => 14,
+				'default'     => 9,
+				'condition'   => array(
+					'show_lineup'   => 'yes',
+					'lineup_scores' => 'yes',
+				),
+				'description' => __( 'Cards line up on a shared baseline, so a deal scored on fewer criteria simply prints fewer rows.', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -419,6 +461,245 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->article_source_controls( 'vs', array( 'show_vs' => 'yes' ), 3 );
+
+		$this->end_controls_section();
+	}
+
+	protected function controls_grid() {
+		/* -------------------------------------------- 02e articles grid */
+
+		$this->start_controls_section(
+			'sec_grid',
+			array( 'label' => __( '02e · Articles grid', 'zlaark-deals-pro' ) )
+		);
+
+		$this->add_control( 'show_grid', $this->toggle( false ) );
+
+		$this->add_control(
+			'grid_title',
+			array(
+				'label'       => __( 'Heading', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'Latest articles', 'zlaark-deals-pro' ),
+				'label_block' => true,
+				'condition'   => array( 'show_grid' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'grid_highlight',
+			array(
+				'label'       => __( 'Accent Word', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'articles', 'zlaark-deals-pro' ),
+				'label_block' => true,
+				'condition'   => array( 'show_grid' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'grid_all_text',
+			array(
+				'label'     => __( 'Header Link Text', 'zlaark-deals-pro' ),
+				'type'      => Controls_Manager::TEXT,
+				'default'   => __( 'View all articles', 'zlaark-deals-pro' ),
+				'condition' => array( 'show_grid' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'grid_all_url',
+			array(
+				'label'       => __( 'Header Link', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::URL,
+				'placeholder' => 'https://',
+				'condition'   => array( 'show_grid' => 'yes' ),
+				'description' => __( 'Leave empty to hide the link rather than print one that goes nowhere.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'grid_cta',
+			array(
+				'label'     => __( 'Card Link Text', 'zlaark-deals-pro' ),
+				'type'      => Controls_Manager::TEXT,
+				'default'   => __( 'Read more', 'zlaark-deals-pro' ),
+				'condition' => array( 'show_grid' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'grid_cols',
+			array(
+				'label'          => __( 'Columns', 'zlaark-deals-pro' ),
+				'type'           => Controls_Manager::SELECT,
+				'default'        => '4',
+				'tablet_default' => '2',
+				'mobile_default' => '1',
+				'condition'      => array( 'show_grid' => 'yes' ),
+				'options'        => array(
+					'2' => '2',
+					'3' => '3',
+					'4' => '4',
+				),
+				'selectors'      => array(
+					'{{WRAPPER}} .zd-agrid__list' => 'grid-template-columns: repeat({{VALUE}}, minmax(0, 1fr));',
+				),
+			)
+		);
+
+		$this->add_control(
+			'grid_tint',
+			array(
+				'label'        => __( 'Tinted Ground', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'show_grid' => 'yes' ),
+			)
+		);
+
+		$this->article_source_controls( 'grid', array( 'show_grid' => 'yes' ), 4 );
+
+		$this->end_controls_section();
+	}
+
+	protected function controls_testimonials() {
+		/* -------------------------------------------- 09b testimonials */
+
+		$this->start_controls_section(
+			'sec_quotes',
+			array( 'label' => __( '09b · Testimonials', 'zlaark-deals-pro' ) )
+		);
+
+		$this->add_control( 'show_quotes', $this->toggle( false ) );
+
+		$this->add_control(
+			'quotes_title',
+			array(
+				'label'       => __( 'Heading', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'They trust us', 'zlaark-deals-pro' ),
+				'label_block' => true,
+				'condition'   => array( 'show_quotes' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'quotes_highlight',
+			array(
+				'label'       => __( 'Accent Word', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'trust', 'zlaark-deals-pro' ),
+				'label_block' => true,
+				'condition'   => array( 'show_quotes' => 'yes' ),
+			)
+		);
+
+		$repeater = new Repeater();
+
+		$repeater->add_control(
+			'quote',
+			array(
+				'label'   => __( 'Quote', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::TEXTAREA,
+				'rows'    => 4,
+				'default' => __( 'After weeks of chaotic research, I finally found a place I can actually trust for reviews and recommendations.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$repeater->add_control(
+			'name',
+			array(
+				'label'   => __( 'Name', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => __( 'Alex Muntean', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$repeater->add_control(
+			'role',
+			array(
+				'label'   => __( 'Role', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => __( 'Architect', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$repeater->add_control(
+			'photo',
+			array(
+				'label' => __( 'Photo', 'zlaark-deals-pro' ),
+				'type'  => Controls_Manager::MEDIA,
+			)
+		);
+
+		/*
+		 * The whole plugin argues from receipts, so an unattributed quote is
+		 * off-message. This line is where the quote came from and when - the
+		 * difference between evidence and a nice sentence someone typed.
+		 */
+		$repeater->add_control(
+			'source',
+			array(
+				'label'       => __( 'Source', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'placeholder' => __( 'Trustpilot · March 2026', 'zlaark-deals-pro' ),
+				'description' => __( 'Where the quote came from. Optional, but an attributed quote is worth several unattributed ones.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'quotes',
+			array(
+				'type'        => Controls_Manager::REPEATER,
+				'fields'      => $repeater->get_controls(),
+				'title_field' => '{{{ name }}}',
+				'condition'   => array( 'show_quotes' => 'yes' ),
+				'default'     => array(
+					array(
+						'quote'  => __( 'The resources here helped me find the right tools and kickstart our marketing strategy. Nothing was oversold.', 'zlaark-deals-pro' ),
+						'name'   => __( 'Lindy Ross', 'zlaark-deals-pro' ),
+						'role'   => __( 'Fashion designer', 'zlaark-deals-pro' ),
+						'source' => __( 'Trustpilot · February 2026', 'zlaark-deals-pro' ),
+					),
+					array(
+						'quote'  => __( 'After weeks of chaotic research, I finally found a place I can actually trust for reviews and recommendations.', 'zlaark-deals-pro' ),
+						'name'   => __( 'Alex Muntean', 'zlaark-deals-pro' ),
+						'role'   => __( 'Architect', 'zlaark-deals-pro' ),
+						'source' => __( 'Trustpilot · March 2026', 'zlaark-deals-pro' ),
+					),
+					array(
+						'quote'  => __( 'They published the numbers that made them look wrong about a tool I already owned. That is when I started reading properly.', 'zlaark-deals-pro' ),
+						'name'   => __( 'Priya Raman', 'zlaark-deals-pro' ),
+						'role'   => __( 'Store owner', 'zlaark-deals-pro' ),
+						'source' => __( 'Email · January 2026', 'zlaark-deals-pro' ),
+					),
+				),
+			)
+		);
+
+		$this->add_control(
+			'quotes_cta_text',
+			array(
+				'label'     => __( 'Button Text', 'zlaark-deals-pro' ),
+				'type'      => Controls_Manager::TEXT,
+				'default'   => __( 'Read every review', 'zlaark-deals-pro' ),
+				'separator' => 'before',
+				'condition' => array( 'show_quotes' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'quotes_cta_url',
+			array(
+				'label'       => __( 'Button Link', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::URL,
+				'placeholder' => 'https://',
+				'condition'   => array( 'show_quotes' => 'yes' ),
+				'description' => __( 'Leave empty to hide the button.', 'zlaark-deals-pro' ),
+			)
+		);
 
 		$this->end_controls_section();
 	}
@@ -1196,6 +1477,12 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			if ( 'yes' === $s['show_vs'] ) {
 				$this->section_articles( $s, 'vs', 'versus' );
 			}
+			if ( 'yes' === $s['show_grid'] ) {
+				$this->section_article_grid( $s );
+			}
+			if ( 'yes' === $s['show_quotes'] ) {
+				$this->section_testimonials( $s );
+			}
 			if ( 'yes' === $s['show_band'] ) {
 				$this->section_band( $s, $deals );
 			}
@@ -1317,17 +1604,44 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	/* ----------------------------------------------- 02 scorecard */
 
 	protected function section_scorecard( $s, $deals ) {
-		$picks = array_slice( $deals, 0, max( 2, (int) $s['score_count'] ) );
+		$limit = max( 2, (int) $s['score_count'] );
+		$tabbed = isset( $s['score_tabs'] ) && 'yes' === $s['score_tabs'];
+
+		if ( $tabbed ) {
+			list( $tabs, $per_term ) = $this->tab_groups( $deals, $limit );
+			$picks                   = $this->tag_by_term( $deals, $per_term );
+			$tabbed                  = count( $tabs ) > 1 && ! empty( $picks );
+		}
+
+		if ( ! $tabbed ) {
+			$tabs  = array();
+			$picks = array_slice( $deals, 0, $limit );
+		}
+
 		if ( count( $picks ) < 2 ) {
 			return;
 		}
+
+		$first = $tabbed ? (string) key( $tabs ) : '';
 		?>
 		<section class="zd-home__sec">
 			<div class="zd-home__inner">
 				<?php $this->section_head( $s['score_title'], __( 'Scored and re-checked monthly', 'zlaark-deals-pro' ) ); ?>
-				<div class="zd-home__cards zd-home__cards--4">
+
+				<?php if ( $tabbed ) : ?>
+					<?php $this->render_tab_rail( $tabs, '.zd-scoregrid', false ); ?>
+				<?php endif; ?>
+
+				<div class="zd-home__cards zd-home__cards--4 zd-scoregrid" data-zd-active="<?php echo esc_attr( $first ); ?>">
 					<?php foreach ( $picks as $i => $deal ) : ?>
-						<article class="zd-card zd-card--pick zd-reveal" data-zd-reveal="rise" style="--zd-i:<?php echo (int) $i; ?>">
+						<?php
+						$terms = isset( $deal['_lineup_terms'] ) ? $deal['_lineup_terms'] : array();
+						$hide  = $tabbed && ! empty( $terms ) && ! in_array( $first, $terms, true );
+						?>
+						<article class="zd-card zd-card--pick zd-reveal<?php echo $hide ? ' is-filtered-out' : ''; ?>"
+							data-zd-reveal="rise"
+							data-zd-terms="<?php echo esc_attr( implode( ' ', $terms ) ); ?>"
+							style="--zd-i:<?php echo (int) $i; ?>">
 							<?php if ( '' !== $deal['rank_label'] ) : ?>
 								<span class="zd-card__cap<?php echo 0 === $i ? ' zd-card__cap--lead' : ''; ?>">
 									<?php echo esc_html( $deal['rank_label'] ); ?>
@@ -1364,6 +1678,72 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 	protected function section_lineup( $s, $deals ) {
 		$limit = max( 2, (int) $s['lineup_count'] );
 
+		list( $tabs, $per_term ) = $this->tab_groups( $deals, $limit );
+
+		/*
+		 * With no categories there is nothing to tab between, so the section
+		 * degrades to a plain four-up rather than printing an empty rail.
+		 */
+		$has_tabs = count( $tabs ) > 1;
+		$all_tab  = $has_tabs && 'yes' === $s['lineup_all_tab'];
+
+		$cards = empty( $tabs )
+			? array_slice( $deals, 0, $limit )
+			: $this->tag_by_term( $deals, $per_term );
+
+		if ( empty( $cards ) ) {
+			return;
+		}
+
+		$first = $all_tab ? 'all' : (string) key( $tabs );
+		?>
+		<section class="zd-home__sec zd-lineup">
+			<div class="zd-home__inner">
+				<?php $this->section_head( $s['lineup_title'], $s['lineup_eyebrow'] ); ?>
+
+				<?php if ( $has_tabs ) : ?>
+					<?php $this->render_tab_rail( $tabs, '.zd-lineup__grid', $all_tab ); ?>
+				<?php endif; ?>
+
+				<?php
+				/*
+				 * The first tab's count is published server-side so the grid is
+				 * already the right width on the initial paint; the script keeps
+				 * it in step from the first tab change onward.
+				 */
+				$first_count = 0;
+				foreach ( $cards as $card ) {
+					$card_terms = isset( $card['_lineup_terms'] ) ? $card['_lineup_terms'] : array();
+					if ( empty( $card_terms ) || 'all' === $first || in_array( $first, $card_terms, true ) ) {
+						$first_count++;
+					}
+				}
+				?>
+				<div class="zd-lineup__grid" data-zd-active="<?php echo esc_attr( $first ); ?>"
+					style="--zd-cols:<?php echo (int) max( 1, min( 4, $first_count ) ); ?>">
+					<?php foreach ( $cards as $i => $deal ) : ?>
+						<?php $this->lineup_card( $deal, $s, $i, $first ); ?>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		</section>
+		<?php
+	}
+
+	/* --------------------------------------- shared category tab rail */
+
+	/**
+	 * Buckets deals by category, capping each bucket independently.
+	 *
+	 * Capping per category rather than slicing a flat list is what stops a tab
+	 * from overflowing or coming up empty: a deal that places 2nd in Ecommerce
+	 * and 6th in Hosting shows under Ecommerce only.
+	 *
+	 * @param array $deals
+	 * @param int   $limit Cards per category.
+	 * @return array [ $tabs, $per_term ]
+	 */
+	protected function tab_groups( $deals, $limit ) {
 		$tabs     = array();
 		$per_term = array();
 
@@ -1383,92 +1763,92 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			}
 		}
 
-		/*
-		 * With no categories there is nothing to tab between, so the section
-		 * degrades to a plain four-up rather than printing an empty rail.
-		 */
-		$has_tabs = count( $tabs ) > 1;
-		$all_tab  = $has_tabs && 'yes' === $s['lineup_all_tab'];
+		return array( $tabs, $per_term );
+	}
 
-		if ( empty( $tabs ) ) {
-			$cards = array_slice( $deals, 0, $limit );
-		} else {
-			$cards = array();
-			foreach ( $deals as $deal ) {
-				$keys = array();
-				foreach ( $deal['terms'] as $term ) {
-					$key = $this->term_key( $term );
-					if ( '' !== $key && isset( $per_term[ $key ] ) && in_array( $deal['id'], $per_term[ $key ], true ) ) {
-						$keys[] = $key;
-					}
+	/**
+	 * Keeps the deals that made the cut somewhere, tagged with the categories
+	 * they qualified in. A deal that placed nowhere is dropped entirely.
+	 */
+	protected function tag_by_term( $deals, $per_term ) {
+		$cards = array();
+
+		foreach ( $deals as $deal ) {
+			$keys = array();
+			foreach ( $deal['terms'] as $term ) {
+				$key = $this->term_key( $term );
+				if ( '' !== $key && isset( $per_term[ $key ] ) && in_array( $deal['id'], $per_term[ $key ], true ) ) {
+					$keys[] = $key;
 				}
-				if ( ! empty( $keys ) ) {
-					$deal['_lineup_terms'] = $keys;
-					$cards[]               = $deal;
-				}
+			}
+			if ( ! empty( $keys ) ) {
+				$deal['_lineup_terms'] = $keys;
+				$cards[]               = $deal;
 			}
 		}
 
-		if ( empty( $cards ) ) {
-			return;
-		}
+		return $cards;
+	}
 
-		$first = $all_tab ? 'all' : (string) key( $tabs );
+	/**
+	 * The scrolling category rail. Shared by the lineup and the scorecard so
+	 * the two cannot drift apart in markup, behaviour or accessibility.
+	 *
+	 * @param array  $tabs    key => label.
+	 * @param string $target  Selector of the grid these filter.
+	 * @param bool   $all_tab Prepend an "All" tab.
+	 */
+	protected function render_tab_rail( $tabs, $target, $all_tab = false ) {
 		?>
-		<section class="zd-home__sec zd-lineup">
-			<div class="zd-home__inner">
-				<?php $this->section_head( $s['lineup_title'], $s['lineup_eyebrow'] ); ?>
+		<div class="zd-tabs zd-tabs--rail zd-reveal" data-zd-reveal="rise"
+			data-zd-tabs-target="<?php echo esc_attr( $target ); ?>">
+			<button class="zd-tabs__arrow zd-tabs__arrow--prev" type="button"
+				aria-label="<?php esc_attr_e( 'Previous categories', 'zlaark-deals-pro' ); ?>">
+				<svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+					<path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2"
+						stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</button>
 
-				<?php if ( $has_tabs ) : ?>
-					<div class="zd-tabs zd-tabs--rail zd-reveal" data-zd-reveal="rise"
-						data-zd-tabs-target=".zd-lineup__grid">
-						<button class="zd-tabs__arrow zd-tabs__arrow--prev" type="button"
-							aria-label="<?php esc_attr_e( 'Previous categories', 'zlaark-deals-pro' ); ?>">
-							<svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-								<path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-						</button>
+			<?php
+			/*
+			 * These filter one grid rather than swapping panels, so they are
+			 * pressed toggle buttons in a named group, not an ARIA tablist - a
+			 * tab with no tabpanel to control is a promise to a screen reader
+			 * that is never kept.
+			 */
+			?>
+			<div class="zd-tabs__scroll" role="group"
+				aria-label="<?php esc_attr_e( 'Filter by category', 'zlaark-deals-pro' ); ?>">
+				<span class="zd-tabs__indicator" aria-hidden="true"></span>
 
-						<div class="zd-tabs__scroll" role="tablist">
-							<span class="zd-tabs__indicator" aria-hidden="true"></span>
-
-							<?php if ( $all_tab ) : ?>
-								<button class="zd-tabs__btn is-active" type="button" role="tab"
-									aria-selected="true" data-zd-filter="all">
-									<?php esc_html_e( 'All', 'zlaark-deals-pro' ); ?>
-								</button>
-							<?php endif; ?>
-
-							<?php $t = 0; ?>
-							<?php foreach ( $tabs as $slug => $name ) : ?>
-								<?php $active = ( ! $all_tab && 0 === $t ); ?>
-								<button class="zd-tabs__btn<?php echo $active ? ' is-active' : ''; ?>" type="button"
-									role="tab" aria-selected="<?php echo $active ? 'true' : 'false'; ?>"
-									data-zd-filter="<?php echo esc_attr( $slug ); ?>">
-									<?php echo esc_html( $name ); ?>
-								</button>
-								<?php $t++; ?>
-							<?php endforeach; ?>
-						</div>
-
-						<button class="zd-tabs__arrow zd-tabs__arrow--next" type="button"
-							aria-label="<?php esc_attr_e( 'More categories', 'zlaark-deals-pro' ); ?>">
-							<svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-								<path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-						</button>
-					</div>
+				<?php if ( $all_tab ) : ?>
+					<button class="zd-tabs__btn is-active" type="button"
+						aria-pressed="true" data-zd-filter="all">
+						<?php esc_html_e( 'All', 'zlaark-deals-pro' ); ?>
+					</button>
 				<?php endif; ?>
 
-				<div class="zd-lineup__grid" data-zd-active="<?php echo esc_attr( $first ); ?>">
-					<?php foreach ( $cards as $i => $deal ) : ?>
-						<?php $this->lineup_card( $deal, $s, $i, $first ); ?>
-					<?php endforeach; ?>
-				</div>
+				<?php $t = 0; ?>
+				<?php foreach ( $tabs as $slug => $name ) : ?>
+					<?php $active = ( ! $all_tab && 0 === $t ); ?>
+					<button class="zd-tabs__btn<?php echo $active ? ' is-active' : ''; ?>" type="button"
+						aria-pressed="<?php echo $active ? 'true' : 'false'; ?>"
+						data-zd-filter="<?php echo esc_attr( $slug ); ?>">
+						<?php echo esc_html( $name ); ?>
+					</button>
+					<?php $t++; ?>
+				<?php endforeach; ?>
 			</div>
-		</section>
+
+			<button class="zd-tabs__arrow zd-tabs__arrow--next" type="button"
+				aria-label="<?php esc_attr_e( 'More categories', 'zlaark-deals-pro' ); ?>">
+				<svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+					<path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2"
+						stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</button>
+		</div>
 		<?php
 	}
 
@@ -1491,6 +1871,16 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 
 		$features = array_slice( $deal['highlights'], 0, max( 2, (int) $s['lineup_feature_count'] ) );
 		$blurb    = ! empty( $features ) ? implode( ', ', $features ) : $deal['tagline'];
+
+		$criteria = array();
+		if ( isset( $s['lineup_scores'] ) && 'yes' === $s['lineup_scores'] ) {
+			foreach ( $deal['scores'] as $row ) {
+				if ( null !== $row['value'] ) {
+					$criteria[] = $row;
+				}
+			}
+			$criteria = array_slice( $criteria, 0, max( 3, (int) $s['lineup_score_count'] ) );
+		}
 
 		$classes = array( 'zd-lcard', 'zd-reveal' );
 		if ( ! $shown ) {
@@ -1528,8 +1918,41 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 				</div>
 			</div>
 
+			<?php if ( ! empty( $criteria ) ) : ?>
+				<?php
+				/*
+				 * The reference prints these as a plain label-to-value table,
+				 * not bars. At nine rows a bar chart becomes a texture you scan
+				 * past; the number carries it, and the colour does the work a
+				 * bar would have done.
+				 */
+				?>
+				<dl class="zd-lcard__scores">
+					<?php foreach ( $criteria as $row ) : ?>
+						<?php $band = Zlaark_Deals_Computed::score_band( $row['value'] ); ?>
+						<div class="zd-lscore">
+							<dt class="zd-lscore__label"><?php echo esc_html( $row['label'] ); ?></dt>
+							<dd class="zd-lscore__value<?php echo '' !== $band ? ' zd-score--' . esc_attr( $band ) : ''; ?>">
+								<?php
+								printf(
+									/* translators: %s: score out of ten. */
+									esc_html__( '%s/10', 'zlaark-deals-pro' ),
+									esc_html( number_format_i18n( (float) $row['value'], ( abs( $row['value'] - round( $row['value'] ) ) < 0.05 ) ? 0 : 1 ) )
+								);
+								?>
+							</dd>
+						</div>
+					<?php endforeach; ?>
+				</dl>
+			<?php endif; ?>
+
 			<?php if ( '' !== $blurb ) : ?>
-				<p class="zd-lcard__blurb"><?php echo esc_html( $blurb ); ?></p>
+				<div class="zd-lcard__more">
+					<?php if ( ! empty( $criteria ) ) : ?>
+						<p class="zd-lcard__morelabel"><?php esc_html_e( 'More details', 'zlaark-deals-pro' ); ?></p>
+					<?php endif; ?>
+					<p class="zd-lcard__blurb"><?php echo esc_html( $blurb ); ?></p>
+				</div>
 			<?php endif; ?>
 
 			<div class="zd-lcard__foot">
@@ -1568,7 +1991,15 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			? $s[ $prefix . '_cta' ]
 			: __( 'Read', 'zlaark-deals-pro' );
 		?>
-		<section class="zd-home__sec zd-strip zd-strip--<?php echo esc_attr( $variant ); ?>">
+		<?php
+		/*
+		 * The homepage alternates plain and tinted grounds. Lineup, reviews and
+		 * comparisons run back to back, so the middle one takes the tint -
+		 * three white sections in a row read as one very long section.
+		 */
+		$tint = ( 'review' === $variant ) ? ' zd-home__tint' : '';
+		?>
+		<section class="zd-home__sec zd-strip zd-strip--<?php echo esc_attr( $variant ); ?><?php echo esc_attr( $tint ); ?>">
 			<div class="zd-home__inner">
 				<?php if ( '' !== $title ) : ?>
 					<h2 class="zd-strip__title zd-reveal" data-zd-reveal="rise">
@@ -1605,11 +2036,82 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		<?php
 	}
 
+
+	/**
+	 * The 02e grid: the same articles, laid out four-up on a tinted ground with
+	 * a header link, rather than scrolled in a rail. Two shapes for the same
+	 * content, because a homepage that scrolls three rails in a row is a
+	 * homepage nobody finishes.
+	 */
+	protected function section_article_grid( $s ) {
+		$articles = $this->fetch_articles( $s, 'grid' );
+
+		if ( empty( $articles ) ) {
+			if ( $this->is_editor() ) {
+				$this->render_empty_notice();
+			}
+			return;
+		}
+
+		$cta      = ( '' !== $s['grid_cta'] ) ? $s['grid_cta'] : __( 'Read more', 'zlaark-deals-pro' );
+		$all_url  = ! empty( $s['grid_all_url']['url'] ) ? $s['grid_all_url']['url'] : '';
+		$tint     = ( 'yes' === $s['grid_tint'] ) ? ' zd-agrid--tint' : '';
+		$external = ! empty( $s['grid_all_url']['is_external'] );
+		?>
+		<section class="zd-home__sec zd-agrid<?php echo esc_attr( $tint ); ?>">
+			<div class="zd-home__inner">
+
+				<div class="zd-agrid__head zd-reveal" data-zd-reveal="rise">
+					<?php if ( '' !== $s['grid_title'] ) : ?>
+						<h2 class="zd-agrid__title">
+							<?php echo wp_kses_post( $this->highlight( $s['grid_title'], $s['grid_highlight'] ) ); ?>
+						</h2>
+					<?php endif; ?>
+
+					<?php if ( '' !== $all_url && '' !== $s['grid_all_text'] ) : ?>
+						<a class="zd-reviewlink zd-agrid__all" href="<?php echo esc_url( $all_url ); ?>"
+							<?php echo $external ? 'target="_blank" rel="noopener"' : ''; ?>>
+							<span><?php echo esc_html( $s['grid_all_text'] ); ?></span>
+							<svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+								<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</a>
+					<?php endif; ?>
+				</div>
+
+				<div class="zd-agrid__list">
+					<?php foreach ( $articles as $i => $article ) : ?>
+						<?php $this->article_card( $article, 'versus', $cta, $i, 'grid' ); ?>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		</section>
+		<?php
+	}
+
+	/*
+	 * The standalone section widgets dispatch to section_{key}( $s ), so the
+	 * two strips that share a renderer need a name each to be addressed by.
+	 */
+	protected function section_reviews( $s ) {
+		$this->section_articles( $s, 'rev', 'review' );
+	}
+
+	protected function section_comparisons( $s ) {
+		$this->section_articles( $s, 'vs', 'versus' );
+	}
+
 	/** One article card: cover, title, excerpt, read button. */
-	protected function article_card( $article, $variant, $cta, $index ) {
+	protected function article_card( $article, $variant, $cta, $index, $layout = 'rail' ) {
 		$parts = ( 'versus' === $variant ) ? Zlaark_Deals_Articles::versus_parts( $article['title'] ) : array();
 		?>
-		<article class="zd-acard zd-reveal" data-zd-reveal="rise" style="--zd-i:<?php echo (int) $index; ?>">
+		<?php
+		// --zd-i staggers the reveal and keeps counting; --zd-v cycles 0-3 so
+		// the cover artwork varies without drifting further every card.
+		?>
+		<article class="zd-acard zd-acard--<?php echo esc_attr( $layout ); ?> zd-reveal" data-zd-reveal="rise"
+			style="--zd-i:<?php echo (int) $index; ?>;--zd-v:<?php echo (int) ( $index % 4 ); ?>">
 			<a class="zd-acard__cover" href="<?php echo esc_url( $article['permalink'] ); ?>"
 				tabindex="-1" aria-hidden="true">
 				<?php if ( $article['image_id'] ) : ?>
@@ -1650,17 +2152,156 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			</div>
 
 			<div class="zd-acard__foot">
-				<a class="zd-btn zd-btn--ghost zd-acard__read" href="<?php echo esc_url( $article['permalink'] ); ?>">
-					<span class="zd-btn__label"><?php echo esc_html( $cta ); ?></span>
-					<span class="zd-btn__arrow" aria-hidden="true">
-						<svg viewBox="0 0 16 16" width="14" height="14" fill="none">
+				<?php if ( 'grid' === $layout ) : ?>
+					<?php // A dense four-up reads better with a text link than four more filled pills. ?>
+					<a class="zd-reviewlink" href="<?php echo esc_url( $article['permalink'] ); ?>">
+						<span><?php echo esc_html( $cta ); ?></span>
+						<svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
 							<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round" stroke-linejoin="round" />
 						</svg>
-					</span>
-				</a>
+					</a>
+				<?php else : ?>
+					<a class="zd-btn zd-btn--ghost zd-acard__read" href="<?php echo esc_url( $article['permalink'] ); ?>">
+						<span class="zd-btn__label"><?php echo esc_html( $cta ); ?></span>
+						<span class="zd-btn__arrow" aria-hidden="true">
+							<svg viewBox="0 0 16 16" width="14" height="14" fill="none">
+								<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</a>
+				<?php endif; ?>
 			</div>
 		</article>
+		<?php
+	}
+
+
+	/* ------------------------------------------------ 09b testimonials */
+
+	/**
+	 * Attributed quotes on a scrolling rail. The card tint cycles by position,
+	 * the same rule the lineup caps follow, so the colour is never a claim
+	 * about the person quoted.
+	 */
+	protected function section_testimonials( $s ) {
+		$rows = is_array( $s['quotes'] ) ? $s['quotes'] : array();
+
+		$rows = array_values(
+			array_filter(
+				$rows,
+				function ( $row ) {
+					return '' !== trim( (string) $row['quote'] );
+				}
+			)
+		);
+
+		if ( empty( $rows ) ) {
+			return;
+		}
+
+		$cta_url = ! empty( $s['quotes_cta_url']['url'] ) ? $s['quotes_cta_url']['url'] : '';
+		?>
+		<section class="zd-home__sec zd-quotes">
+			<div class="zd-home__inner">
+
+				<div class="zd-quotes__head zd-reveal" data-zd-reveal="rise">
+					<?php if ( '' !== $s['quotes_title'] ) : ?>
+						<h2 class="zd-quotes__title">
+							<?php echo wp_kses_post( $this->highlight( $s['quotes_title'], $s['quotes_highlight'] ) ); ?>
+						</h2>
+					<?php endif; ?>
+				</div>
+
+				<div class="zd-rail" data-zd-rail="true">
+					<div class="zd-rail__track zd-rail__track--quotes">
+						<?php foreach ( $rows as $i => $row ) : ?>
+							<?php
+							/*
+							 * No positional tint here. The lineup colours by
+							 * rank because rank is positional; a quote has no
+							 * rank, so colouring these would be decoration
+							 * pretending to be information.
+							 */
+							?>
+							<figure class="zd-quote zd-reveal" data-zd-reveal="rise"
+								style="--zd-i:<?php echo (int) $i; ?>">
+
+								<?php
+								/*
+								 * A real quote mark, set in the display face. It
+								 * leads the quote rather than floating behind it -
+								 * as a background glyph it collided with the first
+								 * two lines on every card wider than one column.
+								 */
+								?>
+								<span class="zd-quote__mark" aria-hidden="true">&ldquo;</span>
+
+								<blockquote class="zd-quote__text">
+									<?php echo esc_html( $row['quote'] ); ?>
+								</blockquote>
+
+								<figcaption class="zd-quote__by">
+									<?php if ( ! empty( $row['photo']['url'] ) ) : ?>
+										<img class="zd-quote__photo" loading="lazy" alt=""
+											src="<?php echo esc_url( $row['photo']['url'] ); ?>" />
+									<?php else : ?>
+										<span class="zd-quote__photo zd-quote__photo--initial" aria-hidden="true">
+											<?php echo esc_html( mb_substr( (string) $row['name'], 0, 1 ) ); ?>
+										</span>
+									<?php endif; ?>
+
+									<span class="zd-quote__who">
+										<?php if ( '' !== $row['name'] ) : ?>
+											<b class="zd-quote__name"><?php echo esc_html( $row['name'] ); ?></b>
+										<?php endif; ?>
+										<?php if ( '' !== $row['role'] ) : ?>
+											<span class="zd-quote__role"><?php echo esc_html( $row['role'] ); ?></span>
+										<?php endif; ?>
+										<?php if ( '' !== $row['source'] ) : ?>
+											<span class="zd-quote__source"><?php echo esc_html( $row['source'] ); ?></span>
+										<?php endif; ?>
+									</span>
+								</figcaption>
+							</figure>
+						<?php endforeach; ?>
+					</div>
+
+					<div class="zd-rail__nav">
+						<button class="zd-rail__btn zd-rail__btn--prev" type="button"
+							aria-label="<?php esc_attr_e( 'Scroll left', 'zlaark-deals-pro' ); ?>">
+							<svg viewBox="0 0 16 16" width="18" height="18" fill="none" aria-hidden="true">
+								<path d="M14 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
+						<button class="zd-rail__btn zd-rail__btn--next" type="button"
+							aria-label="<?php esc_attr_e( 'Scroll right', 'zlaark-deals-pro' ); ?>">
+							<svg viewBox="0 0 16 16" width="18" height="18" fill="none" aria-hidden="true">
+								<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
+					</div>
+				</div>
+
+				<?php if ( '' !== $cta_url && '' !== $s['quotes_cta_text'] ) : ?>
+					<div class="zd-quotes__foot">
+						<a class="zd-btn zd-btn--solid" href="<?php echo esc_url( $cta_url ); ?>"
+							<?php echo ! empty( $s['quotes_cta_url']['is_external'] ) ? 'target="_blank" rel="noopener"' : ''; ?>>
+							<span class="zd-btn__label"><?php echo esc_html( $s['quotes_cta_text'] ); ?></span>
+							<span class="zd-btn__arrow" aria-hidden="true">
+								<svg viewBox="0 0 16 16" width="14" height="14" fill="none">
+									<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
+										stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</span>
+						</a>
+					</div>
+				<?php endif; ?>
+			</div>
+		</section>
 		<?php
 	}
 
@@ -1868,11 +2509,12 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 				$band = Zlaark_Deals_Computed::score_band( $row['value'] );
 				printf(
 					'<div class="zd-cbar" style="--zd-i:%d"><span>%s</span>'
-					. '<span class="zd-cbar__track"><i class="zd-cbar__fill zd-fill--%s" data-zd-bar="%s"></i></span>'
+					. '<span class="zd-cbar__track"><i class="zd-cbar__fill zd-fill--%s" style="--zd-bar:%s%%" data-zd-bar="%s"></i></span>'
 					. '<b class="zd-score--%s">%s</b></div>',
 					(int) $i,
 					esc_html( $row['label'] ),
 					esc_attr( $band ),
+					esc_attr( max( 0, min( 100, $row['value'] * 10 ) ) ),
 					esc_attr( $row['value'] * 10 ),
 					esc_attr( $band ),
 					esc_html( number_format_i18n( $row['value'], 1 ) )

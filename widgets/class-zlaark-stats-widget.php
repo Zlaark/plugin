@@ -360,7 +360,7 @@ class Zlaark_Stats_Widget extends Zlaark_Widget_Base {
 						<?php echo esc_html( $item['prefix'] ); ?><span
 							data-zd-count="<?php echo esc_attr( $item['value'] ); ?>"
 							data-zd-decimals="<?php echo esc_attr( (int) $item['decimals'] ); ?>"
-							data-zd-duration="<?php echo esc_attr( $duration ); ?>">0</span><?php echo esc_html( $item['suffix'] ); ?>
+							data-zd-duration="<?php echo esc_attr( $duration ); ?>"><?php echo esc_html( number_format_i18n( (float) $item['value'], (int) $item['decimals'] ) ); ?></span><?php echo esc_html( $item['suffix'] ); ?>
 					</p>
 
 					<p class="zd-stat-card__label"><?php echo esc_html( $item['label'] ); ?></p>

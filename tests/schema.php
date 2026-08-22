@@ -32,7 +32,10 @@ ck( 'offer price is plain decimal', $g['offers']['price'], '5.00' );
 ck( 'offer currency', $g['offers']['priceCurrency'], 'USD' );
 ck( 'availability', $g['offers']['availability'], 'https://schema.org/InStock' );
 ck( 'priceValidUntil from expiry', $g['offers']['priceValidUntil'], '2026-12-01' );
-ck( 'aggregateRating value', $g['aggregateRating']['ratingValue'], '8.7' );
+// Derived from the fixture rather than hardcoded, so widening the score
+// breakdown does not silently turn a correct average into a red test.
+$expected_overall = number_format( array_sum( array_column( $deals[0]['scores'], 'value' ) ) / count( $deals[0]['scores'] ), 1 );
+ck( 'aggregateRating value', $g['aggregateRating']['ratingValue'], $expected_overall );
 ck( 'aggregateRating bestRating', $g['aggregateRating']['bestRating'], '10' );
 ck( 'review author is Person', $g['review']['author']['@type'], 'Person' );
 ck( 'review has rating', isset( $g['review']['reviewRating'] ), true );

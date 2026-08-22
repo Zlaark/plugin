@@ -152,29 +152,6 @@ class Zlaark_Panel_Widget extends Zlaark_Query_Widget_Base {
 	}
 
 	/** Deal titles for the picker, capped so the control stays usable. */
-	private static function deal_options() {
-		$out   = array();
-		$deals = get_posts(
-			array(
-				'post_type'              => ZLAARK_DEALS_CPT,
-				'post_status'            => 'publish',
-				'posts_per_page'         => 100,
-				'orderby'                => 'title',
-				'order'                  => 'ASC',
-				// This runs on every editor load. Skipping other plugins'
-				// pre_get_posts hooks and the meta/term caches keeps the
-				// editor bootstrap cheap and predictable.
-				'suppress_filters'       => true,
-				'no_found_rows'          => true,
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false,
-			)
-		);
-		foreach ( $deals as $deal ) {
-			$out[ $deal->ID ] = $deal->post_title;
-		}
-		return $out;
-	}
 
 	protected function render() {
 		$s = $this->get_settings_for_display();

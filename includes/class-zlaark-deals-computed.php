@@ -263,4 +263,66 @@ class Zlaark_Deals_Computed {
 			),
 		);
 	}
+
+	/**
+	 * Display symbol for a deal's money.
+	 *
+	 * The Currency field is an ISO code kept for schema markup - printing it
+	 * in front of a number gives "USD95.88". The symbol the reader should see
+	 * is the one already sitting in the deal's own Price string, because that
+	 * is what the editor typed and what every card on the page shows. Falling
+	 * back to the code with a space keeps an unmapped currency readable.
+	 *
+	 * @param array $deal Output of get_deal_data().
+	 * @return string
+	 */
+	public static function currency_symbol( $deal ) {
+		$known = array(
+			'USD' => '$',
+			'EUR' => '€',
+			'GBP' => '£',
+			'INR' => '₹',
+			'JPY' => '¥',
+			'AUD' => 'A$',
+			'CAD' => 'C$',
+		);
+
+		foreach ( array( 'price', 'old_price', 'renewal_price' ) as $field ) {
+			$raw = isset( $deal[ $field ] ) ? trim( (string) $deal[ $field ] ) : '';
+			if ( '' === $raw ) {
+				continue;
+			}
+			// Leading run of anything that is not a digit, space or separator.
+			if ( preg_match( '/^([^\d\s.,-]+)/u', $raw, $m ) ) {
+				return $m[1];
+			}
+		}
+
+		$code = isset( $deal['currency'] ) ? strtoupper( (string) $deal['currency'] ) : '';
+
+		if ( isset( $known[ $code ] ) ) {
+			return $known[ $code ];
+		}
+
+		return ( '' !== $code ) ? $code . "\xC2\xA0" : '$';
+	}
+
+	/**
+	 * A computed amount, formatted the way the rest of the page formats money.
+	 * Whole amounts lose the decimals - "$96" reads harder than "$96.00".
+	 *
+	 * @param float|null $amount
+	 * @param array      $deal
+	 * @return string
+	 */
+	public static function format_money( $amount, $deal ) {
+		if ( null === $amount || '' === $amount ) {
+			return '';
+		}
+
+		$amount   = (float) $amount;
+		$decimals = ( abs( $amount - round( $amount ) ) < 0.005 ) ? 0 : 2;
+
+		return self::currency_symbol( $deal ) . number_format_i18n( $amount, $decimals );
+	}
 }

@@ -792,7 +792,7 @@ class Zlaark_Deals_Widget extends Zlaark_Query_Widget_Base {
 							$terms[] = sprintf(
 								/* translators: %s: total cost across the first term. */
 								__( '%s first term', 'zlaark-deals-pro' ),
-								number_format_i18n( $deal['first_term_total'], 2 )
+								Zlaark_Deals_Computed::format_money( $deal['first_term_total'], $deal )
 							);
 						}
 						?>

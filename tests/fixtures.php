@@ -21,10 +21,18 @@ function zd_fixture_deals() {
 			'price' => '$5.00/mo', 'old_price' => '$12.99/mo', 'badge' => 'Best Value',
 			'rank_label' => 'Best overall', 'rating' => 9.2,
 			'highlights' => array( 'Free migration', '99.9% uptime', '24/7 support' ),
+			// Nine criteria, because that is what a real scorecard carries and
+			// a three-row fixture never exercises the table layout.
 			'scores' => array(
-				array( 'label' => 'Speed', 'value' => 9.6 ),
-				array( 'label' => 'Uptime', 'value' => 9.4 ),
-				array( 'label' => 'Value', 'value' => 7.2 ),
+				array( 'label' => 'Features', 'value' => 10 ),
+				array( 'label' => 'Ease of Use', 'value' => 9 ),
+				array( 'label' => 'Pricing', 'value' => 9 ),
+				array( 'label' => 'Templates & Design', 'value' => 9 ),
+				array( 'label' => 'Inventory', 'value' => 9 ),
+				array( 'label' => 'SEO & Marketing', 'value' => 8 ),
+				array( 'label' => 'Payments', 'value' => 9 ),
+				array( 'label' => 'Security', 'value' => 6 ),
+				array( 'label' => 'Customer Support', 'value' => 5 ),
 			),
 			'button_text' => 'Get this deal', 'button_url' => 'https://a2hosting.com/?aid=1',
 			'button_new' => true, 'terms' => array(),

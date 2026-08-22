@@ -23,6 +23,7 @@ class Zlaark_Deals_Post_Type {
 
 		add_filter( 'manage_' . ZLAARK_DEALS_CPT . '_posts_columns', array( __CLASS__, 'columns' ) );
 		add_action( 'manage_' . ZLAARK_DEALS_CPT . '_posts_custom_column', array( __CLASS__, 'column_content' ), 10, 2 );
+		add_action( 'admin_notices', array( __CLASS__, 'seeded_notice' ) );
 		add_filter( 'enter_title_here', array( __CLASS__, 'title_placeholder' ), 10, 2 );
 	}
 
@@ -108,6 +109,48 @@ class Zlaark_Deals_Post_Type {
 		update_option( 'zlaark_deals_defaults_seeded', 1 );
 	}
 
+	/**
+	 * Placeholder values carried in from a seed import.
+	 *
+	 * The import writes this; clearing a field in the editor does not remove it
+	 * from the list, so the check is done against the live value - a field the
+	 * editor has since filled in stops counting as unverified on its own.
+	 *
+	 * @param int $post_id
+	 * @return array Field names still holding their imported placeholder.
+	 */
+	public static function unverified_fields( $post_id ) {
+		$seeded = get_post_meta( $post_id, '_zlaark_seeded', true );
+
+		if ( empty( $seeded ) || ! is_array( $seeded ) ) {
+			return array();
+		}
+
+		return array_values( array_filter( $seeded ) );
+	}
+
+	/** Notice on the deal editor, so the warning is where the fixing happens. */
+	public static function seeded_notice() {
+		$screen = get_current_screen();
+
+		if ( ! $screen || ZLAARK_DEALS_CPT !== $screen->post_type || 'post' !== $screen->base ) {
+			return;
+		}
+
+		$fields = self::unverified_fields( get_the_ID() );
+
+		if ( empty( $fields ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-warning"><p><strong>%s</strong> %s</p><p><code>%s</code></p></div>',
+			esc_html__( 'Imported placeholders on this deal.', 'zlaark-deals-pro' ),
+			esc_html__( 'These fields were filled by a seed import and stand in for facts only you have. Check each against the vendor page before this deal goes live.', 'zlaark-deals-pro' ),
+			esc_html( implode( ', ', $fields ) )
+		);
+	}
+
 	public static function columns( $columns ) {
 		$reordered = array();
 		foreach ( $columns as $key => $label ) {
@@ -118,6 +161,7 @@ class Zlaark_Deals_Post_Type {
 			if ( 'title' === $key ) {
 				$reordered['zlaark_price']  = __( 'Pricing', 'zlaark-deals-pro' );
 				$reordered['zlaark_rating'] = __( 'Rating', 'zlaark-deals-pro' );
+				$reordered['zlaark_seeded'] = __( 'To verify', 'zlaark-deals-pro' );
 			}
 		}
 		return $reordered;
@@ -149,6 +193,27 @@ class Zlaark_Deals_Post_Type {
 		if ( 'zlaark_rating' === $column ) {
 			$rating = get_post_meta( $post_id, '_zlaark_rating', true );
 			echo '' !== $rating ? esc_html( $rating ) . '<span style="opacity:.5">/10</span>' : '&mdash;';
+		}
+
+		if ( 'zlaark_seeded' === $column ) {
+			$fields = self::unverified_fields( $post_id );
+
+			if ( empty( $fields ) ) {
+				echo '<span style="color:#0b7a4f" title="' . esc_attr__( 'Nothing imported as a placeholder.', 'zlaark-deals-pro' ) . '">&check;</span>';
+				return;
+			}
+
+			printf(
+				'<span style="color:#c2410c;font-weight:600" title="%s">%s</span>',
+				esc_attr( implode( ', ', $fields ) ),
+				esc_html(
+					sprintf(
+						/* translators: %d: number of placeholder fields. */
+						_n( '%d field', '%d fields', count( $fields ), 'zlaark-deals-pro' ),
+						count( $fields )
+					)
+				)
+			);
 		}
 	}
 

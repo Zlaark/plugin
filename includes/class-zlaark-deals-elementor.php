@@ -43,6 +43,14 @@ class Zlaark_Deals_Elementor {
 		'aboutus'      => 'Zlaark_About_Us_Widget',
 		'faq'          => 'Zlaark_Faq_Widget',
 		'cta'          => 'Zlaark_Cta_Widget',
+		'lineup'       => 'Zlaark_Lineup_Widget',
+		'reviews'      => 'Zlaark_Reviews_Widget',
+		'comparisons'  => 'Zlaark_Comparisons_Widget',
+		'grid'         => 'Zlaark_Article_Grid_Widget',
+		'testimonials' => 'Zlaark_Testimonials_Widget',
+		'byline'       => 'Zlaark_Byline_Widget',
+		'verdict'      => 'Zlaark_Verdict_Widget',
+		'offerbar'     => 'Zlaark_Offerbar_Widget',
 	);
 
 	public static function init() {

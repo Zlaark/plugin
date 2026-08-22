@@ -878,7 +878,7 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 			<?php foreach ( $s['stats'] as $i => $stat ) : ?>
 				<div class="zd-stat" style="--zd-i:<?php echo (int) $i; ?>">
 					<p class="zd-stat__value">
-						<?php echo esc_html( $stat['prefix'] ); ?><span data-zd-count="<?php echo esc_attr( $stat['value'] ); ?>">0</span><?php echo esc_html( $stat['suffix'] ); ?>
+						<?php echo esc_html( $stat['prefix'] ); ?><span data-zd-count="<?php echo esc_attr( $stat['value'] ); ?>"><?php echo esc_html( $stat['value'] ); ?></span><?php echo esc_html( $stat['suffix'] ); ?>
 					</p>
 					<p class="zd-stat__label"><?php echo esc_html( $stat['label'] ); ?></p>
 				</div>

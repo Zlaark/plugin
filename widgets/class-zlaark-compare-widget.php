@@ -261,11 +261,28 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->add_control(
+			'score_colour',
+			array(
+				'label'        => __( 'Colour Scores By Value', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => __( 'Strong scores read green, middling amber, weak red - so the 6 among the 9s is findable at a glance. Turn off to colour every value the same.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		/*
+		 * Only offered when the semantic ramp is off. Elementor's selector wins
+		 * over the band class, so leaving both live would silently repaint
+		 * every score one colour and make the switch above do nothing.
+		 */
+		$this->add_control(
 			'value_color',
 			array(
 				'label'     => __( 'Score Value Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
 				'default'   => '#0a1310',
+				'condition' => array( 'score_colour!' => 'yes' ),
 				'selectors' => array( '{{WRAPPER}} .zd-score__value' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -386,7 +403,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 				<?php endif; ?>
 			</div>
 
-			<?php $this->render_scores( $deal['scores'] ); ?>
+			<?php $this->render_scores( $deal['scores'], 'yes' === $s['score_colour'] ); ?>
 
 			<?php if ( '' !== $deal['verified_label'] ) : ?>
 				<p class="zd-compare__verified"><?php echo esc_html( $deal['verified_label'] ); ?></p>
@@ -432,7 +449,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			</div>
 
 			<div class="zd-compare__bars">
-				<?php $this->render_scores( array_slice( $deal['scores'], 0, 3 ) ); ?>
+				<?php $this->render_scores( array_slice( $deal['scores'], 0, 3 ), 'yes' === $s['score_colour'] ); ?>
 			</div>
 
 			<?php if ( 'yes' === $s['show_overall'] && null !== $deal['rating'] ) : ?>
@@ -454,25 +471,37 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 	 * Score bars. Width is set through a custom property that the reveal
 	 * observer flips on, so the fill animates the first time it is seen.
 	 */
-	private function render_scores( $scores ) {
+	private function render_scores( $scores, $banded = true ) {
 		if ( empty( $scores ) ) {
 			return;
 		}
 		?>
 		<ul class="zd-scores">
 			<?php foreach ( $scores as $i => $score ) : ?>
+				<?php
+				/*
+				 * Every score already knows whether it is good, fair or weak -
+				 * score_band() runs on each deal and the ramp is styled - but
+				 * this column used to print a flat colour and throw the band
+				 * away. A wall of identical numbers is not a comparison; the
+				 * whole point is spotting the 6 among the 9s.
+				 */
+				$band = $banded ? Zlaark_Deals_Computed::score_band( $score['value'] ) : '';
+				?>
 				<li class="zd-score" style="--zd-i:<?php echo (int) $i; ?>">
 					<div class="zd-score__head">
 						<span class="zd-score__label"><?php echo esc_html( $score['label'] ); ?></span>
 						<?php if ( null !== $score['value'] ) : ?>
-							<span class="zd-score__value"
+							<span class="zd-score__value<?php echo '' !== $band ? ' zd-score--' . esc_attr( $band ) : ''; ?>"
 								data-zd-count="<?php echo esc_attr( $score['value'] ); ?>"
-								data-zd-decimals="1">0.0</span>
+								data-zd-decimals="1"><?php echo esc_html( number_format_i18n( $score['value'], 1 ) ); ?></span>
 						<?php endif; ?>
 					</div>
 					<?php if ( null !== $score['value'] ) : ?>
 						<span class="zd-score__track">
-							<span class="zd-score__bar" data-zd-bar="<?php echo esc_attr( $score['value'] * 10 ); ?>"></span>
+							<span class="zd-score__bar<?php echo '' !== $band ? ' zd-fill--' . esc_attr( $band ) : ''; ?>"
+								data-zd-bar="<?php echo esc_attr( $score['value'] * 10 ); ?>"
+								style="--zd-bar:<?php echo esc_attr( max( 0, min( 100, $score['value'] * 10 ) ) ); ?>%"></span>
 						</span>
 					<?php endif; ?>
 				</li>

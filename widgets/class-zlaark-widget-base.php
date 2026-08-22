@@ -448,7 +448,7 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 				<circle class="zd-ring__track" cx="30" cy="30" r="<?php echo esc_attr( $radius ); ?>" />
 				<circle class="zd-ring__bar" cx="30" cy="30" r="<?php echo esc_attr( $radius ); ?>" />
 			</svg>
-			<span class="zd-ring__value" data-zd-count="<?php echo esc_attr( $rating ); ?>" data-zd-decimals="1">0.0</span>
+			<span class="zd-ring__value" data-zd-count="<?php echo esc_attr( $rating ); ?>" data-zd-decimals="1"><?php echo esc_html( number_format_i18n( (float) $rating, 1 ) ); ?></span>
 		</div>
 		<?php
 	}
@@ -658,5 +658,83 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 				'excerpt'    => (int) $get( 'excerpt', 24 ),
 			)
 		);
+	}
+
+	/* ------------------------------------------------- one-deal widgets */
+
+	/**
+	 * Published deals for a picker, as ID => title.
+	 *
+	 * Runs on every editor load, so it skips other plugins' pre_get_posts
+	 * hooks and the meta/term caches to keep the editor bootstrap cheap.
+	 */
+	public static function deal_options() {
+		$deals = get_posts(
+			array(
+				'post_type'              => ZLAARK_DEALS_CPT,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 100,
+				'orderby'                => 'title',
+				'order'                  => 'ASC',
+				'suppress_filters'       => true,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$out = array();
+		foreach ( $deals as $deal ) {
+			$out[ $deal->ID ] = $deal->post_title;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * "Current deal / a specific deal" source pair, for the widgets that show
+	 * one deal rather than a query.
+	 */
+	protected function single_deal_controls() {
+		$this->add_control(
+			'source',
+			array(
+				'label'   => __( 'Deal Source', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'current',
+				'options' => array(
+					'current' => __( 'Current deal (single template)', 'zlaark-deals-pro' ),
+					'pick'    => __( 'A specific deal', 'zlaark-deals-pro' ),
+				),
+			)
+		);
+
+		$this->add_control(
+			'deal_id',
+			array(
+				'label'       => __( 'Choose Deal', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::SELECT2,
+				'label_block' => true,
+				'options'     => ( is_admin() || $this->is_editor() ) ? self::deal_options() : array(),
+				'condition'   => array( 'source' => 'pick' ),
+			)
+		);
+	}
+
+	/**
+	 * The deal a one-deal widget should render, or an empty array when there
+	 * is none - which is a widget dropped outside a deal template, not an
+	 * error worth shouting about on the live page.
+	 */
+	protected function resolve_single_deal( $s ) {
+		$post_id = ( 'pick' === $s['source'] && ! empty( $s['deal_id'] ) )
+			? (int) $s['deal_id']
+			: get_the_ID();
+
+		if ( ! $post_id || ZLAARK_DEALS_CPT !== get_post_type( $post_id ) ) {
+			return array();
+		}
+
+		return Zlaark_Deals_Meta::get_deal_data( $post_id );
 	}
 }

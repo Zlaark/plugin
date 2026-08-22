@@ -305,6 +305,13 @@ class Zlaark_Deals_Settings {
 			'site'       => home_url(),
 			'categories' => array(),
 			'deals'      => array(),
+			/*
+			 * The review, comparison and article-grid strips read ordinary
+			 * posts, so an export that carried only deals seeded a site whose
+			 * new sections all rendered empty. Articles travel by slug and
+			 * category; the body copy stays in WordPress where it is edited.
+			 */
+			'articles'   => array(),
 		);
 
 		$terms = get_terms(
@@ -345,6 +352,8 @@ class Zlaark_Deals_Settings {
 			);
 		}
 
+		$payload['articles'] = self::export_articles();
+
 		$json = wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 
 		nocache_headers();
@@ -353,6 +362,120 @@ class Zlaark_Deals_Settings {
 		header( 'Content-Length: ' . strlen( $json ) );
 		echo $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON download.
 		exit;
+	}
+
+
+	/**
+	 * Posts the editorial strips read, flattened for transport.
+	 *
+	 * Only posts in a category the strips actually point at are worth carrying,
+	 * but the export cannot know which categories an editor picked, so it takes
+	 * everything published and lets the import decide. Capped, because an
+	 * export is a seed file, not a site backup.
+	 */
+	private static function export_articles( $limit = 60 ) {
+		$posts = get_posts(
+			array(
+				'post_type'        => 'post',
+				'post_status'      => 'publish',
+				'numberposts'      => $limit,
+				'orderby'          => 'date',
+				'order'            => 'DESC',
+				'suppress_filters' => false,
+			)
+		);
+
+		$out = array();
+
+		foreach ( $posts as $post ) {
+			$thumb = (int) get_post_thumbnail_id( $post->ID );
+
+			$out[] = array(
+				'slug'       => $post->post_name,
+				'title'      => $post->post_title,
+				'excerpt'    => $post->post_excerpt,
+				'status'     => $post->post_status,
+				'categories' => wp_get_post_terms( $post->ID, 'category', array( 'fields' => 'slugs' ) ),
+				'image_url'  => $thumb ? wp_get_attachment_url( $thumb ) : '',
+			);
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Creates the article stubs an imported strip needs, plus any categories
+	 * they are filed under. Existing posts are never overwritten: the body copy
+	 * lives in WordPress, and a seed file has no business replacing it.
+	 *
+	 * @return int Number of posts created.
+	 */
+	private static function import_articles( $articles ) {
+		if ( empty( $articles ) || ! is_array( $articles ) ) {
+			return 0;
+		}
+
+		$created = 0;
+
+		foreach ( $articles as $row ) {
+			if ( empty( $row['title'] ) ) {
+				continue;
+			}
+
+			$slug = isset( $row['slug'] ) ? sanitize_title( $row['slug'] ) : sanitize_title( $row['title'] );
+
+			if ( get_page_by_path( $slug, OBJECT, 'post' ) ) {
+				continue; // Already written. Leave it alone.
+			}
+
+			$term_ids = array();
+			foreach ( (array) ( isset( $row['categories'] ) ? $row['categories'] : array() ) as $cat_slug ) {
+				$cat_slug = sanitize_title( $cat_slug );
+				if ( '' === $cat_slug ) {
+					continue;
+				}
+				$term = get_term_by( 'slug', $cat_slug, 'category' );
+				if ( ! $term ) {
+					$new = wp_insert_term( ucwords( str_replace( '-', ' ', $cat_slug ) ), 'category', array( 'slug' => $cat_slug ) );
+					if ( ! is_wp_error( $new ) ) {
+						$term_ids[] = (int) $new['term_id'];
+					}
+					continue;
+				}
+				$term_ids[] = (int) $term->term_id;
+			}
+
+			$post_id = wp_insert_post(
+				array(
+					'post_type'    => 'post',
+					'post_title'   => sanitize_text_field( $row['title'] ),
+					'post_name'    => $slug,
+					'post_excerpt' => isset( $row['excerpt'] ) ? sanitize_textarea_field( $row['excerpt'] ) : '',
+					'post_content' => '',
+					'post_status'  => ( isset( $row['status'] ) && 'draft' === $row['status'] ) ? 'draft' : 'publish',
+				),
+				true
+			);
+
+			if ( is_wp_error( $post_id ) || ! $post_id ) {
+				continue;
+			}
+
+			if ( ! empty( $term_ids ) ) {
+				wp_set_object_terms( $post_id, $term_ids, 'category', false );
+			}
+
+			if ( ! empty( $row['image_url'] ) ) {
+				$attachment_id = attachment_url_to_postid( esc_url_raw( $row['image_url'] ) );
+				if ( $attachment_id ) {
+					set_post_thumbnail( $post_id, (int) $attachment_id );
+				}
+			}
+
+			$created++;
+		}
+
+		return $created;
 	}
 
 	/* -------------------------------------------------------------------
@@ -464,15 +587,35 @@ class Zlaark_Deals_Settings {
 				}
 			}
 
+			/*
+			 * A seed file may carry placeholder values standing in for facts
+			 * only the site owner has - a renewal price, who tested it, when.
+			 * Recording which fields were guessed is what lets the deal list
+			 * flag them, so nothing plausible-looking goes live as fact
+			 * because somebody forgot it was a placeholder.
+			 */
+			if ( ! empty( $row['_seeded'] ) && is_array( $row['_seeded'] ) ) {
+				update_post_meta(
+					$post_id,
+					'_zlaark_seeded',
+					array_map( 'sanitize_key', $row['_seeded'] )
+				);
+			} else {
+				delete_post_meta( $post_id, '_zlaark_seeded' );
+			}
+
 			update_post_meta( $post_id, '_zlaark_schema', self::SCHEMA );
 		}
+
+		$articles = isset( $payload['articles'] ) ? self::import_articles( $payload['articles'] ) : 0;
 
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'zd_import'  => 'ok',
-					'zd_created' => $created,
-					'zd_updated' => $updated,
+					'zd_import'   => 'ok',
+					'zd_created'  => $created,
+					'zd_updated'  => $updated,
+					'zd_articles' => $articles,
 				),
 				$redirect
 			)
@@ -489,14 +632,16 @@ class Zlaark_Deals_Settings {
 		if ( 'ok' === $state ) {
 			$created = isset( $_GET['zd_created'] ) ? (int) $_GET['zd_created'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$updated = isset( $_GET['zd_updated'] ) ? (int) $_GET['zd_updated'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$articles = isset( $_GET['zd_articles'] ) ? (int) $_GET['zd_articles'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			printf(
 				'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 				esc_html(
 					sprintf(
-						/* translators: 1: created count, 2: updated count. */
-						__( 'Import finished. %1$d deals created, %2$d updated.', 'zlaark-deals-pro' ),
+						/* translators: 1: deals created, 2: deals updated, 3: articles created. */
+						__( 'Import finished. %1$d deals created, %2$d updated, %3$d articles added.', 'zlaark-deals-pro' ),
 						$created,
-						$updated
+						$updated,
+						$articles
 					)
 				)
 			);

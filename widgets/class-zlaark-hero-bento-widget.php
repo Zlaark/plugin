@@ -93,7 +93,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'       => __( 'Eyebrow Pill', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::TEXT,
-				'default'     => __( 'Now in public beta', 'zlaark-deals-pro' ),
+				'default'     => __( 'Re-checked this month', 'zlaark-deals-pro' ),
 				'label_block' => true,
 				'description' => __( 'Small badge above the title. Leave empty to hide.', 'zlaark-deals-pro' ),
 			)
@@ -143,7 +143,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 				'label'   => __( 'Description', 'zlaark-deals-pro' ),
 				'type'    => Controls_Manager::TEXTAREA,
 				'rows'    => 3,
-				'default' => __( 'By empowering users with greater control over their data, identity, and assets.', 'zlaark-deals-pro' ),
+				'default' => __( 'We buy every tool with our own money, run it for weeks, and publish the number we measured - including the renewal price nobody else prints.', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -152,7 +152,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Primary Button', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => __( 'Get In Touch', 'zlaark-deals-pro' ),
+				'default'   => __( 'Browse the deals', 'zlaark-deals-pro' ),
 				'separator' => 'before',
 			)
 		);
@@ -171,7 +171,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'   => __( 'Secondary Button', 'zlaark-deals-pro' ),
 				'type'    => Controls_Manager::TEXT,
-				'default' => __( 'Log In', 'zlaark-deals-pro' ),
+				'default' => __( 'How we test', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -611,7 +611,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'   => __( 'Label', 'zlaark-deals-pro' ),
 				'type'    => Controls_Manager::TEXT,
-				'default' => __( 'Company Collaboration', 'zlaark-deals-pro' ),
+				'default' => __( 'Deals live', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -624,19 +624,19 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 				'title_field' => '{{{ value }}}{{{ suffix }}} - {{{ label }}}',
 				'default'     => array(
 					array(
-						'value'  => 100,
-						'suffix' => '+',
-						'label'  => __( 'Company Collaboration', 'zlaark-deals-pro' ),
+						'value'  => 102,
+						'suffix' => '',
+						'label'  => __( 'Deals live', 'zlaark-deals-pro' ),
 					),
 					array(
-						'value'  => 20,
-						'suffix' => '+',
-						'label'  => __( 'Winning Awards', 'zlaark-deals-pro' ),
+						'value'  => 8400,
+						'suffix' => '',
+						'label'  => __( 'Spent testing', 'zlaark-deals-pro' ),
 					),
 					array(
-						'value'  => 300,
-						'suffix' => 'K+',
-						'label'  => __( 'Join Our Communities', 'zlaark-deals-pro' ),
+						'value'  => 41,
+						'suffix' => '%',
+						'label'  => __( 'Average saving', 'zlaark-deals-pro' ),
 					),
 				),
 			)
@@ -1429,7 +1429,7 @@ class Zlaark_Hero_Bento_Widget extends Zlaark_Widget_Base {
 			<?php foreach ( $s['stats'] as $i => $stat ) : ?>
 				<div class="zd-bento__stat" style="--zd-i:<?php echo (int) $i; ?>">
 					<p class="zd-bento__stat-value">
-						<span data-zd-count="<?php echo esc_attr( $stat['value'] ); ?>">0</span><?php echo esc_html( $stat['suffix'] ); ?>
+						<span data-zd-count="<?php echo esc_attr( $stat['value'] ); ?>"><?php echo esc_html( $stat['value'] ); ?></span><?php echo esc_html( $stat['suffix'] ); ?>
 					</p>
 					<p class="zd-bento__stat-label"><?php echo esc_html( $stat['label'] ); ?></p>
 				</div>

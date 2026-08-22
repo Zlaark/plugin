@@ -142,7 +142,7 @@ class Zlaark_Deals_Panel {
 				$terms[] = sprintf(
 					/* translators: %s: total across the first term. */
 					__( '%s total for the first term', 'zlaark-deals-pro' ),
-					number_format_i18n( $deal['first_term_total'], 2 )
+					Zlaark_Deals_Computed::format_money( $deal['first_term_total'], $deal )
 				);
 			}
 			if ( '' !== $deal['refund_window'] ) {
@@ -211,6 +211,7 @@ class Zlaark_Deals_Panel {
 								<span class="zd-panel__barlabel"><?php echo esc_html( $row['label'] ); ?></span>
 								<span class="zd-panel__bartrack">
 									<i class="zd-panel__barfill zd-fill--<?php echo esc_attr( $band ); ?>"
+										style="--zd-bar:<?php echo esc_attr( max( 0, min( 100, $row['value'] * 10 ) ) ); ?>%"
 										data-zd-bar="<?php echo esc_attr( $row['value'] * 10 ); ?>"></i>
 								</span>
 								<b class="zd-score--<?php echo esc_attr( $band ); ?>">

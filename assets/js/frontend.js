@@ -141,10 +141,32 @@
 		}, { threshold: 0.35 } )
 		: null;
 
+	/**
+	 * The markup now ships the real number and the real bar width, so a page
+	 * with no scripting - or a crawler that does not run any - reads the
+	 * measurements rather than a screen of zeros. The zeroing therefore has to
+	 * happen here, at init, where we know scripting is alive: the animation
+	 * counts up FROM zero instead of the document starting there.
+	 */
+	function primeValue( el ) {
+		if ( reduced ) {
+			return; // Reduced motion: the shipped value is already the answer.
+		}
+		if ( el.hasAttribute( 'data-zd-count' ) ) {
+			var d = parseInt( el.getAttribute( 'data-zd-decimals' ), 10 ) || 0;
+			el.textContent = ( 0 ).toFixed( d );
+		} else if ( el.hasAttribute( 'data-zd-bar' ) ) {
+			el.style.width = '0%';
+		}
+	}
+
 	function watch( el ) {
 		if ( ! once( el ) ) {
 			return;
 		}
+
+		primeValue( el );
+
 		if ( ! valueObserver ) {
 			// No observer support: jump straight to the finished state.
 			if ( el.hasAttribute( 'data-zd-count' ) ) {
@@ -688,14 +710,19 @@
 				} );
 			} );
 
+			// Filter groups use aria-pressed; the original deals tablist uses
+			// aria-selected. Whichever the markup declares is the one we keep
+			// in sync, so neither gets a stale or invented attribute.
+			var stateAttr = ( active && active.hasAttribute( 'aria-pressed' ) ) ? 'aria-pressed' : 'aria-selected';
+
 			Array.prototype.forEach.call( buttons, function ( btn ) {
 				btn.addEventListener( 'click', function () {
 					Array.prototype.forEach.call( buttons, function ( b ) {
 						b.classList.remove( 'is-active' );
-						b.setAttribute( 'aria-selected', 'false' );
+						b.setAttribute( stateAttr, 'false' );
 					} );
 					btn.classList.add( 'is-active' );
-					btn.setAttribute( 'aria-selected', 'true' );
+					btn.setAttribute( stateAttr, 'true' );
 					moveIndicator( scroll, btn );
 
 					// A tab reached with the keyboard can sit outside the rail.
@@ -715,8 +742,78 @@
 					} );
 
 					grid.setAttribute( 'data-zd-active', filter );
+
+					// Track count follows the visible cards, so a category with
+					// two deals renders two columns rather than two cards and
+					// two holes.
+					var visible = grid.querySelectorAll( cardSelector + ':not(.is-filtered-out)' ).length;
+					grid.style.setProperty( '--zd-cols', Math.max( 1, Math.min( 4, visible ) ) );
 				} );
 			} );
+		} );
+	}
+
+	/* ----------------------------------------------------------- offer bar */
+
+	/**
+	 * A dismissal is remembered per deal, so closing the bar on one article
+	 * does not mean meeting it again on the next. Storage can throw outright
+	 * in a private window or with site data blocked, so every access is
+	 * guarded - a bar that cannot remember is still better than a page that
+	 * throws on load.
+	 */
+	function barDismissed( id ) {
+		try {
+			return window.localStorage.getItem( 'zd-obar-' + id ) === '1';
+		} catch ( e ) {
+			return false;
+		}
+	}
+
+	function dismissBar( id ) {
+		try {
+			window.localStorage.setItem( 'zd-obar-' + id, '1' );
+		} catch ( e ) {
+			/* Nothing to do: the bar still closes for this pageview. */
+		}
+	}
+
+	function initOfferBars( scope ) {
+		each( scope, '[data-zd-obar]', function ( bar ) {
+			if ( ! once( bar ) ) {
+				return;
+			}
+
+			var id = bar.getAttribute( 'data-zd-obar' );
+
+			if ( barDismissed( id ) ) {
+				bar.parentNode.removeChild( bar );
+				return;
+			}
+
+			var delay = parseInt( bar.getAttribute( 'data-zd-obar-delay' ), 10 );
+			if ( isNaN( delay ) || reduced ) {
+				delay = 0;
+			}
+
+			window.setTimeout( function () {
+				bar.classList.add( 'is-in' );
+			}, delay );
+
+			var close = bar.querySelector( '.zd-obar__close' );
+			if ( close ) {
+				close.addEventListener( 'click', function () {
+					bar.classList.remove( 'is-in' );
+					dismissBar( id );
+
+					// Let the slide-out finish before the bar leaves the DOM.
+					window.setTimeout( function () {
+						if ( bar.parentNode ) {
+							bar.parentNode.removeChild( bar );
+						}
+					}, reduced ? 0 : 400 );
+				} );
+			}
 		} );
 	}
 
@@ -1122,6 +1219,7 @@
 		initNavbar( scope );
 		initTabs( scope );
 		initRails( scope );
+		initOfferBars( scope );
 		initCoupons( scope );
 		initIndex( scope );
 		syncScrollbarWidth();

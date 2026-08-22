@@ -1183,7 +1183,7 @@ class Zlaark_Hero_Classic_Widget extends Zlaark_Widget_Base {
 					<?php endif; ?>
 					<span class="zd-hc__statcard-body">
 						<span class="zd-hc__statcard-value">
-							<span data-zd-count="<?php echo esc_attr( $s['stat_value'] ); ?>">0</span><?php echo esc_html( $s['stat_suffix'] ); ?>
+							<span data-zd-count="<?php echo esc_attr( $s['stat_value'] ); ?>"><?php echo esc_html( $s['stat_value'] ); ?></span><?php echo esc_html( $s['stat_suffix'] ); ?>
 						</span>
 						<span class="zd-hc__statcard-label"><?php echo esc_html( $s['stat_label'] ); ?></span>
 					</span>
