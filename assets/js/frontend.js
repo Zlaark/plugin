@@ -468,6 +468,37 @@
 		marquee.style.setProperty( '--zd-item-w', Math.max( 24, slot ).toFixed( 2 ) + 'px' );
 	}
 
+	/*
+	 * The track is padded with repeats of the authored set until it covers the
+	 * viewport, so the scroll wraps without a visible seam.
+	 *
+	 * The first version did that by appending one set, reading scrollWidth,
+	 * appending again - a forced layout per round - and rebuilt the whole track
+	 * from scratch whenever a logo finished decoding. In --auto mode a logo has
+	 * no width until it decodes, so the opening pass always ran the full 24
+	 * rounds; every one of those hundreds of clones was an <img> that had not
+	 * loaded yet; and each one's load event rebuilt all of them again. Hundreds
+	 * of rebuilds of hundreds of nodes: a thousand image requests, tens of
+	 * megabytes, thousands of forced reflows, and an editor that never settles.
+	 *
+	 * So: measure one set, derive the repeat count with arithmetic, and only
+	 * ever touch the DOM when the count actually has to grow.
+	 */
+	var MARQUEE_MAX_COPIES = 24;
+
+	function renderMarquee( tracks, set, copies ) {
+		Array.prototype.forEach.call( tracks, function ( track ) {
+			var frag = document.createDocumentFragment();
+			for ( var i = 0; i < copies; i++ ) {
+				set.forEach( function ( node ) {
+					frag.appendChild( node.cloneNode( true ) );
+				} );
+			}
+			track.textContent = '';
+			track.appendChild( frag );
+		} );
+	}
+
 	function fillMarquee( marquee ) {
 		var viewport = marquee.querySelector( '.zd-marquee__viewport' );
 		var tracks = marquee.querySelectorAll( '.zd-marquee__track' );
@@ -476,44 +507,71 @@
 		}
 
 		var first = tracks[ 0 ];
-		var originals = Array.prototype.slice.call( first.children );
-		if ( ! originals.length ) {
-			return;
-		}
 
-		// Remember the authored set so repeated runs don't compound clones.
+		// The authored set, taken before anything has been cloned into place.
 		if ( ! marquee.zdOriginals ) {
-			marquee.zdOriginals = originals.map( function ( node ) {
+			var authored = Array.prototype.slice.call( first.children );
+			if ( ! authored.length ) {
+				return;
+			}
+			marquee.zdOriginals = authored.map( function ( node ) {
 				return node.cloneNode( true );
 			} );
 		}
 
-		Array.prototype.forEach.call( tracks, function ( track ) {
-			track.textContent = '';
-			marquee.zdOriginals.forEach( function ( node ) {
-				track.appendChild( node.cloneNode( true ) );
-			} );
-		} );
+		var width = viewport.clientWidth;
 
 		/*
-		 * A widget that has not been laid out yet - a collapsed container, a
-		 * tab the editor has not shown - measures zero. Padding the track
-		 * against a zero target buys nothing and costs 24 forced reflows and a
-		 * few hundred cloned nodes, so wait for the resize pass instead.
+		 * Not laid out yet - a collapsed container, a tab the editor has not
+		 * shown. Padding against a zero target buys nothing; the resize pass
+		 * comes back to it.
 		 */
-		if ( viewport.clientWidth <= 0 ) {
+		if ( width <= 0 ) {
 			return;
 		}
 
-		var guard = 0;
-		while ( first.scrollWidth < viewport.clientWidth && guard < 24 ) {
-			Array.prototype.forEach.call( tracks, function ( track ) {
-				marquee.zdOriginals.forEach( function ( node ) {
-					track.appendChild( node.cloneNode( true ) );
-				} );
-			} );
-			guard++;
+		if ( ! marquee.zdCopies ) {
+			renderMarquee( tracks, marquee.zdOriginals, 1 );
+			marquee.zdCopies = 1;
 		}
+
+		// One layout read, whatever the repeat count already is.
+		var unit = first.scrollWidth / marquee.zdCopies;
+		if ( unit <= 0 ) {
+			return; // Logos still have no width; a decode will call back.
+		}
+
+		var needed = Math.min( MARQUEE_MAX_COPIES, Math.ceil( width / unit ) + 1 );
+
+		/*
+		 * Grow only. A decoding logo makes the set wider, which can only lower
+		 * the count needed, and rebuilding to shed a spare copy is invisible
+		 * work - it is also what let one decode cascade into the next. Bailing
+		 * here is what breaks the loop.
+		 */
+		if ( needed <= marquee.zdCopies ) {
+			return;
+		}
+
+		renderMarquee( tracks, marquee.zdOriginals, needed );
+		marquee.zdCopies = needed;
+	}
+
+	/*
+	 * In --auto mode the item width comes from the logo's intrinsic ratio, so
+	 * the track cannot be measured until the images decode. Each image is
+	 * watched once; the flag lives on the element, and clones never carry it
+	 * because they come from the authored set, which is never flagged.
+	 */
+	function watchMarqueeLogos( marquee, refresh ) {
+		each( marquee, 'img', function ( img ) {
+			if ( img.complete || img.getAttribute( 'data-zd-watched' ) ) {
+				return;
+			}
+			img.setAttribute( 'data-zd-watched', '1' );
+			img.addEventListener( 'load', refresh, { once: true } );
+			img.addEventListener( 'error', refresh, { once: true } );
+		} );
 	}
 
 	function initMarquee( scope ) {
@@ -522,23 +580,26 @@
 				return;
 			}
 
+			// A burst of decodes costs one pass, not one pass each.
+			var queued = false;
+			var refresh = function () {
+				if ( queued ) {
+					return;
+				}
+				queued = true;
+				requestAnimationFrame( function () {
+					queued = false;
+					sizeMarquee( marquee );
+					fillMarquee( marquee );
+					watchMarqueeLogos( marquee, refresh );
+				} );
+			};
+
 			sizeMarquee( marquee );
 			fillMarquee( marquee );
+			watchMarqueeLogos( marquee, refresh );
 
-			// Logos are images, so widths aren't final until they decode.
-			each( marquee, 'img', function ( img ) {
-				if ( ! img.complete ) {
-					img.addEventListener( 'load', function () {
-						sizeMarquee( marquee );
-						fillMarquee( marquee );
-					}, { once: true } );
-				}
-			} );
-
-			onResize( marquee, function () {
-				sizeMarquee( marquee );
-				fillMarquee( marquee );
-			} );
+			onResize( marquee, refresh );
 		} );
 	}
 
