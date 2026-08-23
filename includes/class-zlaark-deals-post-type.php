@@ -229,6 +229,16 @@ class Zlaark_Deals_Post_Type {
 	 * category dropdown inside the Elementor widget controls.
 	 */
 	public static function get_category_options() {
+		/*
+		 * The Elementor editor bootstrap instantiates every widget and runs
+		 * register_controls() on each, so this is asked for a dozen times in a
+		 * single request. Answer once.
+		 */
+		static $cache = null;
+		if ( null !== $cache ) {
+			return $cache;
+		}
+
 		$options = array();
 		$terms   = get_terms(
 			array(
@@ -244,6 +254,8 @@ class Zlaark_Deals_Post_Type {
 		foreach ( $terms as $term ) {
 			$options[ $term->term_id ] = $term->name;
 		}
+
+		$cache = $options;
 		return $options;
 	}
 }

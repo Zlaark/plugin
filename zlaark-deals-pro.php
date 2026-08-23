@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zlaark Deals
  * Description: Premium animated Elementor widgets - Hero, Deals Grid, Top Picks, Comparison, Stats and Logo Marquee - powered by a Deals manager with categories in the WordPress sidebar.
- * Version:     4.7.0
+ * Version:     4.7.1
  * Author:      Zlaark
  * Text Domain: zlaark-deals-pro
  * Requires PHP: 7.4
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZLAARK_DEALS_VERSION', '4.7.0' );
+define( 'ZLAARK_DEALS_VERSION', '4.7.1' );
 define( 'ZLAARK_DEALS_FILE', __FILE__ );
 define( 'ZLAARK_DEALS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZLAARK_DEALS_URL', plugin_dir_url( __FILE__ ) );
@@ -52,16 +52,24 @@ final class Zlaark_Deals {
 		Zlaark_Deals_Single::init();
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_fonts' ), 5 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'register_frontend_assets' ) );
+		/*
+		 * Every widget declares these handles through get_style_depends() /
+		 * get_script_depends(), and Elementor resolves those in contexts where
+		 * wp_enqueue_scripts never fires - the editor renders each widget over
+		 * AJAX. Enqueueing an unregistered handle there makes WordPress print a
+		 * _doing_it_wrong() notice straight into the AJAX JSON, which the editor
+		 * cannot parse: the widget spins forever. So register everywhere the
+		 * handles can be asked for, not just on the front end.
+		 */
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_frontend_assets' ), 1 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_frontend_assets' ), 1 );
+		add_action( 'elementor/frontend/after_register_styles', array( $this, 'register_frontend_assets' ) );
+		add_action( 'elementor/frontend/after_register_scripts', array( $this, 'register_frontend_assets' ) );
+		add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'register_frontend_assets' ) );
 		add_filter( 'wp_resource_hints', array( $this, 'resource_hints' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_assets' ) );
 	}
 
-	/**
-	 * Registered, not enqueued - every widget declares these through
-	 * get_style_depends()/get_script_depends(), so pages without a Zlaark
-	 * widget never load them.
-	 */
 	/**
 	 * The Google Fonts URL. Filterable so a site can self-host the three
 	 * families and drop the third-party connection from the critical path.
@@ -117,6 +125,12 @@ final class Zlaark_Deals {
 	}
 
 	public function register_frontend_assets() {
+		// Fires from several hooks so the handles exist in every context that
+		// can resolve them; the first one to arrive wins.
+		if ( wp_style_is( 'zlaark-deals', 'registered' ) ) {
+			return;
+		}
+
 		wp_register_style(
 			'zlaark-deals',
 			ZLAARK_DEALS_URL . 'assets/css/frontend.css',

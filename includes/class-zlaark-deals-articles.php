@@ -24,6 +24,11 @@ class Zlaark_Deals_Articles {
 	 * @return array slug => label
 	 */
 	public static function post_type_options() {
+		static $cache = null;
+		if ( null !== $cache ) {
+			return $cache;
+		}
+
 		$types = array( 'post' => __( 'Posts', 'zlaark-deals-pro' ) );
 
 		$custom = get_post_types(
@@ -41,7 +46,9 @@ class Zlaark_Deals_Articles {
 			$types[ $slug ] = $obj->labels->name;
 		}
 
-		return apply_filters( 'zlaark_deals_article_post_types', $types );
+		$cache = apply_filters( 'zlaark_deals_article_post_types', $types );
+
+		return $cache;
 	}
 
 	/**
@@ -51,6 +58,16 @@ class Zlaark_Deals_Articles {
 	 * @return array
 	 */
 	public static function category_options( $post_type = 'post' ) {
+		/*
+		 * Three strips on the Homepage widget ask for this, and each of the
+		 * standalone section widgets asks again - all inside the one request
+		 * that boots the Elementor editor. Memoize per post type.
+		 */
+		static $cache = array();
+		if ( isset( $cache[ $post_type ] ) ) {
+			return $cache[ $post_type ];
+		}
+
 		$out = array();
 
 		foreach ( self::taxonomies_for( $post_type ) as $taxonomy ) {
@@ -71,6 +88,8 @@ class Zlaark_Deals_Articles {
 				$out[ $taxonomy . ':' . $term->term_id ] = sprintf( '%s (%d)', $term->name, $term->count );
 			}
 		}
+
+		$cache[ $post_type ] = $out;
 
 		return $out;
 	}
@@ -95,6 +114,12 @@ class Zlaark_Deals_Articles {
 	 * @return array
 	 */
 	public static function post_options( $post_type = 'post' ) {
+		// Up to 200 rows a call, and the editor bootstrap makes six of them.
+		static $cache = array();
+		if ( isset( $cache[ $post_type ] ) ) {
+			return $cache[ $post_type ];
+		}
+
 		$posts = get_posts(
 			array(
 				'post_type'        => $post_type,
@@ -110,6 +135,8 @@ class Zlaark_Deals_Articles {
 		foreach ( $posts as $post ) {
 			$out[ $post->ID ] = wp_strip_all_tags( get_the_title( $post ) );
 		}
+
+		$cache[ $post_type ] = $out;
 
 		return $out;
 	}

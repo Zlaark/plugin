@@ -65,7 +65,9 @@ class Zlaark_Panel_Widget extends Zlaark_Query_Widget_Base {
 				'label'       => __( 'Choose Deal', 'zlaark-deals-pro' ),
 				'type'        => Controls_Manager::SELECT2,
 				'label_block' => true,
-				'options'     => self::deal_options(),
+				// Only the panel draws the list; a saved value comes from the
+				// settings, so the front end never needs to pay for the query.
+				'options'     => ( is_admin() || $this->is_editor() ) ? self::deal_options() : array(),
 				'condition'   => array( 'source' => 'pick' ),
 			)
 		);

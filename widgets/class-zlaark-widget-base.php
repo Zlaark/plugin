@@ -566,7 +566,7 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 				'type'        => Controls_Manager::SELECT2,
 				'multiple'    => true,
 				'label_block' => true,
-				'options'     => Zlaark_Deals_Articles::category_options( $type ),
+				'options'     => $categories,
 				'default'     => array(),
 				'description' => __( 'Leave empty to pull from every category. Reload the editor after changing Content Type to refresh this list.', 'zlaark-deals-pro' ),
 				'condition'   => array_merge( $condition, array( $prefix . '_source' => 'category' ) ),
@@ -669,6 +669,11 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 	 * hooks and the meta/term caches to keep the editor bootstrap cheap.
 	 */
 	public static function deal_options() {
+		static $cache = null;
+		if ( null !== $cache ) {
+			return $cache;
+		}
+
 		$deals = get_posts(
 			array(
 				'post_type'              => ZLAARK_DEALS_CPT,
@@ -687,6 +692,8 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 		foreach ( $deals as $deal ) {
 			$out[ $deal->ID ] = $deal->post_title;
 		}
+
+		$cache = $out;
 
 		return $out;
 	}

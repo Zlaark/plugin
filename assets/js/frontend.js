@@ -29,6 +29,77 @@
 		Array.prototype.forEach.call( scope.querySelectorAll( selector ), fn );
 	}
 
+	/* ------------------------------------------------- shared window events */
+
+	/*
+	 * Marquees, navbars, tab rails and article rails all need to hear about
+	 * resize and scroll. Binding a listener per widget instance leaks: Elementor
+	 * throws the widget's DOM away and rebuilds it on every control change, so
+	 * the old handlers survive holding detached nodes, and each one still runs -
+	 * the navbar's measured getBoundingClientRect() on every scroll event. After
+	 * a few edits the editor canvas is doing dozens of forced layouts a frame.
+	 *
+	 * One listener per event instead, over a registry that drops jobs whose
+	 * element has left the document, and throttled so a burst of scroll events
+	 * costs one measurement pass.
+	 */
+	var resizeJobs = [];
+	var scrollJobs = [];
+
+	function attached( el ) {
+		return el && ( 'isConnected' in el ? el.isConnected : document.contains( el ) );
+	}
+
+	function runJobs( jobs ) {
+		var live = [];
+		for ( var i = 0; i < jobs.length; i++ ) {
+			if ( attached( jobs[ i ].el ) ) {
+				live.push( jobs[ i ] );
+			}
+		}
+		// Reuse the array the caller holds, so pruning sticks.
+		jobs.length = 0;
+		Array.prototype.push.apply( jobs, live );
+
+		live.forEach( function ( job ) {
+			job.fn();
+		} );
+	}
+
+	/** Runs fn on window resize for as long as el is still in the document. */
+	function onResize( el, fn ) {
+		resizeJobs.push( { el: el, fn: fn } );
+	}
+
+	/** Runs fn on window scroll for as long as el is still in the document. */
+	function onScroll( el, fn ) {
+		scrollJobs.push( { el: el, fn: fn } );
+	}
+
+	var resizeTimer = null;
+	window.addEventListener( 'resize', function () {
+		window.clearTimeout( resizeTimer );
+		resizeTimer = window.setTimeout( function () {
+			runJobs( resizeJobs );
+		}, 150 );
+	} );
+
+	var scrollQueued = false;
+	window.addEventListener(
+		'scroll',
+		function () {
+			if ( scrollQueued ) {
+				return;
+			}
+			scrollQueued = true;
+			requestAnimationFrame( function () {
+				scrollQueued = false;
+				runJobs( scrollJobs );
+			} );
+		},
+		{ passive: true }
+	);
+
 	/* ------------------------------------------------------------- reveals */
 
 	/**
@@ -424,6 +495,16 @@
 			} );
 		} );
 
+		/*
+		 * A widget that has not been laid out yet - a collapsed container, a
+		 * tab the editor has not shown - measures zero. Padding the track
+		 * against a zero target buys nothing and costs 24 forced reflows and a
+		 * few hundred cloned nodes, so wait for the resize pass instead.
+		 */
+		if ( viewport.clientWidth <= 0 ) {
+			return;
+		}
+
 		var guard = 0;
 		while ( first.scrollWidth < viewport.clientWidth && guard < 24 ) {
 			Array.prototype.forEach.call( tracks, function ( track ) {
@@ -454,13 +535,9 @@
 				}
 			} );
 
-			var timer = null;
-			window.addEventListener( 'resize', function () {
-				clearTimeout( timer );
-				timer = setTimeout( function () {
-					sizeMarquee( marquee );
-					fillMarquee( marquee );
-				}, 180 );
+			onResize( marquee, function () {
+				sizeMarquee( marquee );
+				fillMarquee( marquee );
 			} );
 		} );
 	}
@@ -565,7 +642,7 @@
 					}
 				} );
 
-				window.addEventListener( 'resize', function () {
+				onResize( nav, function () {
 					syncCollapse();
 					movePill( activeLink(), false );
 				} );
@@ -597,11 +674,11 @@
 			/* --- stuck state ---------------------------------------------- */
 
 			if ( nav.classList.contains( 'zd-nav--sticky' ) ) {
-				var onScroll = function () {
+				var syncStuck = function () {
 					nav.classList.toggle( 'is-stuck', nav.getBoundingClientRect().top <= 1 );
 				};
-				window.addEventListener( 'scroll', onScroll, { passive: true } );
-				onScroll();
+				onScroll( nav, syncStuck );
+				syncStuck();
 			}
 
 			syncCollapse();
@@ -688,7 +765,7 @@
 				} );
 			}
 
-			window.addEventListener( 'resize', function () {
+			onResize( tabs, function () {
 				var current = tabs.querySelector( '.zd-tabs__btn.is-active' );
 				if ( current ) {
 					moveIndicator( scroll, current );
@@ -867,7 +944,7 @@
 			}
 
 			track.addEventListener( 'scroll', sync );
-			window.addEventListener( 'resize', sync );
+			onResize( rail, sync );
 			requestAnimationFrame( sync );
 		} );
 	}
