@@ -248,6 +248,18 @@ class Zlaark_Deals_Settings {
 		}
 
 		$failures = get_option( 'zlaark_deals_widget_failures', array() );
+
+		/*
+		 * Elementor's Element Manager (Elementor > Elements) turns widgets off
+		 * site-wide, and it does so *after* registration: the plugin registers
+		 * the widget, records no failure, and the widget still never reaches
+		 * the panel. Its "Deactivate unused elements" button switches off every
+		 * widget not currently placed on a page, which is why this usually
+		 * shows up as one or two widgets missing while the rest are fine.
+		 * Reading the same option it writes turns that into a named cause.
+		 */
+		$disabled = (array) get_option( 'elementor_disabled_elements', array() );
+
 		$live     = array();
 		if ( did_action( 'elementor/loaded' ) && class_exists( '\Elementor\Plugin' ) ) {
 			$manager = \Elementor\Plugin::$instance->widgets_manager;
@@ -288,6 +300,8 @@ class Zlaark_Deals_Settings {
 							<em><?php esc_html_e( 'Elementor not loaded on this screen', 'zlaark-deals-pro' ); ?></em>
 						<?php elseif ( $reg ) : ?>
 							&#10003;
+						<?php elseif ( in_array( $name, $disabled, true ) ) : ?>
+							<strong style="color:#b91c1c"><?php esc_html_e( 'switched off in Elementor > Elements (Element Manager). Turn it back on there and save - the plugin registers it correctly.', 'zlaark-deals-pro' ); ?></strong>
 						<?php else : ?>
 							<strong style="color:#b91c1c"><?php esc_html_e( 'registered by the plugin, but Elementor is not holding it. Something removed it after registration - check Elementor > Element Manager, and any optimisation plugin that disables widgets.', 'zlaark-deals-pro' ); ?></strong>
 						<?php endif; ?>

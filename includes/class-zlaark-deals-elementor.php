@@ -172,7 +172,24 @@ class Zlaark_Deals_Elementor {
 					continue;
 				}
 
-				$widgets_manager->register( $widget );
+				/*
+				 * register() is not a promise. Elementor runs every widget past
+				 * the elementor/widgets/is_widget_enabled filter and returns
+				 * false for the ones that come back blocked - it does not throw
+				 * and it does not log. That filter is how Element Manager
+				 * (Elementor > Elements) switches a widget off site-wide, and
+				 * any other plugin can hook it too. Ignoring the return value
+				 * meant a blocked widget looked registered from in here while
+				 * never reaching the panel: the exact "everything shows except
+				 * this one" report, with a clean diagnostic to match.
+				 *
+				 * Strict false only - Elementor before 3.5 returned nothing.
+				 */
+				if ( false === $widgets_manager->register( $widget ) ) {
+					$failures[ $slug ] = 'Elementor refused it: switched off in Elementor > Elements '
+						. '(Element Manager), or another plugin is blocking it through the '
+						. 'elementor/widgets/is_widget_enabled filter';
+				}
 			} catch ( \Throwable $e ) {
 				$failures[ $slug ] = get_class( $e ) . ': ' . $e->getMessage();
 			}
