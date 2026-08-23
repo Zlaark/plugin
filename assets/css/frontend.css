@@ -2569,6 +2569,22 @@
 	color: var(--zd-ink, #0a1310);
 }
 
+/*
+ * The block above leaves :hover out on purpose - but :link and :visited match
+ * a hovered anchor just as happily, they say nothing about hover. At the same
+ * specificity as `.zd-btn:hover` and further down the file, they won: the
+ * accent wash slid in behind the label while the label stayed ink dark, so
+ * every ghost button went dark-green-on-dark-green under the cursor.
+ *
+ * Hover only. :focus has no wash behind it, and white there would be a white
+ * label on a transparent ground.
+ */
+.zd-btn--ghost:hover,
+.zd-btn--ghost:hover:link,
+.zd-btn--ghost:hover:visited {
+	color: #fff;
+}
+
 .zd-pill--solid,
 .zd-pill--solid:link,
 .zd-pill--solid:visited,
