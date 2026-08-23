@@ -72,6 +72,28 @@ class Zlaark_Deals_Elementor {
 		add_action( 'elementor/widgets/register', array( __CLASS__, 'register_widgets' ) );
 	}
 
+	/**
+	 * Which widgets to register, slug => class.
+	 *
+	 * Bisecting a broken editor is otherwise a matter of deleting files: this
+	 * lets a mu-plugin or the theme's functions.php narrow the set down to the
+	 * one widget at fault without touching the plugin. Define
+	 * ZLAARK_DEALS_DISABLE_WIDGETS as true to register none of them - the Deals
+	 * manager keeps working, so the editor either recovers (the fault is here)
+	 * or does not (it is somewhere else).
+	 *
+	 *     add_filter( 'zlaark_deals_registered_widgets', function ( $widgets ) {
+	 *         return array_slice( $widgets, 0, 5, true );
+	 *     } );
+	 */
+	public static function widget_list() {
+		if ( defined( 'ZLAARK_DEALS_DISABLE_WIDGETS' ) && ZLAARK_DEALS_DISABLE_WIDGETS ) {
+			return array();
+		}
+
+		return (array) apply_filters( 'zlaark_deals_registered_widgets', self::WIDGETS );
+	}
+
 	public static function register_category( $manager ) {
 		$manager->add_category(
 			'zlaark-deals',
@@ -83,6 +105,12 @@ class Zlaark_Deals_Elementor {
 	}
 
 	public static function register_widgets( $widgets_manager ) {
+		$widgets = self::widget_list();
+
+		if ( empty( $widgets ) ) {
+			return;
+		}
+
 		require_once ZLAARK_DEALS_PATH . 'widgets/class-zlaark-widget-base.php';
 		require_once ZLAARK_DEALS_PATH . 'widgets/class-zlaark-homepage-widget.php';
 		require_once ZLAARK_DEALS_PATH . 'widgets/class-zlaark-section-widget-base.php';
@@ -95,7 +123,7 @@ class Zlaark_Deals_Elementor {
 		 */
 		$failures = array();
 
-		foreach ( self::WIDGETS as $slug => $class ) {
+		foreach ( $widgets as $slug => $class ) {
 			$file = ZLAARK_DEALS_PATH . 'widgets/class-zlaark-' . $slug . '-widget.php';
 
 			if ( ! file_exists( $file ) ) {
