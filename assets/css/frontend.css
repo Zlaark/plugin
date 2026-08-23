@@ -6276,7 +6276,9 @@
 	max-width: 34ch;
 }
 
-.zd-footer__logo { max-height: 34px; width: auto; }
+/* Scales with the wordmark, so switching the footer to an image logo does not
+   quietly shrink the mark back to label size. */
+.zd-footer__logo { max-height: clamp(34px, 1.6rem + 1vw, 46px); width: auto; }
 
 /*
  * The wordmark, not a line of bold text. At 1.06rem it sat at body scale and
