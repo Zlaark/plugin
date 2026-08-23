@@ -627,28 +627,34 @@
 		} );
 	}
 
-	/* -------------------------------------------------------------- navbar */
+	/* -------------------------------------------------------------- header */
 
-	function initNavbar( scope ) {
-		each( scope, '.zd-nav', function ( nav ) {
-			if ( ! once( nav, 'Nav' ) ) {
+	/*
+	 * The masthead runtime: the collapse threshold (a per-widget setting, so it
+	 * cannot live in a media query), the sliding indicator, the mega panels and
+	 * the stuck state.
+	 */
+	function initHeader( scope ) {
+		each( scope, '.zd-hdr', function ( hdr ) {
+			if ( ! once( hdr, 'Header' ) ) {
 				return;
 			}
 
-			var menu = nav.querySelector( '.zd-nav__menu' );
-			var list = nav.querySelector( '.zd-nav__list' );
-			var pill = nav.querySelector( '.zd-nav__pill' );
-			var burger = nav.querySelector( '.zd-nav__burger' );
-			var breakpoint = parseInt( nav.getAttribute( 'data-zd-nav-bp' ), 10 ) || 1024;
+			var nav = hdr.querySelector( '.zd-hdr__nav' );
+			var list = hdr.querySelector( '.zd-hdr__list' );
+			var pill = hdr.querySelector( '.zd-hdr__pill' );
+			var burger = hdr.querySelector( '.zd-hdr__burger' );
+			var breakpoint = parseInt( hdr.getAttribute( 'data-zd-hdr-bp' ), 10 ) || 1024;
 
-			/* --- collapse ------------------------------------------------ */
-			// The collapse width is a per-widget setting, so it can't live in a
-			// stylesheet media query - it's evaluated here instead.
+			function collapsed() {
+				return hdr.classList.contains( 'zd-hdr--collapsed' );
+			}
+
 			function syncCollapse() {
-				var collapsed = window.innerWidth <= breakpoint;
-				nav.classList.toggle( 'zd-nav--collapsed', collapsed );
-				if ( ! collapsed ) {
-					nav.classList.remove( 'is-open' );
+				var narrow = window.innerWidth <= breakpoint;
+				hdr.classList.toggle( 'zd-hdr--collapsed', narrow );
+				if ( ! narrow ) {
+					hdr.classList.remove( 'is-open' );
 					if ( burger ) {
 						burger.setAttribute( 'aria-expanded', 'false' );
 					}
@@ -658,13 +664,11 @@
 			/* --- sliding indicator --------------------------------------- */
 
 			function activeLink() {
-				return nav.querySelector( '.zd-nav__list a.is-active' )
-					|| nav.querySelector( '.zd-nav__list .current-menu-item > a' )
-					|| nav.querySelector( '.zd-nav__list .current_page_item > a' );
+				return hdr.querySelector( '.zd-hdr__list a.is-active' );
 			}
 
 			function light( link ) {
-				each( nav, '.zd-nav__list a', function ( a ) {
+				each( hdr, '.zd-hdr__list a', function ( a ) {
 					a.classList.remove( 'is-lit' );
 				} );
 				if ( link ) {
@@ -672,31 +676,33 @@
 				}
 			}
 
+			/*
+			 * The indicator is a rule the width of the item, so it is measured
+			 * against the nav rather than the list - the list is what scrolls
+			 * on a narrow bar, and measuring against it made the rule drift.
+			 */
 			function movePill( link, animate ) {
-				if ( ! pill || ! list ) {
+				if ( ! pill || ! nav ) {
 					return;
 				}
-				if ( ! link || nav.classList.contains( 'zd-nav--collapsed' ) ) {
+				if ( ! link || collapsed() ) {
 					pill.style.opacity = '0';
 					return;
 				}
 
-				var listBox = list.getBoundingClientRect();
-				var linkBox = link.getBoundingClientRect();
+				var navBox = nav.getBoundingClientRect();
+				var box = link.getBoundingClientRect();
 
 				if ( ! animate ) {
 					pill.style.transition = 'none';
 				}
 				pill.style.opacity = '1';
-				pill.style.width = linkBox.width + 'px';
-				pill.style.height = linkBox.height + 'px';
-				pill.style.transform = 'translate(' +
-					( linkBox.left - listBox.left ) + 'px,' +
-					( linkBox.top - listBox.top ) + 'px)';
+				pill.style.width = box.width + 'px';
+				pill.style.transform = 'translateX(' + ( box.left - navBox.left ) + 'px)';
 
 				if ( ! animate ) {
-					// Force a reflow so the transition-less jump lands before
-					// transitions are handed back.
+					// Force the transition-less jump to land before transitions
+					// are handed back.
 					void pill.offsetWidth;
 					pill.style.transition = '';
 				}
@@ -709,11 +715,11 @@
 			}
 
 			if ( list && pill ) {
-				var slides = nav.classList.contains( 'zd-nav--slide' );
+				var slides = hdr.classList.contains( 'zd-hdr--slide' );
 
-				each( nav, '.zd-nav__list a', function ( a ) {
+				each( hdr, '.zd-hdr__list a', function ( a ) {
 					a.addEventListener( 'pointerenter', function ( e ) {
-						if ( ! slides || e.pointerType === 'touch' ) {
+						if ( ! slides || e.pointerType === 'touch' || collapsed() ) {
 							return;
 						}
 						movePill( a, true );
@@ -727,7 +733,7 @@
 					}
 				} );
 
-				onResize( nav, function () {
+				onResize( hdr, function () {
 					syncCollapse();
 					movePill( activeLink(), false );
 				} );
@@ -745,14 +751,27 @@
 			/*
 			 * Hover opens on a pointer, but hover alone is a menu no keyboard
 			 * and no touch screen can reach - so the trigger also toggles on
-			 * click, Escape closes, and moving focus out of the item closes it
-			 * too. The panel ships with `hidden` so that without this script
-			 * the markup is a plain link rather than a block of loose text;
-			 * that attribute comes off here and a class drives the animation.
+			 * click, Escape closes, and focus leaving the item closes it too.
+			 * The panel ships with `hidden` so that without this script the
+			 * item is a plain link rather than a loose block of text; the
+			 * attribute comes off here and a class drives the animation.
 			 */
 			var megas = [];
 
-			each( nav, '.zd-nav__item--mega', function ( item ) {
+			function closeAll( except ) {
+				megas.forEach( function ( item ) {
+					if ( item === except ) {
+						return;
+					}
+					item.classList.remove( 'is-open' );
+					var a = item.querySelector( 'a' );
+					if ( a ) {
+						a.setAttribute( 'aria-expanded', 'false' );
+					}
+				} );
+			}
+
+			each( hdr, '.zd-hdr__item--mega', function ( item ) {
 				var trigger = item.querySelector( 'a' );
 				var panel = item.querySelector( '.zd-mega' );
 				if ( ! trigger || ! panel ) {
@@ -762,47 +781,39 @@
 				panel.removeAttribute( 'hidden' );
 				megas.push( item );
 
-				var closeTimer = null;
+				var timer = null;
 
 				function open() {
-					window.clearTimeout( closeTimer );
-					megas.forEach( function ( other ) {
-						if ( other !== item ) {
-							other.classList.remove( 'is-open' );
-							var a = other.querySelector( 'a' );
-							if ( a ) {
-								a.setAttribute( 'aria-expanded', 'false' );
-							}
-						}
-					} );
+					window.clearTimeout( timer );
+					closeAll( item );
 					item.classList.add( 'is-open' );
 					trigger.setAttribute( 'aria-expanded', 'true' );
 				}
 
 				function close( now ) {
-					window.clearTimeout( closeTimer );
-					closeTimer = window.setTimeout( function () {
+					window.clearTimeout( timer );
+					timer = window.setTimeout( function () {
 						item.classList.remove( 'is-open' );
 						trigger.setAttribute( 'aria-expanded', 'false' );
 					}, now ? 0 : 120 );
 				}
 
 				item.addEventListener( 'pointerenter', function ( e ) {
-					if ( e.pointerType !== 'touch' && ! nav.classList.contains( 'zd-nav--collapsed' ) ) {
+					if ( e.pointerType !== 'touch' && ! collapsed() ) {
 						open();
 					}
 				} );
 
 				item.addEventListener( 'pointerleave', function ( e ) {
-					if ( e.pointerType !== 'touch' && ! nav.classList.contains( 'zd-nav--collapsed' ) ) {
+					if ( e.pointerType !== 'touch' && ! collapsed() ) {
 						close();
 					}
 				} );
 
 				trigger.addEventListener( 'click', function ( e ) {
-					// Collapsed, the panel is in flow and always shown, so the
-					// link should just be a link.
-					if ( nav.classList.contains( 'zd-nav--collapsed' ) ) {
+					// Collapsed, the panel sits in the flow of the open menu,
+					// so the link should just be a link.
+					if ( collapsed() ) {
 						return;
 					}
 					e.preventDefault();
@@ -829,42 +840,35 @@
 
 			if ( megas.length ) {
 				document.addEventListener( 'click', function ( e ) {
-					megas.forEach( function ( item ) {
-						if ( item.contains( e.target ) ) {
-							return;
-						}
-						item.classList.remove( 'is-open' );
-						var a = item.querySelector( 'a' );
-						if ( a ) {
-							a.setAttribute( 'aria-expanded', 'false' );
-						}
-					} );
+					if ( ! hdr.contains( e.target ) ) {
+						closeAll( null );
+					}
 				} );
 			}
 
-			/* --- hamburger ------------------------------------------------ */
+			/* --- collapsed menu -------------------------------------------- */
 
-			if ( burger && menu ) {
+			if ( burger ) {
 				burger.addEventListener( 'click', function () {
-					var open = nav.classList.toggle( 'is-open' );
+					var open = hdr.classList.toggle( 'is-open' );
 					burger.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
 				} );
 
-				each( menu, 'a', function ( a ) {
+				each( hdr, '.zd-hdr__panel a', function ( a ) {
 					a.addEventListener( 'click', function () {
-						nav.classList.remove( 'is-open' );
+						hdr.classList.remove( 'is-open' );
 						burger.setAttribute( 'aria-expanded', 'false' );
 					} );
 				} );
 			}
 
-			/* --- stuck state ---------------------------------------------- */
+			/* --- stuck state ------------------------------------------------ */
 
-			if ( nav.classList.contains( 'zd-nav--sticky' ) ) {
+			if ( hdr.classList.contains( 'zd-hdr--sticky' ) ) {
 				var syncStuck = function () {
-					nav.classList.toggle( 'is-stuck', nav.getBoundingClientRect().top <= 1 );
+					hdr.classList.toggle( 'is-stuck', hdr.getBoundingClientRect().top <= 1 );
 				};
-				onScroll( nav, syncStuck );
+				onScroll( hdr, syncStuck );
 				syncStuck();
 			}
 
@@ -872,7 +876,7 @@
 			requestAnimationFrame( function () {
 				movePill( activeLink(), false );
 				light( activeLink() );
-				nav.classList.add( 'is-ready' );
+				hdr.classList.add( 'is-ready' );
 			} );
 		} );
 	}
@@ -1510,7 +1514,7 @@
 		initParallax( scope );
 		initDepthParallax( scope );
 		initMarquee( scope );
-		initNavbar( scope );
+		initHeader( scope );
 		initTabs( scope );
 		initRails( scope );
 		initOfferBars( scope );

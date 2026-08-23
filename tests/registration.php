@@ -88,7 +88,7 @@ printf( "  %-12s %d unique names, %d unexpected   %s\n", 'names', count( array_u
 
 // A genuine clash must still be reported.
 $manager2 = new ZD_Fake_Manager();
-$manager2->types['zlaark_navbar'] = new stdClass();
+$manager2->types['zlaark_header'] = new stdClass();
 Zlaark_Deals_Elementor::register_widgets( $manager2 );
 $f = get_option( 'zlaark_deals_widget_failures', array() );
 $caught = isset( $f['navbar'] ) && false !== strpos( $f['navbar'], 'already held by' );

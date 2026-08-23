@@ -53,7 +53,7 @@ require $P . 'widgets/class-zlaark-homepage-widget.php';
 require $P . 'widgets/class-zlaark-section-widget-base.php';
 
 $WIDGETS = array(
-	'homepage' => 'Zlaark_Homepage_Widget', 'navbar' => 'Zlaark_Navbar_Widget', 'footer' => 'Zlaark_Footer_Widget',
+	'homepage' => 'Zlaark_Homepage_Widget', 'header' => 'Zlaark_Header_Widget', 'footer' => 'Zlaark_Footer_Widget',
 	'hero' => 'Zlaark_Hero_Widget', 'hero-classic' => 'Zlaark_Hero_Classic_Widget',
 	'hero-bento' => 'Zlaark_Hero_Bento_Widget', 'hero-fresh' => 'Zlaark_Hero_Fresh_Widget',
 	'about' => 'Zlaark_About_Widget', 'deals' => 'Zlaark_Deals_Widget',

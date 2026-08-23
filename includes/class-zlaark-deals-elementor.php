@@ -15,7 +15,7 @@ class Zlaark_Deals_Elementor {
 	/** Widget file (without prefix/suffix) => class name. */
 	const WIDGETS = array(
 		'homepage'     => 'Zlaark_Homepage_Widget',
-		'navbar'       => 'Zlaark_Navbar_Widget',
+		'header'       => 'Zlaark_Header_Widget',
 		'footer'       => 'Zlaark_Footer_Widget',
 		'hero'         => 'Zlaark_Hero_Widget',
 		'hero-classic' => 'Zlaark_Hero_Classic_Widget',
