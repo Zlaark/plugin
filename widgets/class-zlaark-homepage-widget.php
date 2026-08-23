@@ -2456,6 +2456,30 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		?>
 		<section class="zd-home__sec zd-home__mq zd-marquee zd-marquee--fade zd-marquee--gray zd-marquee--pause"
 			style="--zd-marquee-speed:34s;">
+			<?php
+			/*
+			 * A logo strip on its own says nothing - it is the one band on the
+			 * page that made no checkable claim, which is why it read as
+			 * filler. The rule and the mono stamp put a number on it, and the
+			 * number is counted off the logos actually printed below rather
+			 * than typed in, so it cannot drift away from what is on screen.
+			 */
+			?>
+			<div class="zd-home__inner">
+				<p class="zd-trust zd-reveal" data-zd-reveal="fade">
+					<span class="zd-trust__label"><?php esc_html_e( 'Tracked', 'zlaark-deals-pro' ); ?></span>
+					<span class="zd-trust__count">
+						<?php
+						printf(
+							/* translators: %s: number of products in the catalogue. */
+							esc_html( _n( '%s product', '%s products', count( $logos ), 'zlaark-deals-pro' ) ),
+							esc_html( number_format_i18n( count( $logos ) ) )
+						);
+						?>
+					</span>
+				</p>
+			</div>
+
 			<div class="zd-marquee__viewport">
 				<div class="zd-marquee__track">
 					<?php foreach ( $logos as $deal ) : ?>
@@ -2856,19 +2880,50 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		<section class="zd-home__sec">
 			<div class="zd-home__inner">
 				<?php $this->section_head( $s['method_title'], __( 'The same four steps, every time', 'zlaark-deals-pro' ) ); ?>
-				<ol class="zd-method">
-					<?php foreach ( $steps as $i => $step ) : ?>
-						<li class="zd-reveal" data-zd-reveal="rise" style="--zd-i:<?php echo (int) $i; ?>">
-							<span class="zd-method__n"><?php echo esc_html( str_pad( $i + 1, 2, '0', STR_PAD_LEFT ) ); ?></span>
-							<div>
-								<h3><?php echo esc_html( $step['title'] ); ?></h3>
+				<?php
+				/*
+				 * The readout motif - square, hard-ruled, mono-led - rather
+				 * than four loose text columns. This is the section about
+				 * measurement, so it should look like the instrument the rest
+				 * of the page quotes numbers from, and it already exists here
+				 * as the savings board and "ending soon".
+				 */
+				?>
+				<div class="zd-method">
+					<div class="zd-method__head">
+						<b><?php esc_html_e( 'Test protocol', 'zlaark-deals-pro' ); ?></b>
+						<span class="zd-method__count">
+							<?php
+							printf(
+								/* translators: %d: number of steps in the testing method. */
+								esc_html( _n( '%d stage', '%d stages', count( $steps ), 'zlaark-deals-pro' ) ),
+								count( $steps )
+							);
+							?>
+						</span>
+					</div>
+
+					<ol class="zd-method__list">
+						<?php foreach ( $steps as $i => $step ) : ?>
+							<li class="zd-method__step zd-reveal" data-zd-reveal="rise"
+								style="--zd-i:<?php echo (int) $i; ?>">
+								<?php
+								/*
+								 * One segment of the rail per stage. Together they
+								 * read as a single process running left to right,
+								 * which four separate cards never did.
+								 */
+								?>
+								<span class="zd-method__rail" aria-hidden="true"><i></i></span>
+								<span class="zd-method__n"><?php echo esc_html( str_pad( $i + 1, 2, '0', STR_PAD_LEFT ) ); ?></span>
+								<h3 class="zd-method__title"><?php echo esc_html( $step['title'] ); ?></h3>
 								<?php if ( '' !== $step['text'] ) : ?>
-									<p><?php echo esc_html( $step['text'] ); ?></p>
+									<p class="zd-method__text"><?php echo esc_html( $step['text'] ); ?></p>
 								<?php endif; ?>
-							</div>
-						</li>
-					<?php endforeach; ?>
-				</ol>
+							</li>
+						<?php endforeach; ?>
+					</ol>
+				</div>
 			</div>
 		</section>
 		<?php
@@ -2909,6 +2964,16 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 				</div>
 
 				<?php if ( ! empty( $people ) ) : ?>
+					<?php
+					/*
+					 * A masthead, not a team grid. The claim this section makes
+					 * is that named people did the work, so the people are set
+					 * as ruled credit rows with the role on the record - the
+					 * shape a publication uses to say who is accountable.
+					 */
+					?>
+					<div class="zd-about2__credits">
+					<p class="zd-about2__masthead"><?php esc_html_e( 'Who tests', 'zlaark-deals-pro' ); ?></p>
 					<ul class="zd-about2__people">
 						<?php foreach ( $people as $i => $person ) : ?>
 							<li class="zd-reveal" data-zd-reveal="rise" style="--zd-i:<?php echo (int) $i; ?>">
@@ -2932,6 +2997,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 							</li>
 						<?php endforeach; ?>
 					</ul>
+					</div>
 				<?php endif; ?>
 			</div>
 		</section>

@@ -10,7 +10,8 @@
         "still_empty": {
             "price, old_price": "Left as found. Two deals carry a _needs_attention note saying the price is genuinely absent from the vendor page - inventing one would publish a false claim about a named company.",
             "image_id": "Needs a media library that only exists on the destination site. Set the logo per deal, or the card falls back to the brand initials."
-        }
+        },
+        "expiry_dates": "Every _zlaark_expiry_date in this file is seeded, and they used to sit 12 to 106 days out - outside the \"Ending soon\" widget's window (14 days by default), so the section had nothing to count down and rendered nothing. Five time-limited offers are now spread across 2 to 12 days from 2026-08-24 so the board fills: Hostinger, HawkHost, ActiveCampaign, Apollo.io, WP Engine. Unlike the other seeded fields these go stale on their own - once the dates pass the section empties again - so replace them with the real close dates from each vendor page. Offers with no end date (free plans, standing discounts) stay empty on purpose; a countdown that is always on stops being information."
     },
     "categories": [
         {
@@ -252,7 +253,7 @@
                 "_zlaark_reviewer": "Kanish Kumar",
                 "_zlaark_tested_date": "2026-02-05",
                 "_zlaark_last_verified": "2026-08-08",
-                "_zlaark_expiry_date": "2026-09-05",
+                "_zlaark_expiry_date": "2026-08-28",
                 "_zlaark_refund_window": "30-day money back",
                 "_zlaark_best_for": "Customer Support matters most to you\nControl Panel is a priority",
                 "_zlaark_not_for": "You need strong pricing\nUptime is non-negotiable",
@@ -308,7 +309,7 @@
                 "_zlaark_reviewer": "Kanish Kumar",
                 "_zlaark_tested_date": "2026-04-09",
                 "_zlaark_last_verified": "2026-08-06",
-                "_zlaark_expiry_date": "2026-10-01",
+                "_zlaark_expiry_date": "2026-08-26",
                 "_zlaark_refund_window": "14-day money back",
                 "_zlaark_best_for": "Speed matters most to you\nUptime is a priority",
                 "_zlaark_not_for": "You need strong control panel\nBackups is non-negotiable",
@@ -364,7 +365,7 @@
                 "_zlaark_reviewer": "Kanish Kumar",
                 "_zlaark_tested_date": "2026-06-02",
                 "_zlaark_last_verified": "2026-08-10",
-                "_zlaark_expiry_date": "2026-10-14",
+                "_zlaark_expiry_date": "2026-09-05",
                 "_zlaark_refund_window": "14-day money back",
                 "_zlaark_best_for": "Pricing matters most to you\nBackups is a priority",
                 "_zlaark_not_for": "You need strong control panel\nSecurity is non-negotiable",
@@ -474,7 +475,7 @@
                 "_zlaark_reviewer": "Kanish Kumar",
                 "_zlaark_tested_date": "2026-06-01",
                 "_zlaark_last_verified": "2026-08-15",
-                "_zlaark_expiry_date": "2026-11-03",
+                "_zlaark_expiry_date": "2026-08-30",
                 "_zlaark_refund_window": "45-day money back",
                 "_zlaark_best_for": "Ease of Use matters most to you\nTemplates & Design is a priority",
                 "_zlaark_not_for": "You need strong pricing\nDeliverability is non-negotiable",
@@ -584,7 +585,7 @@
                 "_zlaark_reviewer": "Kanish Kumar",
                 "_zlaark_tested_date": "2026-06-04",
                 "_zlaark_last_verified": "2026-08-16",
-                "_zlaark_expiry_date": "2026-12-08",
+                "_zlaark_expiry_date": "2026-09-02",
                 "_zlaark_refund_window": "30-day money back",
                 "_zlaark_best_for": "Integrations matters most to you\nAutomation is a priority",
                 "_zlaark_not_for": "You need strong reporting\nEase of Use is non-negotiable",

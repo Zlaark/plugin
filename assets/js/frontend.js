@@ -740,6 +740,108 @@
 				}
 			}
 
+			/* --- mega panels ---------------------------------------------- */
+
+			/*
+			 * Hover opens on a pointer, but hover alone is a menu no keyboard
+			 * and no touch screen can reach - so the trigger also toggles on
+			 * click, Escape closes, and moving focus out of the item closes it
+			 * too. The panel ships with `hidden` so that without this script
+			 * the markup is a plain link rather than a block of loose text;
+			 * that attribute comes off here and a class drives the animation.
+			 */
+			var megas = [];
+
+			each( nav, '.zd-nav__item--mega', function ( item ) {
+				var trigger = item.querySelector( 'a' );
+				var panel = item.querySelector( '.zd-mega' );
+				if ( ! trigger || ! panel ) {
+					return;
+				}
+
+				panel.removeAttribute( 'hidden' );
+				megas.push( item );
+
+				var closeTimer = null;
+
+				function open() {
+					window.clearTimeout( closeTimer );
+					megas.forEach( function ( other ) {
+						if ( other !== item ) {
+							other.classList.remove( 'is-open' );
+							var a = other.querySelector( 'a' );
+							if ( a ) {
+								a.setAttribute( 'aria-expanded', 'false' );
+							}
+						}
+					} );
+					item.classList.add( 'is-open' );
+					trigger.setAttribute( 'aria-expanded', 'true' );
+				}
+
+				function close( now ) {
+					window.clearTimeout( closeTimer );
+					closeTimer = window.setTimeout( function () {
+						item.classList.remove( 'is-open' );
+						trigger.setAttribute( 'aria-expanded', 'false' );
+					}, now ? 0 : 120 );
+				}
+
+				item.addEventListener( 'pointerenter', function ( e ) {
+					if ( e.pointerType !== 'touch' && ! nav.classList.contains( 'zd-nav--collapsed' ) ) {
+						open();
+					}
+				} );
+
+				item.addEventListener( 'pointerleave', function ( e ) {
+					if ( e.pointerType !== 'touch' && ! nav.classList.contains( 'zd-nav--collapsed' ) ) {
+						close();
+					}
+				} );
+
+				trigger.addEventListener( 'click', function ( e ) {
+					// Collapsed, the panel is in flow and always shown, so the
+					// link should just be a link.
+					if ( nav.classList.contains( 'zd-nav--collapsed' ) ) {
+						return;
+					}
+					e.preventDefault();
+					if ( item.classList.contains( 'is-open' ) ) {
+						close( true );
+					} else {
+						open();
+					}
+				} );
+
+				item.addEventListener( 'keydown', function ( e ) {
+					if ( e.key === 'Escape' && item.classList.contains( 'is-open' ) ) {
+						close( true );
+						trigger.focus();
+					}
+				} );
+
+				item.addEventListener( 'focusout', function ( e ) {
+					if ( ! item.contains( e.relatedTarget ) ) {
+						close();
+					}
+				} );
+			} );
+
+			if ( megas.length ) {
+				document.addEventListener( 'click', function ( e ) {
+					megas.forEach( function ( item ) {
+						if ( item.contains( e.target ) ) {
+							return;
+						}
+						item.classList.remove( 'is-open' );
+						var a = item.querySelector( 'a' );
+						if ( a ) {
+							a.setAttribute( 'aria-expanded', 'false' );
+						}
+					} );
+				} );
+			}
+
 			/* --- hamburger ------------------------------------------------ */
 
 			if ( burger && menu ) {

@@ -403,7 +403,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 				<?php endif; ?>
 			</div>
 
-			<?php $this->render_scores( $deal['scores'], 'yes' === $s['score_colour'] ); ?>
+			<?php $this->render_column_body( $deal, $s ); ?>
 
 			<?php if ( '' !== $deal['verified_label'] ) : ?>
 				<p class="zd-compare__verified"><?php echo esc_html( $deal['verified_label'] ); ?></p>
@@ -465,6 +465,36 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			<?php endif; ?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * The middle of a column: score bars, else the highlights, else the tagline.
+	 *
+	 * A deal with no Score Breakdown printed nothing here at all, and because
+	 * the columns are a stretched grid with the footer pinned by margin-top
+	 * auto, the unscored column kept the full height of the scored one - a tall
+	 * white void between the logo and the button. That reads as broken rather
+	 * than as "not scored yet". Every other card in the plugin already steps
+	 * down this same ladder; this column was the one that did not.
+	 */
+	private function render_column_body( $deal, $s ) {
+		if ( ! empty( $deal['scores'] ) ) {
+			$this->render_scores( $deal['scores'], 'yes' === $s['score_colour'] );
+			return;
+		}
+
+		if ( ! empty( $deal['highlights'] ) ) {
+			echo '<ul class="zd-compare__ticks">';
+			foreach ( array_slice( $deal['highlights'], 0, 5 ) as $line ) {
+				echo '<li>' . esc_html( $line ) . '</li>';
+			}
+			echo '</ul>';
+			return;
+		}
+
+		if ( '' !== $deal['tagline'] ) {
+			echo '<p class="zd-compare__blurb">' . esc_html( $deal['tagline'] ) . '</p>';
+		}
 	}
 
 	/**

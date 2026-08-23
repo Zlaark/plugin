@@ -1539,6 +1539,44 @@
 
 .zd-compare__foot { margin-top: auto; }
 
+/* Fallbacks for a deal with no Score Breakdown - the highlights, then the
+   tagline - so the column carries its own content instead of a tall void. */
+.zd-compare__ticks {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.zd-compare__ticks li {
+	position: relative;
+	padding-left: 22px;
+	font-size: 0.9rem;
+	line-height: 1.5;
+	color: var(--zd-body);
+}
+
+.zd-compare__ticks li::before {
+	content: "";
+	position: absolute;
+	left: 2px;
+	top: 0.42em;
+	width: 5px;
+	height: 9px;
+	border-right: 2px solid var(--zd-accent);
+	border-bottom: 2px solid var(--zd-accent);
+	transform: rotate(42deg);
+}
+
+.zd-compare__blurb {
+	margin: 0;
+	font-size: 0.92rem;
+	line-height: 1.6;
+	color: var(--zd-body);
+}
+
 .zd-compare__col .zd-btn {
 	width: 100%;
 	justify-content: center;
@@ -2316,6 +2354,202 @@
 	list-style: none;
 	margin: 0;
 	padding: 0;
+}
+
+/* -------------------------------------------------------------------------
+   Mega panel.
+
+   A sheet that shares the navbar's bottom rule rather than a card floating
+   under it: same hairline, same square corners, full bleed with the content
+   aligned to the same column as the bar above. The dropdown that hovers as a
+   rounded, shadowed rectangle is the one every builder ships, and it always
+   reads as a separate object stuck to the page.
+   ------------------------------------------------------------------------- */
+
+.zd-nav__item--mega > a { display: inline-flex; align-items: center; gap: 6px; }
+
+.zd-nav__chev {
+	flex: 0 0 auto;
+	opacity: 0.55;
+	transition: transform 0.3s var(--zd-ease), opacity 0.3s ease;
+}
+
+.zd-nav__item--mega.is-open > a .zd-nav__chev { transform: rotate(180deg); opacity: 1; }
+
+.zd-mega {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	z-index: 5;
+	background: #fff;
+	border-bottom: 1px solid var(--zd-ink, #0a1310);
+	box-shadow: 0 24px 40px -32px rgba(10, 19, 16, 0.5);
+	opacity: 0;
+	visibility: hidden;
+	translate: 0 -8px;
+	transition: opacity 0.28s var(--zd-ease), translate 0.28s var(--zd-ease), visibility 0.28s;
+}
+
+.zd-nav__item--mega.is-open .zd-mega {
+	opacity: 1;
+	visibility: visible;
+	translate: 0 0;
+}
+
+.zd-mega__inner {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 300px;
+	gap: 0;
+	max-width: 1440px;
+	margin: 0 auto;
+	padding: 0 28px;
+}
+
+.zd-mega__cols {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	padding: 26px 0 30px;
+}
+
+/* Hairlines between columns, the same device the readout uses between stages. */
+.zd-mega__col { padding: 0 26px; border-left: 1px solid var(--zd-hairline, #dce3df); }
+.zd-mega__col:first-child { border-left: 0; padding-left: 0; }
+
+.zd-mega__head {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin: 0 0 14px;
+	padding-bottom: 9px;
+	border-bottom: 1px solid var(--zd-hairline, #dce3df);
+	font-family: var(--zd-font-mono);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-muted, #5e6c64);
+}
+
+/* The count, read off the column - the menu says how much is behind it. */
+.zd-mega__head i {
+	margin-left: auto;
+	font-style: normal;
+	font-variant-numeric: tabular-nums;
+	color: var(--zd-accent, #0b7a4f);
+}
+
+.zd-mega__links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+
+.zd-mega__links li { position: relative; }
+
+.zd-mega__links a,
+.zd-mega__links span {
+	display: block;
+	padding: 7px 0 7px 13px;
+	font-size: 0.92rem;
+	line-height: 1.35;
+	color: var(--zd-body, #4a5a52);
+	text-decoration: none;
+	transition: color 0.2s ease, padding-left 0.28s var(--zd-ease);
+}
+
+/*
+ * An accent tick that grows from the baseline instead of a background wash.
+ * The link moves toward it, so the row reads as being picked rather than
+ * merely highlighted.
+ */
+.zd-mega__links a::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 6px;
+	height: 1.5px;
+	background: var(--zd-accent, #0b7a4f);
+	transform: scaleX(0);
+	transform-origin: left center;
+	transition: transform 0.28s var(--zd-ease);
+}
+
+@media (hover: hover) {
+	.zd-mega__links a:hover { color: var(--zd-ink, #0a1310); padding-left: 19px; }
+	.zd-mega__links a:hover::before { transform: scaleX(1); }
+}
+
+.zd-mega__links a:focus-visible {
+	outline: 2px solid var(--zd-accent, #0b7a4f);
+	outline-offset: 2px;
+	color: var(--zd-ink, #0a1310);
+}
+
+/* The finder is the one filled surface in the sheet, so it reads as the offer
+   rather than as one more column of links. */
+.zd-mega__finder {
+	padding: 26px 0 30px 30px;
+	margin-left: 30px;
+	border-left: 1px solid var(--zd-hairline, #dce3df);
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.zd-mega__findertitle {
+	margin: 0 0 6px;
+	font-family: var(--zd-font-display);
+	font-size: 1.08rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: var(--zd-heading, #101a16);
+}
+
+.zd-mega__findertext {
+	margin: 0 0 16px;
+	font-size: 0.86rem;
+	line-height: 1.55;
+	color: var(--zd-body, #4a5a52);
+}
+
+.zd-mega__findercta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: auto;
+	padding: 11px 18px;
+	border-radius: 999px;
+	background: var(--zd-ink, #0a1310);
+	color: #fff;
+	font-size: 0.86rem;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background-color 0.25s ease, gap 0.25s var(--zd-ease);
+}
+
+.zd-mega__findercta:hover { background: var(--zd-accent, #0b7a4f); gap: 12px; }
+.zd-mega__findercta:focus-visible { outline: 2px solid var(--zd-accent, #0b7a4f); outline-offset: 3px; }
+
+@media (max-width: 1024px) {
+	.zd-mega__inner { grid-template-columns: minmax(0, 1fr); padding: 0 20px; }
+	.zd-mega__finder { margin-left: 0; padding-left: 0; border-left: 0; border-top: 1px solid var(--zd-hairline, #dce3df); }
+	.zd-mega__col { padding: 0 0 18px; border-left: 0; }
+}
+
+/* Collapsed, the sheet is part of the panel: it stays open in flow rather
+   than hanging off a bar that is no longer there. */
+.zd-nav--collapsed .zd-mega {
+	position: static;
+	opacity: 1;
+	visibility: visible;
+	translate: none;
+	border-bottom: 0;
+	box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.zd-mega { transition: none; }
+	.zd-mega__links a,
+	.zd-mega__links a::before,
+	.zd-nav__chev { transition: none; }
 }
 
 .zd-nav__list li { margin: 0; }
@@ -5902,6 +6136,39 @@
 
 .zd-home__mq { padding-top: 40px; padding-bottom: 40px; }
 
+/*
+ * The trust band's stamp. A hairline the full width of the content column with
+ * the label sitting on it, so the logo rail below reads as the body of a
+ * labelled band rather than as a strip of pictures that wandered onto the page.
+ */
+.zd-trust {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	margin: 0 0 26px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--zd-hairline);
+	font-family: var(--zd-font-mono);
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-trust__count {
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.06em;
+	color: var(--zd-accent);
+}
+
+/* The rule runs to the end of the column; the label only owns its own width. */
+.zd-trust__count::before {
+	content: "·";
+	margin-right: 10px;
+	color: var(--zd-hairline);
+}
+
 /* ---- closing CTA ---- */
 
 .zd-home__cta {
@@ -5995,13 +6262,22 @@
 
 .zd-footer__logo { max-height: 34px; width: auto; }
 
+/*
+ * The wordmark, not a line of bold text. At 1.06rem it sat at body scale and
+ * read as a label; a mark needs enough size to be recognised before it is
+ * read, and tighter tracking at that size is what turns spaced-out letters
+ * into one shape. Antialiased because it sits on the dark footer ground.
+ */
 .zd-footer__word {
 	margin: 0;
 	font-family: var(--zd-font-display);
 	font-weight: 800;
-	font-size: 1.06rem;
-	letter-spacing: -0.03em;
+	font-size: clamp(1.7rem, 1.25rem + 1.4vw, 2.2rem);
+	line-height: 1;
+	letter-spacing: -0.045em;
 	color: var(--zd-footer-heading);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 .zd-footer__word span { color: var(--zd-footer-accent); }
@@ -6684,37 +6960,146 @@
 
 /* ---- how we test: numbered because it genuinely is a sequence ---- */
 
+/* -------------------------------------------------------------------------
+   How we test - the readout motif, not a card grid.
+
+   This is the section that explains where every number on the page comes
+   from, so it is built as the instrument rather than as four text columns:
+   square corners, one ink rule around the whole block, a reversed header,
+   mono stamps, and hairline divisions between stages. Same vocabulary as the
+   savings board and "ending soon", which is what makes it a motif.
+   ------------------------------------------------------------------------- */
+
 .zd-method {
+	border: 1px solid var(--zd-ink);
+	border-radius: 0;
+	overflow: hidden;
+	background: #fff;
+}
+
+.zd-method__head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 11px 16px;
+	background: var(--zd-ink);
+}
+
+.zd-method__head b {
+	font-family: var(--zd-font-mono);
+	font-size: 0.75rem;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--zd-on-accent);
+}
+
+.zd-method__count {
+	margin-left: auto;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.7rem;
+	color: var(--zd-accent-lite);
+}
+
+.zd-method__count::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--zd-accent-lite);
+}
+
+.zd-method__list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-	gap: 26px;
+	grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
 }
 
-.zd-method li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: start; }
+/* Hairline divisions, not gaps: the stages are parts of one instrument. */
+.zd-method__step {
+	position: relative;
+	padding: 22px 20px 24px;
+	border-left: 1px solid var(--zd-hairline);
+}
+
+.zd-method__step:first-child { border-left: 0; }
+
+/*
+ * The signature: one rail across the top of the block, a segment per stage,
+ * filling left to right in sequence as the section arrives. Four steps read
+ * as a single process being run rather than four disconnected columns.
+ */
+.zd-method__rail {
+	position: absolute;
+	top: -1px;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: var(--zd-track, #e8ede9);
+	overflow: hidden;
+}
+
+.zd-method__rail i {
+	display: block;
+	height: 100%;
+	background: var(--zd-accent);
+	transform: scaleX(0);
+	transform-origin: left center;
+	transition: transform 0.7s var(--zd-ease);
+	transition-delay: var(--zd-delay, 0ms);
+}
+
+.zd-reveal.is-in .zd-method__rail i { transform: scaleX(1); }
 
 .zd-method__n {
+	display: block;
+	margin-bottom: 12px;
 	font-family: var(--zd-font-mono);
 	font-variant-numeric: tabular-nums;
-	font-size: 0.86rem;
+	font-size: 0.78rem;
 	font-weight: 600;
+	letter-spacing: 0.04em;
 	color: var(--zd-accent);
-	padding-top: 3px;
-	border-top: 2px solid var(--zd-accent);
 }
 
-.zd-method h3 {
-	margin: 0 0 5px;
+.zd-method__title {
+	margin: 0 0 6px;
 	font-family: var(--zd-font-display);
-	font-size: 1rem;
+	font-size: 1.02rem;
 	font-weight: 700;
+	line-height: 1.25;
 	letter-spacing: -0.018em;
 	color: var(--zd-heading);
 }
 
-.zd-method p { margin: 0; font-size: 0.88rem; line-height: 1.55; color: var(--zd-body); }
+.zd-method__text {
+	margin: 0;
+	font-size: 0.88rem;
+	line-height: 1.55;
+	color: var(--zd-body);
+}
+
+/* Stacked, the divisions turn from vertical rules into horizontal ones. */
+@media (max-width: 640px) {
+	.zd-method__list { grid-template-columns: 1fr; }
+
+	.zd-method__step {
+		border-left: 0;
+		border-top: 1px solid var(--zd-hairline);
+	}
+
+	.zd-method__step:first-child { border-top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.zd-method__rail i { transition: none; transform: scaleX(1); }
+}
 
 /* ---- questions ---- */
 
@@ -6793,23 +7178,79 @@
 .zd-about2__text { margin: 14px 0 0; font-size: 0.95rem; line-height: 1.6; color: var(--zd-body); max-width: 42ch; }
 .zd-about2__cta { margin-top: 20px; }
 
+/*
+ * The credits, set as a masthead: a mono stamp, then one ruled row per person.
+ * Rows rather than a 2-up grid of circular avatars, because a circle of face
+ * plus a name is the stock "meet the team" block, and this section is making a
+ * different claim - these people are on the record for the numbers. Hairlines
+ * carry the separation, so the list reads as a printed credit column.
+ */
+/* The masthead and the credit rows are one column of the two-up, not two
+   separate grid children - as separate children the label claimed the right
+   column and pushed the list onto its own row underneath the lead. */
+.zd-about2__credits { min-width: 0; }
+
+.zd-about2__masthead {
+	margin: 0 0 4px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--zd-ink);
+	font-family: var(--zd-font-mono);
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-heading);
+}
+
 .zd-about2__people {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	gap: 24px;
+	display: flex;
+	flex-direction: column;
 }
 
-.zd-about2__people li { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 16px; align-items: start; }
+.zd-about2__people li {
+	position: relative;
+	display: grid;
+	grid-template-columns: 54px minmax(0, 1fr);
+	gap: 16px;
+	align-items: start;
+	padding: 18px 0 18px 14px;
+	border-bottom: 1px solid var(--zd-hairline);
+}
 
+.zd-about2__people li:last-child { border-bottom: 0; }
+
+/* The signature: an accent edge that wipes down the row it belongs to. */
+.zd-about2__people li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background: var(--zd-accent);
+	transform: scaleY(0);
+	transform-origin: top center;
+	transition: transform 0.4s var(--zd-ease);
+}
+
+@media (hover: hover) {
+	.zd-about2__people li:hover::before { transform: scaleY(1); }
+}
+
+/*
+ * A rounded-square tile, the same shape the savings board gives a brand logo,
+ * rather than the circular avatar every team section on the web already uses.
+ */
 .zd-about2__photo {
-	width: 62px;
-	height: 62px;
-	border-radius: 50%;
+	width: 54px;
+	height: 54px;
+	border-radius: var(--zd-r-sm);
 	overflow: hidden;
 	background: var(--zd-surface);
+	border: 1px solid var(--zd-hairline);
 	display: grid;
 	place-items: center;
 }
@@ -6828,9 +7269,10 @@
 
 .zd-about2__who b {
 	font-family: var(--zd-font-display);
-	font-size: 1rem;
+	font-size: 1.12rem;
 	font-weight: 700;
-	letter-spacing: -0.018em;
+	line-height: 1.2;
+	letter-spacing: -0.022em;
 	color: var(--zd-heading);
 }
 
@@ -7960,15 +8402,22 @@
  * glyph it overlapped the first two lines on every card wider than a column,
  * which reads as a rendering fault rather than a flourish.
  */
+/*
+ * The mark reads as punctuation, not as wallpaper. At 52px and 32% opacity it
+ * was a grey ghost behind the card; at full strength on a hairline it becomes
+ * the same labelled-band opening the readout, the trust strip and the mega
+ * columns all use, which is what ties this card to the rest of the page.
+ */
 .zd-quote__mark {
 	display: block;
-	margin-bottom: -14px;
+	margin-bottom: 2px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--zd-hairline);
 	font-family: var(--zd-font-display);
-	font-size: 52px;
+	font-size: 34px;
 	font-weight: 800;
-	line-height: 1;
+	line-height: 0.7;
 	color: var(--zd-accent);
-	opacity: 0.32;
 	pointer-events: none;
 	user-select: none;
 }
@@ -8025,10 +8474,15 @@
 	color: var(--zd-heading);
 }
 
+/* Mono uppercase, the same stamp the About credits give a role - two sections
+   naming people should not name them in two different voices. */
 .zd-quote__role {
-	font-size: 14px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
 	line-height: 1.3;
-	color: var(--zd-muted);
+	color: var(--zd-accent);
 }
 
 /*
@@ -8036,11 +8490,12 @@
  * an unattributed quote would be the one soft claim in the whole design.
  */
 .zd-quote__source {
-	margin-top: 4px;
-	font-size: 11.5px;
-	font-weight: 600;
+	margin-top: 6px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.68rem;
+	font-weight: 500;
 	line-height: 1.3;
-	letter-spacing: 0.06em;
+	letter-spacing: 0.08em;
 	text-transform: uppercase;
 	color: var(--zd-muted);
 }

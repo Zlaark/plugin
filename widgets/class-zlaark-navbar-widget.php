@@ -38,6 +38,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 	protected function register_controls() {
 		$this->brand_controls();
 		$this->menu_controls();
+		$this->mega_controls();
 		$this->action_controls();
 		$this->layout_controls();
 		$this->style_controls();
@@ -70,7 +71,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Logo Text', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => 'Cobutec',
+				'default'   => get_bloginfo( 'name' ),
 				'condition' => array( 'logo_type' => 'text' ),
 			)
 		);
@@ -186,6 +187,16 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			)
 		);
 
+		$repeater->add_control(
+			'mega',
+			array(
+				'label'        => __( 'Opens Mega Panel', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'description'  => __( 'Builds the panel from the Mega Panel section, matching on this item\'s text.', 'zlaark-deals-pro' ),
+			)
+		);
+
 		$this->add_control(
 			'items',
 			array(
@@ -194,12 +205,18 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 				'fields'      => $repeater->get_controls(),
 				'title_field' => '{{{ text }}}',
 				'condition'   => array( 'menu_source' => 'manual' ),
+				/*
+				 * The plugin's own information architecture, not a SaaS
+				 * template's. A navbar that ships "Features / Assets / Pricing"
+				 * next to a deals catalogue reads as somebody else's demo, and
+				 * that is exactly how it looked on the page.
+				 */
 				'default'     => array(
-					array( 'text' => __( 'Home', 'zlaark-deals-pro' ), 'is_active' => 'yes' ),
-					array( 'text' => __( 'Features', 'zlaark-deals-pro' ) ),
-					array( 'text' => __( 'Assets', 'zlaark-deals-pro' ) ),
-					array( 'text' => __( 'Pricing', 'zlaark-deals-pro' ) ),
-					array( 'text' => __( 'Protection', 'zlaark-deals-pro' ) ),
+					array( 'text' => __( 'Deals', 'zlaark-deals-pro' ), 'is_active' => 'yes' ),
+					array( 'text' => __( 'Hosting', 'zlaark-deals-pro' ), 'mega' => 'yes' ),
+					array( 'text' => __( 'Reviews', 'zlaark-deals-pro' ) ),
+					array( 'text' => __( 'Compare', 'zlaark-deals-pro' ) ),
+					array( 'text' => __( 'How we test', 'zlaark-deals-pro' ) ),
 				),
 			)
 		);
@@ -213,6 +230,143 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 				'return_value' => 'yes',
 				'separator'    => 'before',
 				'description'  => __( 'Highlights the item whose link matches the page being viewed.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * Mega panel content.
+	 *
+	 * Elementor cannot nest a repeater inside a repeater, so the columns live
+	 * in one flat list and each row names the menu item it belongs to. One
+	 * repeater can therefore feed several panels, and the alternative - a fixed
+	 * set of "column 1..4" control groups - would cap the design at whatever
+	 * number was guessed here.
+	 */
+	private function mega_controls() {
+		$this->start_controls_section(
+			'section_mega',
+			array(
+				'label'     => __( 'Mega Panel', 'zlaark-deals-pro' ),
+				'condition' => array( 'menu_source' => 'manual' ),
+			)
+		);
+
+		$col = new Repeater();
+
+		$col->add_control(
+			'parent',
+			array(
+				'label'       => __( 'Belongs To', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'Hosting', 'zlaark-deals-pro' ),
+				'description' => __( 'The menu item text this column appears under. Match it exactly.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$col->add_control(
+			'heading',
+			array(
+				'label'   => __( 'Column Heading', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => __( 'By use case', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$col->add_control(
+			'links',
+			array(
+				'label'       => __( 'Links', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXTAREA,
+				'rows'        => 6,
+				'placeholder' => "WordPress hosting|/best-wordpress-hosting/\nVPS hosting|/best-vps-hosting/",
+				'description' => __( 'One per line as Label|URL. A line with no URL renders as plain text.', 'zlaark-deals-pro' ),
+				'default'     => "WordPress hosting|#\nVPS hosting|#\nCloud hosting|#\nReseller hosting|#",
+			)
+		);
+
+		$this->add_control(
+			'mega_cols',
+			array(
+				'label'       => __( 'Columns', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::REPEATER,
+				'fields'      => $col->get_controls(),
+				'title_field' => '{{{ parent }}} - {{{ heading }}}',
+				'default'     => array(
+					array(
+						'parent'  => __( 'Hosting', 'zlaark-deals-pro' ),
+						'heading' => __( 'By use case', 'zlaark-deals-pro' ),
+						'links'   => "WordPress hosting|#\nVPS hosting|#\nCloud hosting|#\nReseller hosting|#",
+					),
+					array(
+						'parent'  => __( 'Hosting', 'zlaark-deals-pro' ),
+						'heading' => __( 'By budget', 'zlaark-deals-pro' ),
+						'links'   => "Under $3 a month|#\nUnder $10 a month|#\nBest value overall|#",
+					),
+					array(
+						'parent'  => __( 'Hosting', 'zlaark-deals-pro' ),
+						'heading' => __( 'Head to head', 'zlaark-deals-pro' ),
+						'links'   => "Hostinger vs Bluehost|#\nWP Engine vs Kinsta|#\nAll comparisons|#",
+					),
+				),
+			)
+		);
+
+		$this->add_control(
+			'finder_heading',
+			array(
+				'label'     => __( 'Finder Column', 'zlaark-deals-pro' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'finder_parent',
+			array(
+				'label'       => __( 'Belongs To', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'Hosting', 'zlaark-deals-pro' ),
+				'description' => __( 'Leave empty to hide the finder.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'finder_title',
+			array(
+				'label'   => __( 'Title', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => __( 'Hosting finder', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'finder_text',
+			array(
+				'label'   => __( 'Text', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::TEXTAREA,
+				'rows'    => 3,
+				'default' => __( 'Answer three questions and we will shortlist the hosts we have actually paid for and measured.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'finder_cta_text',
+			array(
+				'label'   => __( 'Button Text', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::TEXT,
+				'default' => __( 'Start the finder', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'finder_cta_url',
+			array(
+				'label'   => __( 'Button Link', 'zlaark-deals-pro' ),
+				'type'    => Controls_Manager::URL,
+				'default' => array( 'url' => '#' ),
 			)
 		);
 
@@ -375,7 +529,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Bottom Border', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ececf0',
+				'default'   => '#dce3df',
 				'selectors' => array( '{{WRAPPER}} .zd-nav' => 'border-bottom-color: {{VALUE}};' ),
 			)
 		);
@@ -405,7 +559,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0a0a0a',
+				'default'   => '#0a1310',
 				'condition' => array( 'logo_type' => 'text' ),
 				'selectors' => array( '{{WRAPPER}} .zd-nav__logo' => 'color: {{VALUE}};' ),
 			)
@@ -436,7 +590,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Indicator Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#1d6aff',
+				'default'   => '#0b7a4f',
 				'selectors' => array( '{{WRAPPER}} .zd-nav' => '--zd-nav-accent: {{VALUE}};' ),
 			)
 		);
@@ -446,7 +600,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Link Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#3f3f46',
+				'default'   => '#4a5a52',
 				'selectors' => array( '{{WRAPPER}} .zd-nav' => '--zd-nav-link: {{VALUE}};' ),
 			)
 		);
@@ -485,7 +639,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Capsule Border', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#e7e7ec',
+				'default'   => '#dce3df',
 				'selectors' => array( '{{WRAPPER}} .zd-nav__menu' => 'border-color: {{VALUE}};' ),
 			)
 		);
@@ -526,7 +680,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'Text Link Color', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0a0a0a',
+				'default'   => '#0a1310',
 				'selectors' => array( '{{WRAPPER}} .zd-nav__link-action' => 'color: {{VALUE}};' ),
 			)
 		);
@@ -544,7 +698,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'CTA Background', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#0a0a0a',
+				'default'   => '#0a1310',
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .zd-nav__cta' => 'background-color: {{VALUE}};' ),
 			)
@@ -565,7 +719,7 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 			array(
 				'label'     => __( 'CTA Background (Hover)', 'zlaark-deals-pro' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#1d6aff',
+				'default'   => '#065f42',
 				'selectors' => array( '{{WRAPPER}} .zd-nav__cta:hover' => 'background-color: {{VALUE}};' ),
 			)
 		);
@@ -793,17 +947,156 @@ class Zlaark_Navbar_Widget extends Zlaark_Widget_Base {
 				} else {
 					$this->add_render_attribute( $key, 'href', '#' );
 				}
+				$panel = ( 'yes' === $item['mega'] ) ? $this->mega_panel( $s, $item['text'] ) : '';
+				$pid   = 'zd-mega-' . $this->get_id() . '-' . $i;
+
+				if ( '' !== $panel ) {
+					$this->add_render_attribute( $key, 'aria-expanded', 'false' );
+					$this->add_render_attribute( $key, 'aria-controls', $pid );
+				}
 				?>
-				<li class="zd-nav__item">
+				<li class="zd-nav__item<?php echo '' !== $panel ? ' zd-nav__item--mega' : ''; ?>">
 					<a <?php $this->print_render_attribute_string( $key ); ?>>
 						<?php echo esc_html( $item['text'] ); ?>
+						<?php if ( '' !== $panel ) : ?>
+							<svg class="zd-nav__chev" viewBox="0 0 12 12" width="10" height="10"
+								fill="none" aria-hidden="true">
+								<path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6"
+									stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						<?php endif; ?>
 					</a>
+					<?php if ( '' !== $panel ) : ?>
+						<div class="zd-mega" id="<?php echo esc_attr( $pid ); ?>" hidden>
+							<div class="zd-mega__inner"><?php echo $panel; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built and escaped in mega_panel(). ?></div>
+						</div>
+					<?php endif; ?>
 				</li>
 				<?php
 			}
 			?>
 		</ul>
 		<?php
+	}
+
+	/**
+	 * The panel for one menu item, or '' when that item has no content.
+	 *
+	 * Built as a string rather than echoed, so render_menu() can ask "is there
+	 * a panel?" before it decides whether the item needs a chevron and the ARIA
+	 * wiring - an item that announces a menu it does not have is worse than one
+	 * that never claims to.
+	 */
+	private function mega_panel( $s, $label ) {
+		$label = trim( (string) $label );
+		if ( '' === $label ) {
+			return '';
+		}
+
+		$cols = is_array( $s['mega_cols'] ) ? $s['mega_cols'] : array();
+		$mine = array();
+
+		foreach ( $cols as $col ) {
+			if ( 0 !== strcasecmp( trim( (string) $col['parent'] ), $label ) ) {
+				continue;
+			}
+			$links = $this->parse_links( $col['links'] );
+			if ( '' === trim( (string) $col['heading'] ) && empty( $links ) ) {
+				continue;
+			}
+			$mine[] = array( 'heading' => $col['heading'], 'links' => $links );
+		}
+
+		$finder = ( 0 === strcasecmp( trim( (string) $s['finder_parent'] ), $label ) )
+			&& ( '' !== trim( (string) $s['finder_title'] ) );
+
+		if ( empty( $mine ) && ! $finder ) {
+			return '';
+		}
+
+		ob_start();
+		?>
+		<div class="zd-mega__cols">
+			<?php foreach ( $mine as $col ) : ?>
+				<div class="zd-mega__col">
+					<?php if ( '' !== trim( (string) $col['heading'] ) ) : ?>
+						<p class="zd-mega__head">
+							<span><?php echo esc_html( $col['heading'] ); ?></span>
+							<?php
+							/*
+							 * The count is read off the column itself. A menu
+							 * that says how much is behind each heading is
+							 * doing the same job as the score bars further
+							 * down the page - telling you before you click.
+							 */
+							?>
+							<?php if ( ! empty( $col['links'] ) ) : ?>
+								<i><?php echo esc_html( number_format_i18n( count( $col['links'] ) ) ); ?></i>
+							<?php endif; ?>
+						</p>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $col['links'] ) ) : ?>
+						<ul class="zd-mega__links">
+							<?php foreach ( $col['links'] as $link ) : ?>
+								<li>
+									<?php if ( '' !== $link['url'] ) : ?>
+										<a href="<?php echo esc_url( $link['url'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a>
+									<?php else : ?>
+										<span><?php echo esc_html( $link['label'] ); ?></span>
+									<?php endif; ?>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endif; ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
+
+		<?php if ( $finder ) : ?>
+			<div class="zd-mega__finder">
+				<p class="zd-mega__head"><span><?php esc_html_e( 'Not sure yet', 'zlaark-deals-pro' ); ?></span></p>
+				<p class="zd-mega__findertitle"><?php echo esc_html( $s['finder_title'] ); ?></p>
+				<?php if ( '' !== $s['finder_text'] ) : ?>
+					<p class="zd-mega__findertext"><?php echo esc_html( $s['finder_text'] ); ?></p>
+				<?php endif; ?>
+				<?php if ( '' !== $s['finder_cta_text'] ) : ?>
+					<a class="zd-mega__findercta"
+						href="<?php echo esc_url( ! empty( $s['finder_cta_url']['url'] ) ? $s['finder_cta_url']['url'] : '#' ); ?>">
+						<span><?php echo esc_html( $s['finder_cta_text'] ); ?></span>
+						<svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
+							<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+					</a>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
+		<?php
+		return (string) ob_get_clean();
+	}
+
+	/** "Label|URL" per line. A line with no pipe is a label with no link. */
+	private function parse_links( $raw ) {
+		$out = array();
+
+		foreach ( preg_split( '/\r\n|\r|\n/', (string) $raw ) as $line ) {
+			$line = trim( $line );
+			if ( '' === $line ) {
+				continue;
+			}
+			$parts = explode( '|', $line, 2 );
+			$label = trim( $parts[0] );
+			if ( '' === $label ) {
+				continue;
+			}
+			$out[] = array(
+				'label' => $label,
+				'url'   => isset( $parts[1] ) ? trim( $parts[1] ) : '',
+			);
+		}
+
+		return $out;
 	}
 
 	/**
