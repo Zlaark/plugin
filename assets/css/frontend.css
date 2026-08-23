@@ -223,6 +223,35 @@
 	text-wrap: balance;
 }
 
+/*
+ * An element inside a heading is still heading text. The reset above is
+ * `.zd-x.zd-x *`, which beats plain inheritance, so the accent word in
+ * "Best <span>Tools</span> Reviews" was pulled back to the body face while the
+ * words either side of it kept the display face - one heading, two typefaces.
+ * Same two-class specificity plus a type selector, so it outranks the reset
+ * without reaching for !important.
+ */
+.zd-hero.zd-hero :is(h1, h2, h3, h4, h5, h6) *,
+.zd-hc.zd-hc :is(h1, h2, h3, h4, h5, h6) *,
+.zd-hf.zd-hf :is(h1, h2, h3, h4, h5, h6) *,
+.zd-bento.zd-bento :is(h1, h2, h3, h4, h5, h6) *,
+.zd-nav.zd-nav :is(h1, h2, h3, h4, h5, h6) *,
+.zd-about.zd-about :is(h1, h2, h3, h4, h5, h6) *,
+.zd-deals.zd-deals :is(h1, h2, h3, h4, h5, h6) *,
+.zd-picks.zd-picks :is(h1, h2, h3, h4, h5, h6) *,
+.zd-compare.zd-compare :is(h1, h2, h3, h4, h5, h6) *,
+.zd-stats.zd-stats :is(h1, h2, h3, h4, h5, h6) *,
+.zd-marquee.zd-marquee :is(h1, h2, h3, h4, h5, h6) *,
+.zd-index.zd-index :is(h1, h2, h3, h4, h5, h6) *,
+.zd-panel.zd-panel :is(h1, h2, h3, h4, h5, h6) *,
+.zd-home.zd-home :is(h1, h2, h3, h4, h5, h6) *,
+.zd-footer.zd-footer :is(h1, h2, h3, h4, h5, h6) *,
+.zd-single.zd-single :is(h1, h2, h3, h4, h5, h6) *,
+.zd-card.zd-card :is(h1, h2, h3, h4, h5, h6) *,
+.zd-board.zd-board :is(h1, h2, h3, h4, h5, h6) * {
+	font-family: inherit;
+}
+
 .zd-hero.zd-hero :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
 .zd-hc.zd-hc :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
 .zd-hf.zd-hf :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
@@ -7411,6 +7440,7 @@
 
 .zd-strip__title {
 	margin: 0 0 30px;
+	font-family: var(--zd-font-display);
 	font-size: clamp(28px, 4vw, 42px);
 	font-weight: 800;
 	line-height: 1.1;

@@ -1534,7 +1534,14 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		<?php
 	}
 
-	/** Wraps the highlight phrase in an accent span, once. */
+	/**
+	 * Wraps the highlight phrase in an accent span, once.
+	 *
+	 * A <span>, not an <em>: the accent word is coloured, not emphasised, and
+	 * <em> asked the browser for an italic face. Bricolage Grotesque ships no
+	 * italic, so any theme rule that beat our font-style:normal sent that one
+	 * word off to a different family - a heading rendered in two typefaces.
+	 */
 	private function highlight( $title, $phrase ) {
 		$title = esc_html( $title );
 		if ( '' === trim( (string) $phrase ) ) {
@@ -1546,7 +1553,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 			return $title;
 		}
 		return substr( $title, 0, $pos )
-			. '<em class="zd-home__hl">' . $phrase . '</em>'
+			. '<span class="zd-home__hl">' . $phrase . '</span>'
 			. substr( $title, $pos + strlen( $phrase ) );
 	}
 

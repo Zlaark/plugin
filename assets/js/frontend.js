@@ -17,11 +17,22 @@
 	var DONE = 'zdInit';
 	var reduced = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
-	function once( el ) {
-		if ( el.dataset[ DONE ] ) {
+	/*
+	 * Idempotence guard, so Elementor can re-run init over the same DOM.
+	 *
+	 * The flag is per feature, not per element: one element can be the concern
+	 * of two initialisers at once - the category rail is a .zd-tabs and a
+	 * reveal - and a single shared flag meant whichever ran first claimed the
+	 * element and the second silently skipped it. That is what left the rail
+	 * rendered but dead: initReveals stamped it, so initTabs never bound the
+	 * tab or arrow clicks.
+	 */
+	function once( el, feature ) {
+		var key = DONE + feature;
+		if ( el.dataset[ key ] ) {
 			return false;
 		}
-		el.dataset[ DONE ] = '1';
+		el.dataset[ key ] = '1';
 		return true;
 	}
 
@@ -161,7 +172,7 @@
 		} );
 
 		each( scope, '[data-zd-reveal]', function ( el ) {
-			if ( ! once( el ) ) {
+			if ( ! once( el, 'Reveal' ) ) {
 				return;
 			}
 			if ( ! revealObserver || reduced ) {
@@ -253,7 +264,7 @@
 	}
 
 	function watch( el ) {
-		if ( ! once( el ) ) {
+		if ( ! once( el, 'Value' ) ) {
 			return;
 		}
 
@@ -299,7 +310,7 @@
 		}
 
 		each( scope, '.zd-bento__stage--parallax', function ( stage ) {
-			if ( ! once( stage ) ) {
+			if ( ! once( stage, 'Depth' ) ) {
 				return;
 			}
 
@@ -337,7 +348,7 @@
 		}
 
 		each( scope, '.zd-tilt', function ( card ) {
-			if ( ! once( card ) ) {
+			if ( ! once( card, 'Tilt' ) ) {
 				return;
 			}
 
@@ -377,7 +388,7 @@
 		}
 
 		each( scope, '.zd-magnetic', function ( btn ) {
-			if ( ! once( btn ) ) {
+			if ( ! once( btn, 'Magnetic' ) ) {
 				return;
 			}
 
@@ -418,7 +429,7 @@
 		}
 
 		each( scope, '.zd-parallax', function ( media ) {
-			if ( ! once( media ) ) {
+			if ( ! once( media, 'Parallax' ) ) {
 				return;
 			}
 
@@ -597,7 +608,7 @@
 
 	function initMarquee( scope ) {
 		each( scope, '.zd-marquee', function ( marquee ) {
-			if ( ! once( marquee ) ) {
+			if ( ! once( marquee, 'Marquee' ) ) {
 				return;
 			}
 
@@ -620,7 +631,7 @@
 
 	function initNavbar( scope ) {
 		each( scope, '.zd-nav', function ( nav ) {
-			if ( ! once( nav ) ) {
+			if ( ! once( nav, 'Nav' ) ) {
 				return;
 			}
 
@@ -821,7 +832,7 @@
 
 	function initTabs( scope ) {
 		each( scope, '.zd-tabs', function ( tabs ) {
-			if ( ! once( tabs ) ) {
+			if ( ! once( tabs, 'Tabs' ) ) {
 				return;
 			}
 
@@ -946,7 +957,7 @@
 		var editing = inEditor();
 
 		each( scope, '[data-zd-obar]', function ( bar ) {
-			if ( ! once( bar ) ) {
+			if ( ! once( bar, 'Obar' ) ) {
 				return;
 			}
 
@@ -1002,7 +1013,7 @@
 
 	function initRails( scope ) {
 		each( scope, '.zd-rail', function ( rail ) {
-			if ( ! once( rail ) ) {
+			if ( ! once( rail, 'Rail' ) ) {
 				return;
 			}
 
@@ -1059,7 +1070,7 @@
 
 	function initCoupons( scope ) {
 		each( scope, '.zd-coupon', function ( box ) {
-			if ( ! once( box ) ) {
+			if ( ! once( box, 'Coupon' ) ) {
 				return;
 			}
 
@@ -1114,7 +1125,7 @@
 	 */
 	function initIndex( scope ) {
 		each( scope, '[data-zd-index]', function ( root ) {
-			if ( ! once( root ) ) {
+			if ( ! once( root, 'Index' ) ) {
 				return;
 			}
 
