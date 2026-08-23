@@ -636,14 +636,34 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 	 */
 	protected function article_picker_type( $prefix ) {
 		/*
-		 * This runs from inside register_controls(). get_settings() would walk
-		 * the control stack to apply defaults - while that stack is still half
-		 * built - and cache the half-finished result, so it costs a full
-		 * settings pass on each of the six source blocks and reads a list that
-		 * does not include the control being registered anyway. The saved value
-		 * is what is wanted, and get_data() hands it over without any of that.
+		 * Elementor builds the widget panel's control config from an instance
+		 * constructed with no data at all, and get_data() does not survive
+		 * that. It reaches straight into $this->data['settings'] - null on such
+		 * an instance, because Controls_Stack::init() never ran - and hands the
+		 * result to sanitize_settings(), whose signature is typed `array`. The
+		 * TypeError is fatal; it lands inside the get_widgets_config AJAX call
+		 * that fetches every widget's controls; the editor asked for JSON and
+		 * gets a "critical error" HTML page, so it sits on the loading screen
+		 * forever. is_type_instance() is how Elementor itself separates the
+		 * panel's template instance from a widget actually placed on a page.
+		 *
+		 * There is no saved value on a type instance to read anyway, so the
+		 * default is the only answer that could be correct here.
 		 */
-		$settings = method_exists( $this, 'get_data' ) ? (array) $this->get_data( 'settings' ) : array();
+		if ( $this->is_type_instance() ) {
+			return 'post';
+		}
+
+		/*
+		 * On a real instance this runs from inside register_controls().
+		 * get_settings() would walk the control stack to apply defaults - while
+		 * that stack is still half built - and cache the half-finished result,
+		 * so it costs a full settings pass on each of the six source blocks and
+		 * reads a list that does not include the control being registered
+		 * anyway. The saved value is what is wanted, and get_data() hands it
+		 * over without any of that.
+		 */
+		$settings = (array) $this->get_data( 'settings' );
 		$saved    = isset( $settings[ $prefix . '_post_type' ] ) ? $settings[ $prefix . '_post_type' ] : '';
 
 		return ( is_string( $saved ) && '' !== $saved && post_type_exists( $saved ) ) ? $saved : 'post';

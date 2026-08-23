@@ -304,7 +304,50 @@ abstract class Widget_Base {
 	public $zd_sections = array();
 	protected $open = null;
 
-	public function __construct( $data = array(), $args = null ) {}
+	/**
+	 * Mirrors Elementor's own flag: true when the widget was built with no
+	 * data, which is the instance Elementor uses to produce the panel's
+	 * control config. That instance has never run Controls_Stack::init(), so
+	 * its $data is null - and that is what makes get_data() unsafe on it.
+	 */
+	private $is_type_instance = true;
+
+	public function __construct( $data = array(), $args = null ) {
+		if ( $data ) {
+			$this->is_type_instance = false;
+			$this->zd_data          = array_merge( array( 'settings' => array() ), (array) $data );
+		}
+	}
+
+	/** @var array|null Null on a type instance, exactly as Elementor leaves it. */
+	protected $zd_data = null;
+
+	public function is_type_instance() {
+		return $this->is_type_instance;
+	}
+
+	/**
+	 * Elementor's get_data(), including the part that bites.
+	 *
+	 * Controls_Stack::get_data() reaches into $this->data['settings'] and
+	 * passes it to sanitize_settings(), which is declared `array $settings`.
+	 * On a type instance $this->data is null, so PHP raises a TypeError and
+	 * the request dies. That fatal lands in the get_widgets_config AJAX call,
+	 * the editor receives an HTML error page where it expected JSON, and it
+	 * never leaves the loading screen. Reproduce it faithfully or the harness
+	 * cannot see it.
+	 */
+	public function get_data( $item = null ) {
+		if ( null === $this->zd_data || ! isset( $this->zd_data['settings'] ) ) {
+			throw new \TypeError(
+				'Elementor\\Controls_Stack::sanitize_settings(): Argument #1 ($settings) '
+				. 'must be of type array, null given'
+			);
+		}
+
+		return ( null === $item ) ? $this->zd_data
+			: ( isset( $this->zd_data[ $item ] ) ? $this->zd_data[ $item ] : null );
+	}
 
 	public function start_controls_section( $id, $args = array() ) {
 		if ( null !== $this->open ) {
