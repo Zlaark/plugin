@@ -66,6 +66,27 @@
 		} );
 	}
 
+	/**
+	 * Collapses a burst of events into a single call on the next frame.
+	 *
+	 * The rail and tab-strip handlers read scrollWidth/clientWidth and then
+	 * write classes and disabled flags, which forces a synchronous layout. Run
+	 * straight off a scroll event that is one forced layout per event fired.
+	 */
+	function onFrame( fn ) {
+		var queued = false;
+		return function () {
+			if ( queued ) {
+				return;
+			}
+			queued = true;
+			requestAnimationFrame( function () {
+				queued = false;
+				fn();
+			} );
+		};
+	}
+
 	/** Runs fn on window resize for as long as el is still in the document. */
 	function onResize( el, fn ) {
 		resizeJobs.push( { el: el, fn: fn } );
@@ -581,19 +602,11 @@
 			}
 
 			// A burst of decodes costs one pass, not one pass each.
-			var queued = false;
-			var refresh = function () {
-				if ( queued ) {
-					return;
-				}
-				queued = true;
-				requestAnimationFrame( function () {
-					queued = false;
-					sizeMarquee( marquee );
-					fillMarquee( marquee );
-					watchMarqueeLogos( marquee, refresh );
-				} );
-			};
+			var refresh = onFrame( function () {
+				sizeMarquee( marquee );
+				fillMarquee( marquee );
+				watchMarqueeLogos( marquee, refresh );
+			} );
 
 			sizeMarquee( marquee );
 			fillMarquee( marquee );
@@ -835,9 +848,9 @@
 			} );
 
 			if ( scroll !== tabs ) {
-				scroll.addEventListener( 'scroll', function () {
+				scroll.addEventListener( 'scroll', onFrame( function () {
 					syncArrows( tabs, scroll );
-				} );
+				} ) );
 			}
 
 			each( tabs, '.zd-tabs__arrow', function ( arrow ) {
@@ -916,7 +929,22 @@
 		}
 	}
 
+	/*
+	 * True inside the Elementor editor canvas. Elementor holds a live reference
+	 * to each widget's element, so anything that deletes one out from under it
+	 * leaves the author with a widget they cannot select, move or edit.
+	 */
+	function inEditor() {
+		return !! (
+			document.body &&
+			( document.body.classList.contains( 'elementor-editor-active' ) ||
+			  document.body.classList.contains( 'elementor-editor-preview' ) )
+		);
+	}
+
 	function initOfferBars( scope ) {
+		var editing = inEditor();
+
 		each( scope, '[data-zd-obar]', function ( bar ) {
 			if ( ! once( bar ) ) {
 				return;
@@ -924,7 +952,14 @@
 
 			var id = bar.getAttribute( 'data-zd-obar' );
 
-			if ( barDismissed( id ) ) {
+			/*
+			 * A dismissal is a visitor's choice, not an editing one. Honouring
+			 * it in the editor deleted the widget from the canvas the moment it
+			 * rendered - and because Elementor rebuilds the widget on every
+			 * control change, it was deleted again on every edit, so the bar
+			 * could never be worked on again once closed while previewing.
+			 */
+			if ( ! editing && barDismissed( id ) ) {
 				bar.parentNode.removeChild( bar );
 				return;
 			}
@@ -942,6 +977,14 @@
 			if ( close ) {
 				close.addEventListener( 'click', function () {
 					bar.classList.remove( 'is-in' );
+
+					// In the editor the close button is there to be previewed,
+					// not obeyed: no persisted dismissal, and the element stays
+					// where Elementor put it.
+					if ( editing ) {
+						return;
+					}
+
 					dismissBar( id );
 
 					// Let the slide-out finish before the bar leaves the DOM.
@@ -1004,7 +1047,7 @@
 				} );
 			}
 
-			track.addEventListener( 'scroll', sync );
+			track.addEventListener( 'scroll', onFrame( sync ) );
 			onResize( rail, sync );
 			requestAnimationFrame( sync );
 		} );

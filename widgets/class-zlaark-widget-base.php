@@ -635,10 +635,18 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 	 * otherwise the category and article pickers would always list posts.
 	 */
 	protected function article_picker_type( $prefix ) {
-		$settings = $this->get_settings();
+		/*
+		 * This runs from inside register_controls(). get_settings() would walk
+		 * the control stack to apply defaults - while that stack is still half
+		 * built - and cache the half-finished result, so it costs a full
+		 * settings pass on each of the six source blocks and reads a list that
+		 * does not include the control being registered anyway. The saved value
+		 * is what is wanted, and get_data() hands it over without any of that.
+		 */
+		$settings = method_exists( $this, 'get_data' ) ? (array) $this->get_data( 'settings' ) : array();
 		$saved    = isset( $settings[ $prefix . '_post_type' ] ) ? $settings[ $prefix . '_post_type' ] : '';
 
-		return ( '' !== $saved && post_type_exists( $saved ) ) ? $saved : 'post';
+		return ( is_string( $saved ) && '' !== $saved && post_type_exists( $saved ) ) ? $saved : 'post';
 	}
 
 	/** Runs the strip query for one prefixed source block. */

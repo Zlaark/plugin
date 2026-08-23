@@ -14,8 +14,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Zlaark_Deals_Articles {
 
-	/** Hard cap on the manual picker, so the Elementor panel stays usable. */
-	const PICKER_LIMIT = 200;
+	/**
+	 * Hard cap on the manual picker.
+	 *
+	 * Every one of these titles is serialised into the editor's JSON config,
+	 * once per source block - and there are six of them across the Homepage
+	 * widget and the reviews/comparisons/grid sections. At 200 that is 1,200
+	 * embedded options before the editor has drawn anything. 100 keeps the
+	 * picker useful and halves the payload; a site with a deeper archive can
+	 * raise it through zlaark_deals_picker_limit.
+	 */
+	const PICKER_LIMIT = 100;
+
+	/** @return int Rows the manual picker will offer. */
+	public static function picker_limit() {
+		return max( 1, (int) apply_filters( 'zlaark_deals_picker_limit', self::PICKER_LIMIT ) );
+	}
 
 	/**
 	 * Post types offered as an article source. Filterable so a site that keeps
@@ -71,10 +85,12 @@ class Zlaark_Deals_Articles {
 		$out = array();
 
 		foreach ( self::taxonomies_for( $post_type ) as $taxonomy ) {
+			// Name and count only - no term meta is read from these.
 			$terms = get_terms(
 				array(
-					'taxonomy'   => $taxonomy,
-					'hide_empty' => false,
+					'taxonomy'               => $taxonomy,
+					'hide_empty'             => false,
+					'update_term_meta_cache' => false,
 				)
 			);
 
@@ -120,14 +136,23 @@ class Zlaark_Deals_Articles {
 			return $cache[ $post_type ];
 		}
 
+		/*
+		 * Only the ID and the title are read below, but get_posts() hydrates
+		 * the meta and term caches by default - so this was pulling every
+		 * postmeta row and every term for 200 posts, at control-registration
+		 * time, on every editor bootstrap. Ask for the posts and nothing else.
+		 */
 		$posts = get_posts(
 			array(
-				'post_type'        => $post_type,
-				'post_status'      => 'publish',
-				'numberposts'      => self::PICKER_LIMIT,
-				'orderby'          => 'date',
-				'order'            => 'DESC',
-				'suppress_filters' => false,
+				'post_type'              => $post_type,
+				'post_status'            => 'publish',
+				'numberposts'            => self::picker_limit(),
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'suppress_filters'       => false,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			)
 		);
 

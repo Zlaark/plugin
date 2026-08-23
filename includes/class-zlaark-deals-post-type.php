@@ -242,8 +242,9 @@ class Zlaark_Deals_Post_Type {
 		$options = array();
 		$terms   = get_terms(
 			array(
-				'taxonomy'   => ZLAARK_DEALS_TAX,
-				'hide_empty' => false,
+				'taxonomy'               => ZLAARK_DEALS_TAX,
+				'hide_empty'             => false,
+				'update_term_meta_cache' => false,
 			)
 		);
 
