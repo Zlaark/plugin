@@ -753,3 +753,31 @@ abstract class Zlaark_Query_Widget_Base extends Zlaark_Widget_Base {
 		return Zlaark_Deals_Meta::get_deal_data( $post_id );
 	}
 }
+
+
+/**
+ * Alt text for a MEDIA control's image.
+ *
+ * Elementor stores alt text on the attachment, not in the control value, so
+ * every widget that renders a raw <img> needs this to ship an alt attribute.
+ *
+ * It lives here rather than beside its first caller. Six widget files call it -
+ * hero, hero-classic, hero-fresh, hero-bento, about and navbar - and it used to
+ * be defined at the tail of the hero widget's file, so all six only worked
+ * because registration happened to require hero first. Narrow that set (the
+ * zlaark_deals_registered_widgets filter exists to do exactly that when
+ * bisecting a broken editor) or reorder the widget list, and the others died
+ * with "call to undefined function" mid-render. This file is required before
+ * any widget file, so the helper is always there.
+ */
+if ( ! function_exists( 'zlaark_deals_media_alt' ) ) {
+	function zlaark_deals_media_alt( $media ) {
+		if ( ! empty( $media['id'] ) ) {
+			$alt = get_post_meta( (int) $media['id'], '_wp_attachment_image_alt', true );
+			if ( $alt ) {
+				return $alt;
+			}
+		}
+		return '';
+	}
+}

@@ -130,6 +130,25 @@ abstract class Zlaark_Section_Widget_Base extends Zlaark_Homepage_Widget {
 		);
 	}
 
+	/**
+	 * A section on its own needs its own deals and nobody else's.
+	 *
+	 * Inheriting the Homepage widget's pool meant every section widget queried
+	 * sixty deals and hydrated all sixty - thirty-odd meta reads apiece - to
+	 * draw three cards. A page built from eight of these did that eight times
+	 * over, which is what made the Elementor preview crawl. The headroom on
+	 * top of the chosen count covers the near-duplicate brand names that
+	 * fetch() drops, so a section still fills up after the dedupe pass.
+	 *
+	 * @param array $s Widget settings.
+	 * @return int
+	 */
+	protected function fetch_limit( $s ) {
+		$limit = isset( $s['limit'] ) ? (int) $s['limit'] : 12;
+
+		return max( 4, min( 60, $limit + 6 ) );
+	}
+
 	protected function render() {
 		$s     = $this->get_settings_for_display();
 		$deals = array();

@@ -57,3 +57,7 @@ if ( ! is_wp_error( $zlaark_terms ) ) {
 
 delete_option( 'zlaark_deals_defaults_seeded' );
 delete_option( 'zlaark_deals_settings' );
+
+// Written by the Elementor bootstrap whenever a widget fails to register, so
+// it outlives the plugin unless it is named here too.
+delete_option( 'zlaark_deals_widget_failures' );

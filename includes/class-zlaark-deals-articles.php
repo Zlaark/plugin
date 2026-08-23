@@ -296,10 +296,15 @@ class Zlaark_Deals_Articles {
 			? get_the_excerpt( $post )
 			: wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
 
+		/*
+		 * get_the_terms(), not wp_get_post_terms(): the latter always goes to
+		 * the database, and this runs once per article per strip. WP_Query has
+		 * already primed the term cache these reads come out of.
+		 */
 		$terms = array();
 		foreach ( self::taxonomies_for( $post->post_type ) as $taxonomy ) {
-			$found = wp_get_post_terms( $post->ID, $taxonomy );
-			if ( ! is_wp_error( $found ) ) {
+			$found = get_the_terms( $post->ID, $taxonomy );
+			if ( is_array( $found ) ) {
 				$terms = array_merge( $terms, $found );
 			}
 		}

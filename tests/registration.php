@@ -95,6 +95,33 @@ $caught = isset( $f['navbar'] ) && false !== strpos( $f['navbar'], 'already held
 printf( "  %-12s %s   %s\n", 'real clash', $caught ? 'reported' : 'MISSED', $caught ? 'ok' : 'FAILED' );
 $caught ? $pass++ : $fail++;
 
+/*
+ * No widget file may define a global function.
+ *
+ * zlaark_deals_media_alt() used to live at the tail of the hero widget's file
+ * while six other widget files called it. That only worked because
+ * registration happened to require hero before them; narrowing the widget list
+ * - which zlaark_deals_registered_widgets exists to let you do when bisecting a
+ * broken editor - or reordering the list killed the others mid-render with
+ * "call to undefined function". A shared helper belongs in the base file, which
+ * is required before any widget. This keeps it that way.
+ */
+$strays = array();
+foreach ( glob( $P . 'widgets/*.php' ) as $file ) {
+	if ( 'class-zlaark-widget-base.php' === basename( $file ) ) {
+		continue; // The one file guaranteed to be loaded first.
+	}
+	if ( preg_match_all( '/^function\s+(\w+)/m', (string) file_get_contents( $file ), $m ) ) {
+		foreach ( $m[1] as $fn ) {
+			$strays[] = basename( $file ) . ':' . $fn . '()';
+		}
+	}
+}
+printf( "  %-12s %s   %s\n", 'helpers',
+	$strays ? implode( ', ', $strays ) : 'none outside the base file',
+	empty( $strays ) ? 'ok' : 'FAILED' );
+empty( $strays ) ? $pass++ : $fail++;
+
 echo str_repeat( '-', 74 ) . "\n";
 printf( "%d passed, %d failed\n", $pass, $fail );
 exit( $fail > 0 ? 1 : 0 );

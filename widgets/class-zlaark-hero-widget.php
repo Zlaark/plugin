@@ -922,17 +922,3 @@ class Zlaark_Hero_Widget extends Zlaark_Widget_Base {
 		<?php
 	}
 }
-
-/**
- * Elementor stores alt text on the attachment, not in the control value.
- * Small helper so hero images always ship an alt attribute.
- */
-function zlaark_deals_media_alt( $media ) {
-	if ( ! empty( $media['id'] ) ) {
-		$alt = get_post_meta( (int) $media['id'], '_wp_attachment_image_alt', true );
-		if ( $alt ) {
-			return $alt;
-		}
-	}
-	return '';
-}

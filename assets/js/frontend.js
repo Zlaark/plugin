@@ -1430,10 +1430,17 @@
 	 * editor. 'element_ready/global' fires for every element, so nothing can
 	 * be forgotten.
 	 */
-	window.addEventListener( 'elementor/frontend/init', function () {
-		if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
-			return;
+	var elementorHooked = false;
+
+	function hookElementor() {
+		if ( elementorHooked ) {
+			return true;
 		}
+		if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
+			return false;
+		}
+
+		elementorHooked = true;
 
 		window.elementorFrontend.hooks.addAction(
 			'frontend/element_ready/global',
@@ -1449,6 +1456,25 @@
 				init( el );
 			}
 		);
-	} );
+
+		return true;
+	}
+
+	/*
+	 * Elementor announces itself with jQuery( window ).trigger(...), and a
+	 * jQuery trigger of a custom type never reaches addEventListener - jQuery
+	 * dispatches to its own handler list, not to a real DOM event. Listening
+	 * natively meant this hook simply never ran: in the editor a widget kept
+	 * its reveal styles at opacity:0 after every control change and looked
+	 * like it had failed to load. Bind through jQuery, which is always present
+	 * wherever elementorFrontend is.
+	 */
+	if ( ! hookElementor() ) {
+		if ( window.jQuery ) {
+			window.jQuery( window ).on( 'elementor/frontend/init', hookElementor );
+		}
+		// Harmless if Elementor ever dispatches a native event as well.
+		window.addEventListener( 'elementor/frontend/init', hookElementor );
+	}
 
 } )();

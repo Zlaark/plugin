@@ -123,6 +123,17 @@ class Zlaark_Deals_Elementor {
 		 */
 		$failures = array();
 
+		/*
+		 * One snapshot of what the manager already holds, rather than asking it
+		 * per widget. get_widget_types() is the call that lazily triggers
+		 * Elementor's own widget initialisation, and this loop runs from inside
+		 * that initialisation - re-entering it thirty-one times a request to
+		 * answer a question that cannot change while the loop runs is asking
+		 * for trouble as well as being slower.
+		 */
+		$held = $widgets_manager->get_widget_types();
+		$held = is_array( $held ) ? $held : array();
+
 		foreach ( $widgets as $slug => $class ) {
 			$file = ZLAARK_DEALS_PATH . 'widgets/class-zlaark-' . $slug . '-widget.php';
 
@@ -150,13 +161,13 @@ class Zlaark_Deals_Elementor {
 				 * with false alarms. A different class holding the name is the
 				 * only thing worth flagging.
 				 */
-				$held = $widgets_manager->get_widget_types( $name );
+				$incumbent = isset( $held[ $name ] ) ? $held[ $name ] : null;
 
-				if ( $held && ! ( $held instanceof $class ) ) {
+				if ( $incumbent && ! ( $incumbent instanceof $class ) ) {
 					$failures[ $slug ] = sprintf(
 						'name "%s" is already held by %s',
 						$name,
-						get_class( $held )
+						get_class( $incumbent )
 					);
 					continue;
 				}

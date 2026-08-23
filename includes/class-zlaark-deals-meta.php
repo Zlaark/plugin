@@ -52,6 +52,13 @@ class Zlaark_Deals_Meta {
 		'_zlaark_review_url'     => 'esc_url_raw',
 	);
 
+	/**
+	 * Assembled deals, keyed by post id, for the life of the request.
+	 *
+	 * @var array<int,array>
+	 */
+	private static $data_cache = array();
+
 	/** Offer types. Key => admin label; drives the neutral card chip. */
 	public static function offer_types() {
 		return array(
@@ -443,10 +450,22 @@ class Zlaark_Deals_Meta {
 		}
 
 		update_post_meta( $post_id, '_zlaark_schema', Zlaark_Deals_Settings::SCHEMA );
+
+		self::flush_deal_cache( $post_id );
 	}
 
 	/**
 	 * Normalized data for one deal, ready for the frontend templates.
+	 *
+	 * Thirty-odd meta reads and a term query per deal, and a page can ask for
+	 * the same deal several times over - the homepage widget pulls sixty, each
+	 * standalone section pulls its own set, and the schema graph reads the
+	 * single deal again in wp_head. The reads themselves are answered from the
+	 * object cache once WP_Query has primed it, so the cost that matters is
+	 * the assembly; memoize it and every repeat call is a hash lookup.
+	 *
+	 * The filter still runs on every call, so anything hooked to it keeps
+	 * seeing each use of the deal rather than only the first.
 	 *
 	 * @param int|WP_Post $post
 	 * @return array
@@ -455,6 +474,11 @@ class Zlaark_Deals_Meta {
 		$post = get_post( $post );
 		if ( ! $post ) {
 			return array();
+		}
+
+		if ( isset( self::$data_cache[ $post->ID ] ) ) {
+			/** This filter is documented at the end of this method. */
+			return apply_filters( 'zlaark_deals_deal_data', self::$data_cache[ $post->ID ], $post );
 		}
 
 		$image_id = (int) get_post_meta( $post->ID, '_zlaark_image_id', true );
@@ -480,7 +504,7 @@ class Zlaark_Deals_Meta {
 			'button_text' => (string) get_post_meta( $post->ID, '_zlaark_button_text', true ),
 			'button_url'  => (string) get_post_meta( $post->ID, '_zlaark_button_url', true ),
 			'button_new'  => (bool) get_post_meta( $post->ID, '_zlaark_button_new', true ),
-			'terms'       => wp_get_post_terms( $post->ID, ZLAARK_DEALS_TAX, array( 'fields' => 'all' ) ),
+			'terms'       => self::deal_terms( $post->ID ),
 		);
 
 		/* ---------------- stored, added in schema 2 ---------------- */
@@ -517,6 +541,8 @@ class Zlaark_Deals_Meta {
 		$data['urgency_label']    = call_user_func( array( $c, 'urgency_label' ), $data['expiry_date'] );
 		$data['verified_label']   = call_user_func( array( $c, 'verified_label' ), $data['last_verified'] );
 
+		self::$data_cache[ $post->ID ] = $data;
+
 		/**
 		 * Filters the fully assembled deal, after computed values are attached.
 		 *
@@ -524,6 +550,38 @@ class Zlaark_Deals_Meta {
 		 * @param WP_Post $post
 		 */
 		return apply_filters( 'zlaark_deals_deal_data', $data, $post );
+	}
+
+	/**
+	 * The deal's categories.
+	 *
+	 * wp_get_post_terms() goes to the database every single time - it is the
+	 * uncached sibling of get_the_terms(), and nothing WP_Query primes helps
+	 * it. Called once per deal per widget, that was the plugin's single
+	 * biggest source of queries on a busy page: sixty deals across half a
+	 * dozen sections meant several hundred term queries, which is slow enough
+	 * on shared hosting to time the Elementor preview out. get_the_terms()
+	 * reads the cache WP_Query already filled.
+	 *
+	 * @param int $post_id
+	 * @return WP_Term[]
+	 */
+	private static function deal_terms( $post_id ) {
+		$terms = get_the_terms( $post_id, ZLAARK_DEALS_TAX );
+
+		// false when the deal has no categories, WP_Error when the taxonomy
+		// is not registered yet; callers only ever foreach over this.
+		return ( is_array( $terms ) ) ? $terms : array();
+	}
+
+	/**
+	 * Drops a deal from the request cache after its meta changes, so anything
+	 * rendering later in the same request sees what was just saved.
+	 *
+	 * @param int $post_id
+	 */
+	public static function flush_deal_cache( $post_id ) {
+		unset( self::$data_cache[ (int) $post_id ] );
 	}
 
 	/** Splits a textarea into trimmed, non-empty lines. */

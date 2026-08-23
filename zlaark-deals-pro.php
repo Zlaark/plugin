@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zlaark Deals
  * Description: Premium animated Elementor widgets - Hero, Deals Grid, Top Picks, Comparison, Stats and Logo Marquee - powered by a Deals manager with categories in the WordPress sidebar.
- * Version:     4.7.3
+ * Version:     4.7.4
  * Author:      Zlaark
  * Text Domain: zlaark-deals-pro
  * Requires PHP: 7.4
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZLAARK_DEALS_VERSION', '4.7.3' );
+define( 'ZLAARK_DEALS_VERSION', '4.7.4' );
 define( 'ZLAARK_DEALS_FILE', __FILE__ );
 define( 'ZLAARK_DEALS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZLAARK_DEALS_URL', plugin_dir_url( __FILE__ ) );
@@ -54,18 +54,25 @@ final class Zlaark_Deals {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_fonts' ), 5 );
 		/*
 		 * Every widget declares these handles through get_style_depends() /
-		 * get_script_depends(), and Elementor resolves those in contexts where
-		 * wp_enqueue_scripts never fires - the editor renders each widget over
-		 * AJAX. Enqueueing an unregistered handle there makes WordPress print a
-		 * _doing_it_wrong() notice straight into the AJAX JSON, which the editor
-		 * cannot parse: the widget spins forever. So register everywhere the
-		 * handles can be asked for, not just on the front end.
+		 * get_script_depends(), and Elementor resolves those by calling
+		 * wp_enqueue_style()/wp_enqueue_script() the moment a widget renders -
+		 * including inside wp_ajax_elementor_ajax, which is how the editor
+		 * renders a widget after every control change.
+		 *
+		 * That request is the one that used to break the editor. admin-ajax.php
+		 * never fires admin_enqueue_scripts (that comes from admin-header.php,
+		 * which it does not load) and it is not a front-end request, so
+		 * wp_enqueue_scripts - and with it Elementor's own
+		 * elementor/frontend/after_register_* hooks, which hang off it - never
+		 * fire either. Registering on any of those left the handles undefined
+		 * exactly where the editor needed them.
+		 *
+		 * `init` is the one hook that fires in every context WordPress serves -
+		 * front end, admin, admin-ajax, REST, cron - and always before all of
+		 * them, so one registration covers every path a widget can be rendered
+		 * down. Priority 0 keeps it ahead of anything else hooked to init.
 		 */
-		add_action( 'wp_enqueue_scripts', array( $this, 'register_frontend_assets' ), 1 );
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_frontend_assets' ), 1 );
-		add_action( 'elementor/frontend/after_register_styles', array( $this, 'register_frontend_assets' ) );
-		add_action( 'elementor/frontend/after_register_scripts', array( $this, 'register_frontend_assets' ) );
-		add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'register_frontend_assets' ) );
+		add_action( 'init', array( $this, 'register_frontend_assets' ), 0 );
 		add_filter( 'wp_resource_hints', array( $this, 'resource_hints' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_assets' ) );
 	}
@@ -125,8 +132,6 @@ final class Zlaark_Deals {
 	}
 
 	public function register_frontend_assets() {
-		// Fires from several hooks so the handles exist in every context that
-		// can resolve them; the first one to arrive wins.
 		if ( wp_style_is( 'zlaark-deals', 'registered' ) ) {
 			return;
 		}

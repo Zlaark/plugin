@@ -1396,10 +1396,26 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 	}
 
+	/**
+	 * How many deals the single query pulls.
+	 *
+	 * The Homepage widget draws a dozen sections off one result set, and each
+	 * of them slices its own count out of it, so it needs a deep pool - the
+	 * scorecard's tabs alone can want several deals per category. A standalone
+	 * section widget draws exactly one of those blocks, so it overrides this
+	 * with its own "Number of Deals" and does not pay for the other eleven.
+	 *
+	 * @param array $s Widget settings.
+	 * @return int
+	 */
+	protected function fetch_limit( $s ) {
+		return 60;
+	}
+
 	/** One query feeds every section, so no two blocks can disagree. */
 	protected function fetch( $s ) {
 		$args                   = $this->build_query_args( $s );
-		$args['posts_per_page'] = 60;
+		$args['posts_per_page'] = $this->fetch_limit( $s );
 
 		$query = new WP_Query( $args );
 		$deals = array();

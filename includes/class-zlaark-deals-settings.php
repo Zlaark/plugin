@@ -26,17 +26,38 @@ class Zlaark_Deals_Settings {
 		);
 	}
 
+	/** Resolved settings for this request. @var array|null */
+	private static $resolved = null;
+
+	/**
+	 * get() is asked several times per request - the font enqueue, the resource
+	 * hints filter, and the single-deal injection which checks the layout on
+	 * every the_content pass - and each call was rebuilding the defaults array
+	 * and re-parsing the saved option. Resolve it once.
+	 */
 	public static function all() {
+		if ( null !== self::$resolved ) {
+			return self::$resolved;
+		}
+
 		$saved = get_option( self::OPTION, array() );
 		if ( ! is_array( $saved ) ) {
 			$saved = array();
 		}
-		return wp_parse_args( $saved, self::defaults() );
+
+		self::$resolved = wp_parse_args( $saved, self::defaults() );
+
+		return self::$resolved;
 	}
 
 	public static function get( $key ) {
 		$all = self::all();
 		return isset( $all[ $key ] ) ? $all[ $key ] : null;
+	}
+
+	/** Saving the settings form rewrites the option mid-request. */
+	public static function flush() {
+		self::$resolved = null;
 	}
 
 	public static function init() {
@@ -71,6 +92,8 @@ class Zlaark_Deals_Settings {
 	}
 
 	public static function sanitize( $input ) {
+		self::flush();
+
 		$out = self::defaults();
 		$out['delete_data_on_uninstall'] = empty( $input['delete_data_on_uninstall'] ) ? 0 : 1;
 		$out['load_fonts']               = empty( $input['load_fonts'] ) ? 0 : 1;

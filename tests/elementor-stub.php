@@ -69,12 +69,21 @@ function wp_get_attachment_image( $id, $s = 'full', $i = false, $a = array() ) {
 function wp_get_attachment_image_url( $id, $s = 'full' ) { return 'https://example.com/x.png'; }
 function get_post_meta( $id, $k = '', $s = false ) { return ''; }
 function get_permalink( $p = 0 ) { return 'https://example.com/deal'; }
-function get_the_title( $p = 0 ) { return 'Deal'; }
+function get_the_title( $p = 0 ) {
+	return is_object( $p ) ? $p->post_title . ' ' . $p->ID : 'Deal';
+}
 function get_the_ID() { return 1; }
 function get_post_type( $p = null ) { return ZLAARK_DEALS_CPT; }
 function has_post_thumbnail( $id ) { return false; }
 function get_post_thumbnail_id( $id ) { return 0; }
-function wp_get_post_terms( $id, $tax, $args = array() ) { return array(); }
+function wp_get_post_terms( $id, $tax, $args = array() ) { $GLOBALS['zd_calls'][] = 'wp_get_post_terms'; return array(); }
+/*
+ * The cached read the plugin uses in the render path. WordPress returns false
+ * for a post with no terms and a WP_Error for an unregistered taxonomy, never
+ * an empty array, so the stub returns false too - callers have to cope with
+ * that, and a stub that hands back array() would hide it.
+ */
+function get_the_terms( $id, $tax ) { return false; }
 function is_singular( $t = '' ) { return false; }
 function get_queried_object_id() { return 0; }
 function wp_json_encode( $d, $f = 0 ) { return json_encode( $d, $f ); }
@@ -94,12 +103,30 @@ function get_object_taxonomies( $type, $output = 'names' ) {
 	$tax = (object) array( 'public' => true, 'hierarchical' => true );
 	return ( 'objects' === $output ) ? array( 'category' => $tax ) : array( 'category' );
 }
+/**
+ * Two terms by default, so the existing markup tests keep their fixed output.
+ * Set $GLOBALS['zd_term_count'] to model a site with a real taxonomy - the
+ * picker payload tests need that to mean anything.
+ */
 function get_terms( $args = array() ) {
 	$GLOBALS['zd_calls'][] = 'get_terms';
-	return array(
+
+	$out = array(
 		(object) array( 'term_id' => 4, 'name' => 'Ecommerce', 'slug' => 'ecommerce', 'count' => 6 ),
 		(object) array( 'term_id' => 5, 'name' => 'AI Store Builders', 'slug' => 'ai-store-builders', 'count' => 3 ),
 	);
+
+	$want = isset( $GLOBALS['zd_term_count'] ) ? (int) $GLOBALS['zd_term_count'] : count( $out );
+	for ( $i = count( $out ); $i < $want; $i++ ) {
+		$out[] = (object) array(
+			'term_id' => 100 + $i,
+			'name'    => 'Category ' . $i . ' with a fairly ordinary name',
+			'slug'    => 'category-' . $i,
+			'count'   => 2,
+		);
+	}
+
+	return array_slice( $out, 0, max( 0, $want ) );
 }
 function has_excerpt( $p = null ) { return false; }
 function get_the_excerpt( $p = null ) { return 'An excerpt.'; }
@@ -112,10 +139,40 @@ function wp_trim_words( $text, $n = 55, $more = null ) {
 }
 function get_the_date( $format = '', $p = null ) { return '21 August 2026'; }
 
-/** The call the harness is really interested in. */
+/** A stand-in post, so the stubbed queries have something to hand back. */
+if ( ! class_exists( 'ZD_Fake_Post' ) ) {
+	class ZD_Fake_Post {
+		public $ID = 1;
+		public $post_title = 'A2 Hosting';
+		public $post_name = 'a2-hosting';
+		public $post_type = 'post';
+		public $post_content = 'In this review I will cover everything a store owner needs to know.';
+		public function __construct( $id ) { $this->ID = $id; }
+	}
+}
+
+/**
+ * The call the harness is really interested in. Empty by default; set
+ * $GLOBALS['zd_post_count'] to model a site whose pickers actually have
+ * something to list.
+ */
 function get_posts( $args = array() ) {
 	$GLOBALS['zd_calls'][] = 'get_posts';
-	return array();
+
+	$want = isset( $GLOBALS['zd_post_count'] ) ? (int) $GLOBALS['zd_post_count'] : 0;
+	$cap  = isset( $args['numberposts'] ) ? (int) $args['numberposts']
+		: ( isset( $args['posts_per_page'] ) ? (int) $args['posts_per_page'] : $want );
+
+	if ( $cap > 0 ) {
+		$want = min( $want, $cap );
+	}
+
+	$out = array();
+	for ( $i = 1; $i <= $want; $i++ ) {
+		$out[] = new ZD_Fake_Post( $i );
+	}
+
+	return $out;
 }
 function get_post( $p = null ) { return isset( $GLOBALS['zd_current'] ) ? new ZD_Fake_Post( $GLOBALS['zd_current'] ) : null; }
 function wp_reset_postdata() {}
@@ -141,7 +198,21 @@ class WP_Query {
 	private $i = 0;
 	public function __construct( $args = array() ) {
 		$GLOBALS['zd_calls'][] = 'WP_Query';
+
+		// Every query's args, so a test can assert what was actually asked for
+		// rather than only that something was asked.
+		$GLOBALS['zd_queries'][] = $args;
+
 		$n = isset( $GLOBALS['zd_fake_posts'] ) ? $GLOBALS['zd_fake_posts'] : 0;
+
+		/*
+		 * Honour posts_per_page. A widget that over-fetches costs real rows in
+		 * production, and a stub that hands back the same list whatever was
+		 * asked for makes that invisible.
+		 */
+		if ( isset( $args['posts_per_page'] ) && (int) $args['posts_per_page'] > 0 ) {
+			$n = min( $n, (int) $args['posts_per_page'] );
+		}
 
 		/*
 		 * Deal widgets walk the loop with the_post() and only ever use the id,
@@ -162,7 +233,15 @@ class WP_Query {
 class Zlaark_Deals_Post_Type {
 	public static function get_category_options() {
 		$GLOBALS['zd_calls'][] = 'get_category_options';
-		return array( 10 => 'Hosting', 11 => 'Tools' );
+
+		$out  = array( 10 => 'Hosting', 11 => 'Tools' );
+		$want = isset( $GLOBALS['zd_term_count'] ) ? (int) $GLOBALS['zd_term_count'] : count( $out );
+
+		for ( $i = count( $out ); $i < $want; $i++ ) {
+			$out[ 200 + $i ] = 'Deal category ' . $i;
+		}
+
+		return array_slice( $out, 0, max( 0, $want ), true );
 	}
 }
 }
@@ -272,10 +351,27 @@ abstract class Widget_Base {
 	public function end_controls_tabs() {}
 	public function start_controls_tab( $id, $args = array() ) {}
 	public function end_controls_tab() {}
+	/**
+	 * Settings to use instead of the control defaults, id => value.
+	 *
+	 * Rendering every widget on its defaults only ever walks one path through
+	 * it. Every switcher-gated block, every branch behind a SELECT that is not
+	 * on its first option, is code the harness has never executed - and a
+	 * notice raised in one of those is a notice printed into the editor's AJAX
+	 * response. This lets a test drive the widget off its defaults.
+	 *
+	 * @var array
+	 */
+	public $zd_override = array();
+
 	public function get_settings_for_display( $k = null ) {
 		$out = array();
 		foreach ( $this->zd_controls as $id => $args ) {
 			$val = array_key_exists( 'default', $args ) ? $args['default'] : '';
+
+			if ( array_key_exists( $id, $this->zd_override ) ) {
+				$val = $this->zd_override[ $id ];
+			}
 
 			/*
 			 * Elementor merges each repeater FIELD's own default into every
