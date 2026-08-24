@@ -19,6 +19,26 @@ class Zlaark_Deals_Single {
 	public static function init() {
 		add_filter( 'the_content', array( __CLASS__, 'inject' ), 20 );
 		add_filter( 'body_class', array( __CLASS__, 'body_class' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_readable' ) );
+	}
+
+	/**
+	 * The stylesheet reaches the front end through each widget's
+	 * get_style_depends(), which means it is only there when a Zlaark widget is
+	 * on the page. Post typography has no widget - it styles markup the theme
+	 * printed - so it has to ask for the stylesheet itself, or the body class
+	 * lands on a page with nothing to act on it.
+	 */
+	public static function enqueue_readable() {
+		if ( is_admin() || ! is_singular( 'post' ) ) {
+			return;
+		}
+		if ( ! Zlaark_Deals_Settings::get( 'style_posts' ) ) {
+			return;
+		}
+		if ( wp_style_is( 'zlaark-deals', 'registered' ) ) {
+			wp_enqueue_style( 'zlaark-deals' );
+		}
 	}
 
 	/** Layout choice from Settings: off | above | side. */
@@ -31,6 +51,21 @@ class Zlaark_Deals_Single {
 		if ( self::applies() && 'side' === self::layout() ) {
 			$classes[] = 'zd-single-side';
 		}
+
+		/*
+		 * Post typography is opt-out, and it hangs off a body class rather than
+		 * styling .entry-content unconditionally: that wrapper belongs to the
+		 * theme, and a plugin that restyles every post on the site whether or
+		 * not it was asked to is a plugin nobody can debug.
+		 *
+		 * is_singular() rather than the applies() check above - that one is
+		 * scoped to deals and to the main loop, and this is about ordinary
+		 * posts, in the <body> tag, long before any loop runs.
+		 */
+		if ( ! is_admin() && is_singular( 'post' ) && Zlaark_Deals_Settings::get( 'style_posts' ) ) {
+			$classes[] = 'zd-readable';
+		}
+
 		return $classes;
 	}
 

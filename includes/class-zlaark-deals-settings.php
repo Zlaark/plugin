@@ -23,6 +23,7 @@ class Zlaark_Deals_Settings {
 			'delete_data_on_uninstall' => 0,
 			'load_fonts'               => 1,
 			'single_panel'             => 'side',
+			'style_posts'              => 1,
 		);
 	}
 
@@ -97,6 +98,7 @@ class Zlaark_Deals_Settings {
 		$out = self::defaults();
 		$out['delete_data_on_uninstall'] = empty( $input['delete_data_on_uninstall'] ) ? 0 : 1;
 		$out['load_fonts']               = empty( $input['load_fonts'] ) ? 0 : 1;
+		$out['style_posts']              = empty( $input['style_posts'] ) ? 0 : 1;
 
 		$mode = isset( $input['single_panel'] ) ? sanitize_key( $input['single_panel'] ) : 'side';
 		$out['single_panel'] = in_array( $mode, array( 'off', 'above', 'side' ), true ) ? $mode : 'side';
@@ -134,6 +136,18 @@ class Zlaark_Deals_Settings {
 							</label>
 							<p class="description">
 								<?php esc_html_e( 'Turn this off only if your theme already loads these three families. All three are free and open-source (SIL Open Font License).', 'zlaark-deals-pro' ); ?>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Post typography', 'zlaark-deals-pro' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="<?php echo esc_attr( self::OPTION ); ?>[style_posts]" value="1" <?php checked( $settings['style_posts'], 1 ); ?>>
+								<?php esc_html_e( 'Set blog and review posts in the Zlaark reading style', 'zlaark-deals-pro' ); ?>
+							</label>
+							<p class="description">
+								<?php esc_html_e( 'Applies the article measure, heading scale, tick lists and instrument tables to the post content your theme renders - no template building required. Turn it off to leave posts entirely to the theme.', 'zlaark-deals-pro' ); ?>
 							</p>
 						</td>
 					</tr>

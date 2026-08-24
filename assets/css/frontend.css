@@ -108,6 +108,7 @@
  */
 .zd-byline,
 .zd-art,
+.zd-readable,
 .zd-verdict,
 .zd-obar {
 	/* Type - all three faces are SIL Open Font License (free, self-hostable). */
@@ -10257,21 +10258,21 @@
 /* --- body typography ------------------------------------------------------
    The measure is a control, so it is set inline; everything else is here. */
 
-.zd-art__body { min-width: 0; }
+:is(.zd-art__body, .zd-readable .entry-content) { min-width: 0; }
 
-.zd-art__body > * { margin-top: 0; }
+:is(.zd-art__body, .zd-readable .entry-content) > * { margin-top: 0; }
 
-.zd-art__body p,
-.zd-art__body ul,
-.zd-art__body ol,
-.zd-art__body figure,
-.zd-art__body blockquote,
-.zd-art__body table,
-.zd-art__body pre {
+:is(.zd-art__body, .zd-readable .entry-content) p,
+:is(.zd-art__body, .zd-readable .entry-content) ul,
+:is(.zd-art__body, .zd-readable .entry-content) ol,
+:is(.zd-art__body, .zd-readable .entry-content) figure,
+:is(.zd-art__body, .zd-readable .entry-content) blockquote,
+:is(.zd-art__body, .zd-readable .entry-content) table,
+:is(.zd-art__body, .zd-readable .entry-content) pre {
 	margin: 0 0 1.15em;
 }
 
-.zd-art__body p {
+:is(.zd-art__body, .zd-readable .entry-content) p {
 	font-size: 1.05rem;
 	line-height: 1.72;
 	color: var(--zd-body);
@@ -10281,7 +10282,7 @@
  * Headings get their air above, not below - the gap belongs to the section
  * starting, not to the paragraph that follows it.
  */
-.zd-art__body :is(h2, h3, h4) {
+:is(.zd-art__body, .zd-readable .entry-content) :is(h2, h3, h4) {
 	font-family: var(--zd-font-display);
 	color: var(--zd-heading);
 	letter-spacing: -0.025em;
@@ -10289,7 +10290,7 @@
 	text-wrap: balance;
 }
 
-.zd-art__body h2 {
+:is(.zd-art__body, .zd-readable .entry-content) h2 {
 	margin: 2em 0 0.5em;
 	padding-top: 0.55em;
 	border-top: 1px solid var(--zd-hairline);
@@ -10298,20 +10299,20 @@
 	scroll-margin-top: 96px;
 }
 
-.zd-art__body h3 {
+:is(.zd-art__body, .zd-readable .entry-content) h3 {
 	margin: 1.6em 0 0.4em;
 	font-size: clamp(1.1rem, 1rem + 0.4vw, 1.28rem);
 	font-weight: 700;
 	scroll-margin-top: 96px;
 }
 
-.zd-art__body h4 {
+:is(.zd-art__body, .zd-readable .entry-content) h4 {
 	margin: 1.4em 0 0.35em;
 	font-size: 1.02rem;
 	font-weight: 700;
 }
 
-.zd-art__body a {
+:is(.zd-art__body, .zd-readable .entry-content) a {
 	color: var(--zd-accent);
 	text-decoration: underline;
 	text-decoration-thickness: 1px;
@@ -10319,13 +10320,13 @@
 	transition: color 0.2s ease;
 }
 
-.zd-art__body a:hover { color: var(--zd-accent-2); }
+:is(.zd-art__body, .zd-readable .entry-content) a:hover { color: var(--zd-accent-2); }
 
-.zd-art__body strong { color: var(--zd-heading); font-weight: 700; }
+:is(.zd-art__body, .zd-readable .entry-content) strong { color: var(--zd-heading); font-weight: 700; }
 
-.zd-art__body :is(ul, ol) { padding-left: 0; list-style: none; }
+:is(.zd-art__body, .zd-readable .entry-content) :is(ul, ol) { padding-left: 0; list-style: none; }
 
-.zd-art__body li {
+:is(.zd-art__body, .zd-readable .entry-content) li {
 	position: relative;
 	padding-left: 24px;
 	margin-bottom: 0.5em;
@@ -10334,7 +10335,7 @@
 }
 
 /* A tick rather than a bullet, matching the checklists on the cards. */
-.zd-art__body ul > li::before {
+:is(.zd-art__body, .zd-readable .entry-content) ul > li::before {
 	content: "";
 	position: absolute;
 	left: 3px;
@@ -10346,11 +10347,11 @@
 	transform: rotate(42deg);
 }
 
-.zd-art__body ol { counter-reset: zd-ol; }
+:is(.zd-art__body, .zd-readable .entry-content) ol { counter-reset: zd-ol; }
 
-.zd-art__body ol > li { counter-increment: zd-ol; }
+:is(.zd-art__body, .zd-readable .entry-content) ol > li { counter-increment: zd-ol; }
 
-.zd-art__body ol > li::before {
+:is(.zd-art__body, .zd-readable .entry-content) ol > li::before {
 	content: counter(zd-ol, decimal-leading-zero);
 	position: absolute;
 	left: 0;
@@ -10364,7 +10365,7 @@
 
 /* Pulled out with a rule, not a grey box - the quote is the page's voice
    changing, not a panel. */
-.zd-art__body blockquote {
+:is(.zd-art__body, .zd-readable .entry-content) blockquote {
 	padding: 2px 0 2px 22px;
 	border-left: 2px solid var(--zd-accent);
 	font-family: var(--zd-font-display);
@@ -10375,8 +10376,8 @@
 	color: var(--zd-heading);
 }
 
-.zd-art__body blockquote p { font: inherit; color: inherit; }
-.zd-art__body blockquote cite {
+:is(.zd-art__body, .zd-readable .entry-content) blockquote p { font: inherit; color: inherit; }
+:is(.zd-art__body, .zd-readable .entry-content) blockquote cite {
 	display: block;
 	margin-top: 8px;
 	font-family: var(--zd-font-mono);
@@ -10387,9 +10388,9 @@
 	color: var(--zd-muted);
 }
 
-.zd-art__body :is(img, video) { max-width: 100%; height: auto; display: block; }
+:is(.zd-art__body, .zd-readable .entry-content) :is(img, video) { max-width: 100%; height: auto; display: block; }
 
-.zd-art__body figcaption {
+:is(.zd-art__body, .zd-readable .entry-content) figcaption {
 	margin-top: 8px;
 	font-family: var(--zd-font-mono);
 	font-size: 0.7rem;
@@ -10398,14 +10399,14 @@
 }
 
 /* Tables carry numbers, so they get the instrument treatment. */
-.zd-art__body table {
+:is(.zd-art__body, .zd-readable .entry-content) table {
 	width: 100%;
 	border-collapse: collapse;
 	border: 1px solid var(--zd-ink);
 	font-size: 0.92rem;
 }
 
-.zd-art__body thead th {
+:is(.zd-art__body, .zd-readable .entry-content) thead th {
 	padding: 10px 14px;
 	background: var(--zd-ink);
 	color: var(--zd-on-accent);
@@ -10417,17 +10418,17 @@
 	text-align: left;
 }
 
-.zd-art__body tbody td,
-.zd-art__body tbody th {
+:is(.zd-art__body, .zd-readable .entry-content) tbody td,
+:is(.zd-art__body, .zd-readable .entry-content) tbody th {
 	padding: 11px 14px;
 	border-top: 1px solid var(--zd-hairline);
 	text-align: left;
 	font-variant-numeric: tabular-nums;
 }
 
-.zd-art__body tbody tr:nth-child(even) { background: var(--zd-surface); }
+:is(.zd-art__body, .zd-readable .entry-content) tbody tr:nth-child(even) { background: var(--zd-surface); }
 
-.zd-art__body :is(code, kbd, samp) {
+:is(.zd-art__body, .zd-readable .entry-content) :is(code, kbd, samp) {
 	font-family: var(--zd-font-mono);
 	font-size: 0.88em;
 	padding: 0.12em 0.36em;
@@ -10436,16 +10437,16 @@
 	color: var(--zd-heading);
 }
 
-.zd-art__body pre {
+:is(.zd-art__body, .zd-readable .entry-content) pre {
 	padding: 16px 18px;
 	overflow-x: auto;
 	border: 1px solid var(--zd-hairline);
 	background: var(--zd-surface);
 }
 
-.zd-art__body pre code { padding: 0; background: none; }
+:is(.zd-art__body, .zd-readable .entry-content) pre code { padding: 0; background: none; }
 
-.zd-art__body hr {
+:is(.zd-art__body, .zd-readable .entry-content) hr {
 	margin: 2em 0;
 	border: 0;
 	border-top: 1px solid var(--zd-hairline);
@@ -10467,4 +10468,69 @@
 	.zd-art__robody { flex-direction: column; align-items: flex-start; gap: 18px; }
 	.zd-art__rogrid > div { border-left: 0; border-top: 1px solid var(--zd-hairline); }
 	.zd-art__rogrid > div:first-child { border-top: 0; }
+}
+
+/* -------------------------------------------------------------------------
+   The theme's own post header, brought onto the same footing.
+
+   The body typography above already serves .entry-content; this is the part
+   above it - the title and the theme's meta line - which otherwise stays in
+   the theme's voice and makes the whole article read as someone else's page.
+
+   Scoped to the .zd-readable body class, which the plugin only adds on single
+   posts and only while "Post typography" is on. Deliberately gentle: the theme
+   owns this markup, so this sets the face, the scale and the tracking and
+   leaves the structure alone.
+   ------------------------------------------------------------------------- */
+
+.zd-readable .entry-header .page-title,
+.zd-readable .entry-header .entry-title {
+	font-family: var(--zd-font-display);
+	font-size: clamp(2rem, 1.3rem + 3vw, 3.2rem);
+	font-weight: 800;
+	line-height: 1.06;
+	letter-spacing: -0.035em;
+	color: var(--zd-heading);
+	text-wrap: balance;
+}
+
+/* The meta line as a row of stamps, the same language as the byline strip on
+   the Article widget and the credits in About. */
+.zd-readable .entry-header .entry-meta {
+	font-family: var(--zd-font-mono);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-readable .entry-header .entry-meta a {
+	color: var(--zd-muted);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.zd-readable .entry-header .entry-meta a:hover { color: var(--zd-accent); }
+
+.zd-readable .entry-header .meta-date { color: var(--zd-accent); }
+
+/* A rule under the header, so the article opens on a line rather than drifting
+   into the body - the device every other section on the site uses. */
+.zd-readable .entry-header {
+	padding-bottom: 18px;
+	border-bottom: 1px solid var(--zd-hairline);
+}
+
+/*
+ * The measure. Blocksy constrains .entry-content itself, so this only narrows
+ * it - long lines are the single biggest reason readers give up, and the theme
+ * default here runs well past 100 characters.
+ */
+.zd-readable .entry-content { max-width: 68ch; }
+
+/* Full-bleed children stay full-bleed: tables and figures earn the extra room,
+   and clamping them to the text measure is what makes a data table unreadable. */
+.zd-readable .entry-content > :is(figure, table, .wp-block-table, .alignwide, .alignfull) {
+	max-width: none;
 }
