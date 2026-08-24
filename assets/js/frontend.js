@@ -1492,6 +1492,131 @@
 			apply();
 		} );
 	}
+	/* ------------------------------------------------- comparison table */
+
+	/*
+	 * The Compare button on a scorecard, and the table it feeds.
+	 *
+	 * Every deal is already printed into that table server-side - one column
+	 * each, all of them off - so nothing here builds markup: picking a deal
+	 * un-hides its column, dropping it hides the column again. That keeps the
+	 * escaping, the number formatting and the responsive logos in PHP, where
+	 * they are already correct, and leaves this file with a class toggle.
+	 *
+	 * A row whose every showing cell is empty hides itself, so comparing two
+	 * deals that both left the refund window blank does not print a row of
+	 * dashes across the table.
+	 */
+	function initCompare( scope ) {
+		each( scope, '[data-zd-cmp-root]', function ( root ) {
+			if ( ! once( root, 'Compare' ) ) {
+				return;
+			}
+
+			var table = root.querySelector( '[data-zd-cmp]' );
+			if ( ! table ) {
+				return;
+			}
+
+			var countEl = table.querySelector( '[data-zd-cmp-count]' );
+			var picked  = [];
+
+			var has = function ( id ) {
+				return picked.indexOf( id ) !== -1;
+			};
+
+			var sync = function () {
+				each( root, '[data-zd-cmp-col]', function ( cell ) {
+					cell.classList.toggle( 'is-off', ! has( cell.getAttribute( 'data-zd-cmp-col' ) ) );
+				} );
+
+				each( root, '[data-zd-cmp-row]', function ( row ) {
+					var cells  = row.querySelectorAll( '[data-zd-cmp-col]' );
+					var filled = false;
+
+					for ( var i = 0; i < cells.length; i++ ) {
+						if ( has( cells[ i ].getAttribute( 'data-zd-cmp-col' ) )
+							&& ! cells[ i ].hasAttribute( 'data-zd-cmp-empty' ) ) {
+							filled = true;
+							break;
+						}
+					}
+
+					row.hidden = ! filled;
+				} );
+
+				each( root, '[data-zd-cmp-add]', function ( btn ) {
+					var on    = has( btn.getAttribute( 'data-zd-cmp-add' ) );
+					var label = btn.querySelector( '.zd-compare__addlabel' );
+					var text  = btn.getAttribute( on ? 'data-zd-label-on' : 'data-zd-label-off' );
+
+					btn.classList.toggle( 'is-on', on );
+					btn.setAttribute( 'aria-pressed', String( on ) );
+
+					if ( label && text ) {
+						label.textContent = text;
+					}
+				} );
+
+				if ( countEl ) {
+					countEl.textContent = String( picked.length );
+				}
+
+				table.hidden = picked.length === 0;
+				root.classList.toggle( 'is-comparing', picked.length > 0 );
+			};
+
+			var toggle = function ( id, reveal ) {
+				var at   = picked.indexOf( id );
+				var were = picked.length;
+
+				if ( at === -1 ) {
+					picked.push( id );
+				} else {
+					picked.splice( at, 1 );
+				}
+
+				sync();
+
+				/*
+				 * Only the first pick scrolls. The table is below the cards, so
+				 * without this the button appears to do nothing; scrolling on
+				 * every later pick would yank the page while someone is still
+				 * working down the grid ticking boxes.
+				 */
+				if ( reveal && 0 === were && 1 === picked.length ) {
+					window.requestAnimationFrame( function () {
+						table.scrollIntoView( {
+							behavior: reduced ? 'auto' : 'smooth',
+							block: 'nearest'
+						} );
+					} );
+				}
+			};
+
+			each( root, '[data-zd-cmp-add]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					toggle( btn.getAttribute( 'data-zd-cmp-add' ), true );
+				} );
+			} );
+
+			each( root, '[data-zd-cmp-drop]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					toggle( btn.getAttribute( 'data-zd-cmp-drop' ), false );
+				} );
+			} );
+
+			each( root, '[data-zd-cmp-clear]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					picked = [];
+					sync();
+				} );
+			} );
+
+			sync();
+		} );
+	}
+
 
 	/* ------------------------------------------------- scrollbar gutter */
 
@@ -1520,6 +1645,7 @@
 		initOfferBars( scope );
 		initCoupons( scope );
 		initIndex( scope );
+		initCompare( scope );
 		syncScrollbarWidth();
 	}
 
