@@ -52,6 +52,10 @@
 .zd-compare *, 
 .zd-compare *::before,
 .zd-compare *::after,
+.zd-cmpx,
+.zd-cmpx *, 
+.zd-cmpx *::before,
+.zd-cmpx *::after,
 .zd-stats,
 .zd-stats *, 
 .zd-stats *::before,
@@ -90,6 +94,7 @@
 .zd-deals,
 .zd-picks,
 .zd-compare,
+.zd-cmpx,
 .zd-stats,
 .zd-marquee,
 .zd-index,
@@ -187,6 +192,7 @@
 .zd-deals.zd-deals *,
 .zd-picks.zd-picks *,
 .zd-compare.zd-compare *,
+.zd-cmpx.zd-cmpx *,
 .zd-stats.zd-stats *,
 .zd-marquee.zd-marquee *,
 .zd-index.zd-index *,
@@ -208,6 +214,7 @@
 .zd-deals.zd-deals :is(h1, h2, h3, h4, h5, h6),
 .zd-picks.zd-picks :is(h1, h2, h3, h4, h5, h6),
 .zd-compare.zd-compare :is(h1, h2, h3, h4, h5, h6),
+.zd-cmpx.zd-cmpx :is(h1, h2, h3, h4, h5, h6),
 .zd-stats.zd-stats :is(h1, h2, h3, h4, h5, h6),
 .zd-marquee.zd-marquee :is(h1, h2, h3, h4, h5, h6),
 .zd-index.zd-index :is(h1, h2, h3, h4, h5, h6),
@@ -240,6 +247,7 @@
 .zd-deals.zd-deals :is(h1, h2, h3, h4, h5, h6) *,
 .zd-picks.zd-picks :is(h1, h2, h3, h4, h5, h6) *,
 .zd-compare.zd-compare :is(h1, h2, h3, h4, h5, h6) *,
+.zd-cmpx.zd-cmpx :is(h1, h2, h3, h4, h5, h6) *,
 .zd-stats.zd-stats :is(h1, h2, h3, h4, h5, h6) *,
 .zd-marquee.zd-marquee :is(h1, h2, h3, h4, h5, h6) *,
 .zd-index.zd-index :is(h1, h2, h3, h4, h5, h6) *,
@@ -261,6 +269,7 @@
 .zd-deals.zd-deals :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
 .zd-picks.zd-picks :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
 .zd-compare.zd-compare :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
+.zd-cmpx.zd-cmpx :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
 .zd-stats.zd-stats :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
 .zd-marquee.zd-marquee :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
 .zd-index.zd-index :is([class*="__price"], [class*="__score"], [class*="__rating"], [class*="__value"], [class*="__num"], [class*="__count"], [class*="__stat-value"], .zd-mono),
@@ -9037,12 +9046,24 @@
 }
 
 /* =========================================================================
-   19. Comparison - the Compare button and the table it feeds
+   19. Comparison - the Compare button, the tray and the overlay
 
    The button took the place of the old "Full review" link at the foot of a
-   scorecard; the review link now lives in the table's last row, beside that
-   deal's CTA. Every deal is printed into the table up front with its column
-   switched off, so opening a comparison is a class toggle, never a render.
+   scorecard; the review link now lives in the panel's last row, beside that
+   deal's CTA. Picks collect in a docked tray, and the tray opens a full-screen
+   panel holding one column per deal - every deal printed up front with its
+   column switched off, so opening a comparison is a class toggle.
+
+   The tray and the panel are moved to <body> at init (see hoistCompare), so
+   they are styled from .zd-cmpx rather than through .zd-compare. That class is
+   registered in the token, reset and typography lists at the top of this file,
+   which is where their fonts, colours and box-sizing come from.
+
+   Nearly everything is written with the root class repeated - `.zd-cmpx
+   .zd-x`, `.zd-compare .zd-x`. A button and a table are the two elements every
+   WordPress theme has an opinion about (`.entry-content button`, `table th`),
+   and a bare single class loses those fights, which reads on the front end as
+   a Compare control with no border and a table wearing the theme's borders.
    ========================================================================= */
 
 /* ---------------------------------------------- the button on the card */
@@ -9052,29 +9073,34 @@
  * from the base rule, which is what pins every card's footer to the same line
  * however tall the scores above it run.
  */
-.zd-compare__foot {
+.zd-compare .zd-compare__foot {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	align-items: stretch;
+	gap: 12px;
 }
 
-.zd-compare__add {
-	display: inline-flex;
+.zd-compare .zd-compare__add {
+	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
 	width: 100%;
-	min-height: 44px;
-	padding: 11px 16px;
+	min-height: 46px;
+	margin: 0;
+	padding: 12px 18px;
 	border: 1px solid var(--zd-hairline);
 	border-radius: var(--zd-r-sm);
-	background: transparent;
+	background: #fff;
 	color: var(--zd-body);
 	font-family: inherit;
-	font-size: 0.85rem;
+	font-size: 0.86rem;
 	font-weight: 700;
 	line-height: 1.2;
+	letter-spacing: 0;
 	text-align: center;
+	text-transform: none;
+	box-shadow: none;
 	cursor: pointer;
 	-webkit-appearance: none;
 	appearance: none;
@@ -9084,85 +9110,332 @@
 		color var(--zd-dur-hover) var(--zd-ease);
 }
 
-.zd-compare__add:hover {
+.zd-compare .zd-compare__add:hover {
 	background: var(--zd-accent-tint);
 	border-color: color-mix(in srgb, var(--zd-accent) 40%, transparent);
 	color: var(--zd-accent-2);
 }
 
-.zd-compare__add:focus-visible {
+.zd-compare .zd-compare__add:focus-visible {
 	outline: 2px solid var(--zd-accent);
 	outline-offset: 2px;
 }
 
 /* Picked: the tint fills, the plus becomes a tick. */
-.zd-compare__add.is-on {
+.zd-compare .zd-compare__add.is-on {
 	background: var(--zd-accent-tint);
 	border-color: color-mix(in srgb, var(--zd-accent) 55%, transparent);
 	color: var(--zd-accent-2);
 }
 
-.zd-compare__addicon {
+.zd-compare .zd-compare__addicon {
 	display: flex;
+	align-items: center;
+	justify-content: center;
 	flex: 0 0 auto;
+	width: 16px;
+	height: 16px;
 	color: var(--zd-accent);
 }
 
-.zd-compare__addtick { display: none; }
-.zd-compare__add.is-on .zd-compare__addplus { display: none; }
-.zd-compare__add.is-on .zd-compare__addtick { display: block; }
-
-/* ------------------------------------------------------------ the table */
-
-.zd-cmp {
-	margin-top: 28px;
-	border: 1px solid var(--zd-hairline);
-	border-radius: var(--zd-r-lg);
-	background: #fff;
-	box-shadow: var(--zd-shadow-rest);
-	overflow: hidden;
-	animation: zd-cmp-in var(--zd-dur-in) var(--zd-ease) both;
+.zd-compare .zd-compare__addicon svg {
+	display: block;
+	width: 14px;
+	height: 14px;
 }
 
-/* The [hidden] attribute has to beat the block above it. */
-.zd-cmp[hidden] { display: none; }
+.zd-compare .zd-compare__addlabel {
+	display: block;
+	white-space: nowrap;
+}
 
-@keyframes zd-cmp-in {
-	from { opacity: 0; transform: translateY(12px); }
+.zd-compare .zd-compare__addtick { display: none; }
+.zd-compare .zd-compare__add.is-on .zd-compare__addplus { display: none; }
+.zd-compare .zd-compare__add.is-on .zd-compare__addtick { display: block; }
+
+/* ------------------------------------------------------------- the tray */
+
+.zd-cmpx.zd-cmp-tray {
+	position: fixed;
+	z-index: 9998;
+	left: 50%;
+	bottom: 20px;
+	transform: translateX(-50%);
+	width: max-content;
+	max-width: calc(100vw - 24px);
+	animation: zd-tray-in 320ms var(--zd-ease) both;
+}
+
+.zd-cmpx.zd-cmp-tray[hidden] { display: none; }
+
+@keyframes zd-tray-in {
+	from { opacity: 0; transform: translate(-50%, 16px); }
+	to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.zd-cmpx .zd-cmp-tray__inner {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	max-width: 100%;
+	padding: 10px 10px 10px 20px;
+	background: #fff;
+	border: 1px solid var(--zd-hairline);
+	border-radius: 999px;
+	box-shadow: 0 2px 6px rgba(10, 19, 16, 0.06), 0 22px 48px -20px rgba(10, 19, 16, 0.45);
+}
+
+.zd-cmpx .zd-cmp-tray__label {
+	flex: 0 0 auto;
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	color: var(--zd-muted);
+}
+
+.zd-cmpx .zd-cmp-tray__items {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.zd-cmpx .zd-cmp-tray__items::-webkit-scrollbar { display: none; }
+
+.zd-cmpx .zd-cmp-tray__item { flex: 0 0 auto; margin: 0; }
+.zd-cmpx .zd-cmp-tray__item.is-off { display: none; }
+
+.zd-cmpx .zd-cmp-tray__thumb {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 42px;
+	height: 42px;
+	margin: 0;
+	padding: 0;
+	border: 1px solid var(--zd-hairline);
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: none;
+	cursor: pointer;
+	overflow: visible;
+	-webkit-appearance: none;
+	appearance: none;
+	transition: border-color var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-cmpx .zd-cmp-tray__thumb:hover {
+	border-color: color-mix(in srgb, var(--zd-ember) 50%, transparent);
+}
+
+.zd-cmpx .zd-cmp-tray__thumb:focus-visible {
+	outline: 2px solid var(--zd-accent);
+	outline-offset: 2px;
+}
+
+.zd-cmpx .zd-cmp-tray__thumb img {
+	max-width: 74%;
+	max-height: 74%;
+	object-fit: contain;
+	border-radius: 8px;
+}
+
+.zd-cmpx .zd-cmp-tray__initial {
+	font-size: 0.95rem;
+	font-weight: 800;
+	color: var(--zd-accent-2);
+}
+
+/* The chip IS the remove control, so it says so on hover and on focus. */
+.zd-cmpx .zd-cmp-tray__x {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	display: grid;
+	place-items: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: var(--zd-ember);
+	color: #fff;
+	opacity: 0;
+	transform: scale(0.7);
+	transition:
+		opacity var(--zd-dur-hover) var(--zd-ease),
+		transform var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-cmpx .zd-cmp-tray__thumb:hover .zd-cmp-tray__x,
+.zd-cmpx .zd-cmp-tray__thumb:focus-visible .zd-cmp-tray__x {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.zd-cmpx .zd-cmp-tray__clear {
+	flex: 0 0 auto;
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--zd-muted);
+	box-shadow: none;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	transition: color var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-cmpx .zd-cmp-tray__clear:hover { color: var(--zd-ember); }
+
+.zd-cmpx .zd-cmp-tray__clear:focus-visible {
+	outline: 2px solid var(--zd-accent);
+	outline-offset: 2px;
+}
+
+.zd-cmpx .zd-cmp-tray__go {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	margin: 0;
+	padding: 12px 22px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--zd-accent);
+	color: var(--zd-on-accent);
+	font-family: inherit;
+	font-size: 0.86rem;
+	font-weight: 800;
+	line-height: 1;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	box-shadow: none;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	transition: background-color var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-cmpx .zd-cmp-tray__go:hover { background: var(--zd-accent-2); }
+
+.zd-cmpx .zd-cmp-tray__go:focus-visible {
+	outline: 2px solid var(--zd-accent);
+	outline-offset: 3px;
+}
+
+.zd-cmpx .zd-cmp-tray__gocount {
+	display: grid;
+	place-items: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 6px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.22);
+	font-size: 0.76rem;
+	font-weight: 800;
+}
+
+/* ---------------------------------------------------------- the overlay */
+
+.zd-cmpx.zd-cmp {
+	position: fixed;
+	z-index: 9999;
+	inset: 0;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+}
+
+.zd-cmpx.zd-cmp[hidden] { display: none; }
+
+/* Set on <html> while the panel is open, so the page behind it holds still. */
+.zd-cmp-lock { overflow: hidden; }
+
+.zd-cmpx .zd-cmp__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(10, 19, 16, 0.55);
+	animation: zd-cmp-fade 260ms var(--zd-ease) both;
+}
+
+.zd-cmpx .zd-cmp__panel {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: min(1280px, 100%);
+	/*
+	 * A flex item's automatic minimum is its content, and this one's content is
+	 * a table as wide as the deals being compared. Without this the panel
+	 * refuses to shrink to a phone and the close button lands off-screen.
+	 */
+	min-width: 0;
+	max-height: 92vh;
+	background: #fff;
+	border-radius: 26px 26px 0 0;
+	box-shadow: 0 -20px 60px -30px rgba(10, 19, 16, 0.8);
+	overflow: hidden;
+	animation: zd-cmp-rise 380ms var(--zd-ease) both;
+}
+
+@keyframes zd-cmp-fade {
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+@keyframes zd-cmp-rise {
+	from { opacity: 0; transform: translateY(28px); }
 	to   { opacity: 1; transform: none; }
 }
 
-.zd-cmp__head {
+.zd-cmpx .zd-cmp__head {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 16px;
-	padding: 18px 22px;
+	flex: 0 0 auto;
+	padding: 20px 24px;
 	background: var(--zd-surface);
 	border-bottom: 1px solid var(--zd-hairline);
 }
 
-.zd-cmp__title {
+.zd-cmpx .zd-cmp__title {
 	margin: 0;
-	font-size: 1.02rem;
+	font-size: 1.08rem;
 	font-weight: 800;
 }
 
-.zd-cmp__sub {
+.zd-cmpx .zd-cmp__sub {
 	margin: 4px 0 0;
 	font-size: 0.78rem;
 	color: var(--zd-muted);
 }
 
-.zd-cmp__count {
+.zd-cmpx .zd-cmp__count {
 	font-weight: 700;
 	color: var(--zd-accent);
 }
 
-.zd-cmp__clear {
-	flex: 0 0 auto;
+.zd-cmpx .zd-cmp__headtools {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.zd-cmpx .zd-cmp__clear {
 	min-height: 36px;
-	padding: 8px 14px;
+	margin: 0;
+	padding: 8px 16px;
 	border: 1px solid var(--zd-hairline);
 	border-radius: 999px;
 	background: #fff;
@@ -9170,64 +9443,102 @@
 	font-family: inherit;
 	font-size: 0.78rem;
 	font-weight: 700;
+	line-height: 1.2;
+	text-transform: none;
+	box-shadow: none;
 	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
 	transition:
 		color var(--zd-dur-hover) var(--zd-ease),
 		border-color var(--zd-dur-hover) var(--zd-ease);
 }
 
-.zd-cmp__clear:hover {
+.zd-cmpx .zd-cmp__clear:hover {
 	color: var(--zd-ember);
 	border-color: color-mix(in srgb, var(--zd-ember) 45%, transparent);
 }
 
-.zd-cmp__clear:focus-visible {
+.zd-cmpx .zd-cmp__close {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	margin: 0;
+	padding: 0;
+	border: 1px solid var(--zd-hairline);
+	border-radius: 50%;
+	background: #fff;
+	color: var(--zd-ink);
+	box-shadow: none;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	transition:
+		color var(--zd-dur-hover) var(--zd-ease),
+		border-color var(--zd-dur-hover) var(--zd-ease);
+}
+
+.zd-cmpx .zd-cmp__close:hover {
+	color: var(--zd-ember);
+	border-color: color-mix(in srgb, var(--zd-ember) 45%, transparent);
+}
+
+.zd-cmpx :is(.zd-cmp__clear, .zd-cmp__close):focus-visible {
 	outline: 2px solid var(--zd-accent);
 	outline-offset: 2px;
 }
 
 /*
- * Sideways only. Capping the height and scrolling both axes here would let the
- * product header stick as well, but it also traps the table in a box of its
- * own inside the page - the last rows, the CTA among them, sit below a scroll
- * nobody expects. The table grows down the page instead, and only the extra
- * columns scroll, against a criterion column pinned to the left.
+ * Inside a panel the scroll is expected, so both axes live here: the product
+ * header sticks to the top and the criterion column to the left while the
+ * reader travels through a long comparison.
  */
-.zd-cmp__scroll {
-	overflow-x: auto;
-	overflow-y: hidden;
+.zd-cmpx .zd-cmp__scroll {
+	flex: 1 1 auto;
+	/* Same reason as the panel's min-width, on the other axis. */
+	min-width: 0;
+	min-height: 0;
+	overflow: auto;
 	-webkit-overflow-scrolling: touch;
 	scrollbar-width: thin;
 }
 
-.zd-cmp__scroll:focus-visible {
+.zd-cmpx .zd-cmp__scroll:focus-visible {
 	outline: 2px solid var(--zd-accent);
 	outline-offset: -2px;
 }
 
-.zd-cmp__table {
+.zd-cmpx .zd-cmp__table {
 	width: 100%;
+	margin: 0;
+	border: 0;
 	border-collapse: separate;
 	border-spacing: 0;
+	background: transparent;
+	font-size: 1rem;
 }
 
-.zd-cmp__table :is(th, td) {
-	padding: 16px 18px;
+.zd-cmpx .zd-cmp__table :is(th, td) {
+	padding: 16px 20px;
+	border: 0;
+	border-bottom: 1px solid var(--zd-hairline);
+	background: transparent;
 	text-align: left;
 	vertical-align: middle;
-	border-bottom: 1px solid var(--zd-hairline);
+	font-weight: 400;
 }
 
-.zd-cmp__table tr:last-child :is(th, td) { border-bottom: 0; }
+.zd-cmpx .zd-cmp__table tr:last-child :is(th, td) { border-bottom: 0; }
 
 /* A column that is not being compared. */
-.zd-cmp__prod.is-off,
-.zd-cmp__cell.is-off { display: none; }
+.zd-cmpx .zd-cmp__prod.is-off,
+.zd-cmpx .zd-cmp__cell.is-off { display: none; }
 
 /* ---- the criterion column, pinned left ---- */
 
-.zd-cmp__corner,
-.zd-cmp__label {
+.zd-cmpx .zd-cmp__corner,
+.zd-cmpx .zd-cmp__label {
 	position: sticky;
 	left: 0;
 	z-index: 2;
@@ -9237,14 +9548,16 @@
 	border-right: 1px solid var(--zd-hairline);
 }
 
-.zd-cmp__label {
+.zd-cmpx .zd-cmp__label {
 	font-size: 0.8rem;
 	font-weight: 700;
 	color: var(--zd-muted);
 }
 
-.zd-cmp__corner {
-	z-index: 4;
+.zd-cmpx .zd-cmp__corner {
+	position: sticky;
+	top: 0;
+	z-index: 5;
 	background: var(--zd-surface);
 	font-family: var(--zd-font-mono);
 	font-size: 0.68rem;
@@ -9255,32 +9568,35 @@
 }
 
 /* Reading across one criterion is the whole job, so the row lights up. */
-.zd-cmp__r:hover :is(.zd-cmp__label, .zd-cmp__cell) {
+.zd-cmpx .zd-cmp__r:hover :is(.zd-cmp__label, .zd-cmp__cell) {
 	background: var(--zd-surface);
 }
 
 /* ---- the product header, pinned top ---- */
 
-.zd-cmp__prod {
-	min-width: 220px;
+.zd-cmpx .zd-cmp__prod {
+	position: sticky;
+	top: 0;
+	z-index: 3;
+	min-width: 230px;
 	background: var(--zd-surface);
 	vertical-align: bottom;
 }
 
-.zd-cmp__prodinner {
+.zd-cmpx .zd-cmp__prodinner {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 8px;
 }
 
-.zd-cmp__prodname {
+.zd-cmpx .zd-cmp__prodname {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 }
 
-.zd-cmp__logo {
+.zd-cmpx .zd-cmp__logo {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -9292,20 +9608,20 @@
 	overflow: hidden;
 }
 
-.zd-cmp__logo img {
+.zd-cmpx .zd-cmp__logo img {
 	max-width: 74%;
 	max-height: 74%;
 	object-fit: contain;
 }
 
-.zd-cmp__name {
+.zd-cmpx .zd-cmp__name {
 	font-size: 0.95rem;
 	font-weight: 800;
 	line-height: 1.3;
 	color: var(--zd-heading);
 }
 
-.zd-cmp__cap {
+.zd-cmpx .zd-cmp__cap {
 	font-family: var(--zd-font-mono);
 	font-size: 0.62rem;
 	font-weight: 600;
@@ -9317,52 +9633,56 @@
 	padding: 4px 9px;
 }
 
-.zd-cmp__drop {
+.zd-cmpx .zd-cmp__drop {
 	flex: 0 0 auto;
 	display: grid;
 	place-items: center;
 	width: 22px;
 	height: 22px;
+	margin: 0;
 	padding: 0;
 	border: 1px solid var(--zd-hairline);
 	border-radius: 50%;
 	background: #fff;
 	color: var(--zd-muted);
+	box-shadow: none;
 	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
 	transition:
 		color var(--zd-dur-hover) var(--zd-ease),
 		border-color var(--zd-dur-hover) var(--zd-ease);
 }
 
-.zd-cmp__drop:hover {
+.zd-cmpx .zd-cmp__drop:hover {
 	color: var(--zd-ember);
 	border-color: color-mix(in srgb, var(--zd-ember) 45%, transparent);
 }
 
-.zd-cmp__drop:focus-visible {
+.zd-cmpx .zd-cmp__drop:focus-visible {
 	outline: 2px solid var(--zd-accent);
 	outline-offset: 2px;
 }
 
 /* ---- cell contents ---- */
 
-.zd-cmp__none {
+.zd-cmpx .zd-cmp__none {
 	color: var(--zd-hairline);
 	font-weight: 700;
 }
 
-.zd-cmp__pricenow {
+.zd-cmpx .zd-cmp__pricenow {
 	font-size: 0.98rem;
 	font-weight: 700;
 	color: var(--zd-ink);
 }
 
-.zd-cmp__priceold {
+.zd-cmpx .zd-cmp__priceold {
 	color: var(--zd-muted);
 	font-size: 0.85em;
 }
 
-.zd-cmp__save {
+.zd-cmpx .zd-cmp__save {
 	display: inline-block;
 	margin-left: 4px;
 	padding: 3px 7px;
@@ -9373,7 +9693,7 @@
 	font-weight: 700;
 }
 
-.zd-cmp__scorevalue {
+.zd-cmpx .zd-cmp__scorevalue {
 	display: block;
 	margin-bottom: 8px;
 	font-size: 0.95rem;
@@ -9383,11 +9703,13 @@
 
 /* Only reached when "Colour Scores By Value" is on - it is what makes the 6
    among the 9s findable while reading down a column. */
-.zd-cmp__scorevalue.zd-score--good { color: var(--zd-score-good); }
+.zd-cmpx .zd-cmp__scorevalue.zd-score--good { color: var(--zd-score-good); }
+.zd-cmpx .zd-cmp__scorevalue.zd-score--fair { color: var(--zd-score-fair); }
+.zd-cmpx .zd-cmp__scorevalue.zd-score--weak { color: var(--zd-score-weak); }
 
-.zd-cmp__r--score .zd-score__track { max-width: 190px; }
+.zd-cmpx .zd-cmp__r--score .zd-score__track { max-width: 190px; }
 
-.zd-cmp__ticks {
+.zd-cmpx .zd-cmp__ticks {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -9396,15 +9718,16 @@
 	gap: 8px;
 }
 
-.zd-cmp__ticks li {
+.zd-cmpx .zd-cmp__ticks li {
 	position: relative;
+	margin: 0;
 	padding-left: 20px;
 	font-size: 0.86rem;
 	line-height: 1.5;
 	color: var(--zd-body);
 }
 
-.zd-cmp__ticks li::before {
+.zd-cmpx .zd-cmp__ticks li::before {
 	content: "";
 	position: absolute;
 	left: 2px;
@@ -9417,7 +9740,7 @@
 }
 
 /* The cons row is the one place a tick would be a lie. */
-.zd-cmp__ticks--cons li::before {
+.zd-cmpx .zd-cmp__ticks--cons li::before {
 	top: 0.5em;
 	width: 9px;
 	height: 0;
@@ -9426,7 +9749,7 @@
 	transform: none;
 }
 
-.zd-cmp__code {
+.zd-cmpx .zd-cmp__code {
 	display: inline-block;
 	padding: 5px 10px;
 	border: 1px dashed color-mix(in srgb, var(--zd-accent) 45%, transparent);
@@ -9438,24 +9761,24 @@
 	color: var(--zd-accent-2);
 }
 
-.zd-cmp__r--verified .zd-cmp__cell {
+.zd-cmpx .zd-cmp__r--verified .zd-cmp__cell {
 	font-family: var(--zd-font-mono);
 	font-size: 0.76rem;
 	color: var(--zd-accent);
 }
 
 /* A row of bullet lists reads down each column, so it hangs from the top. */
-.zd-cmp__r--list :is(.zd-cmp__label, .zd-cmp__cell),
-.zd-cmp__r--cta .zd-cmp__cell {
+.zd-cmpx .zd-cmp__r--list :is(.zd-cmp__label, .zd-cmp__cell),
+.zd-cmpx .zd-cmp__r--cta .zd-cmp__cell {
 	vertical-align: top;
 }
 
-.zd-cmp__cta {
+.zd-cmpx .zd-cmp__cta {
 	width: 100%;
 	justify-content: center;
 }
 
-.zd-cmp__review {
+.zd-cmpx .zd-cmp__review {
 	display: block;
 	margin-top: 9px;
 	text-align: center;
@@ -9464,44 +9787,81 @@
 	text-decoration: none;
 }
 
-.zd-cmp__review:hover { color: var(--zd-accent); }
+.zd-cmpx .zd-cmp__review:hover { color: var(--zd-accent); }
 
 /* ---- narrow screens ---- */
 
 @media (max-width: 640px) {
-	.zd-cmp { margin-top: 22px; }
-
-	.zd-cmp__head {
-		padding: 14px 16px;
-		align-items: flex-start;
+	.zd-cmpx.zd-cmp-tray {
+		left: 12px;
+		right: 12px;
+		bottom: 12px;
+		width: auto;
+		max-width: none;
+		transform: none;
 	}
 
-	.zd-cmp__table :is(th, td) { padding: 13px 14px; }
+	@keyframes zd-tray-in {
+		from { opacity: 0; transform: translateY(16px); }
+		to   { opacity: 1; transform: none; }
+	}
 
-	.zd-cmp__corner,
-	.zd-cmp__label {
+	.zd-cmpx .zd-cmp-tray__inner {
+		gap: 10px;
+		padding: 8px 8px 8px 14px;
+	}
+
+	/* The word goes; the count and the pill carry the meaning. */
+	.zd-cmpx .zd-cmp-tray__label { display: none; }
+
+	.zd-cmpx .zd-cmp-tray__go {
+		padding: 12px 16px;
+		font-size: 0.78rem;
+	}
+
+	.zd-cmpx .zd-cmp__panel {
+		max-height: 94vh;
+		border-radius: 20px 20px 0 0;
+	}
+
+	.zd-cmpx .zd-cmp__head { padding: 16px; }
+
+	.zd-cmpx .zd-cmp__table :is(th, td) { padding: 13px 14px; }
+
+	.zd-cmpx .zd-cmp__corner,
+	.zd-cmpx .zd-cmp__label {
 		width: 128px;
 		min-width: 128px;
 	}
 
-	.zd-cmp__prod { min-width: 190px; }
-	.zd-cmp__r--score .zd-score__track { max-width: none; }
+	.zd-cmpx .zd-cmp__prod { min-width: 190px; }
+	.zd-cmpx .zd-cmp__r--score .zd-score__track { max-width: none; }
 }
 
 @media (pointer: coarse) {
-	.zd-cmp__review {
+	.zd-cmpx .zd-cmp__review {
 		min-height: 44px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
-	.zd-cmp__drop {
+	.zd-cmpx .zd-cmp__drop {
 		width: 30px;
 		height: 30px;
+	}
+
+	/* No hover to reveal it on a touch screen, so it is always showing. */
+	.zd-cmpx .zd-cmp-tray__x {
+		opacity: 1;
+		transform: none;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.zd-cmp { animation: none; }
+	.zd-cmpx.zd-cmp-tray,
+	.zd-cmpx .zd-cmp__panel,
+	.zd-cmpx .zd-cmp__backdrop {
+		animation: none;
+	}
 }

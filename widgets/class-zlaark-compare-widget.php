@@ -134,7 +134,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 				'default'      => 'yes',
 				'return_value' => 'yes',
 				'separator'    => 'before',
-				'description'  => __( 'Adds a Compare button to each card. Ticking a card drops it into a side-by-side table below, which stays hidden until the first pick.', 'zlaark-deals-pro' ),
+				'description'  => __( 'Adds a Compare button to each card. Picks collect in a bar at the bottom of the screen, and that bar opens a full-screen side-by-side table with a column per deal.', 'zlaark-deals-pro' ),
 			)
 		);
 
@@ -382,7 +382,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 		$table_on = ! empty( $s['show_table'] ) && 'yes' === $s['show_table'];
 		?>
 		<div class="zd-compare zd-compare--<?php echo esc_attr( $s['style_mode'] ); ?>"
-			<?php echo $table_on ? 'data-zd-cmp-root="true"' : ''; ?>
+			<?php echo $table_on ? 'data-zd-cmp-root="' . esc_attr( $this->get_id() ) . '"' : ''; ?>
 			data-zd-reveal-root="true" data-zd-stagger="<?php echo esc_attr( $stagger ); ?>">
 
 			<?php if ( '' !== $heading ) : ?>
@@ -679,66 +679,163 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 		}
 
 		$title = ! empty( $s['table_heading'] ) ? $s['table_heading'] : __( 'Compare side by side', 'zlaark-deals-pro' );
-		?>
-		<section class="zd-cmp" data-zd-cmp hidden>
-			<header class="zd-cmp__head">
-				<div class="zd-cmp__headtext">
-					<h3 class="zd-cmp__title"><?php echo esc_html( $title ); ?></h3>
-					<p class="zd-cmp__sub">
-						<span class="zd-cmp__count" data-zd-cmp-count>0</span>
-						<?php
-						printf(
-							/* translators: %d: how many deals are on the page. */
-							esc_html__( 'of %d picked', 'zlaark-deals-pro' ),
-							count( $deals )
-						);
-						?>
-					</p>
-				</div>
-				<button type="button" class="zd-cmp__clear" data-zd-cmp-clear>
-					<?php esc_html_e( 'Clear all', 'zlaark-deals-pro' ); ?>
-				</button>
-			</header>
+		$uid   = $this->get_id();
+		$oid   = 'zd-cmp-' . $uid;
 
-			<div class="zd-cmp__scroll" tabindex="0" role="region"
-				aria-label="<?php esc_attr_e( 'Comparison table', 'zlaark-deals-pro' ); ?>">
-				<table class="zd-cmp__table">
-					<thead>
-						<tr>
-							<th scope="col" class="zd-cmp__corner">
-								<?php esc_html_e( 'Comparing', 'zlaark-deals-pro' ); ?>
-							</th>
-							<?php foreach ( $deals as $deal ) : ?>
-								<th scope="col" class="zd-cmp__prod is-off" data-zd-cmp-col="<?php echo (int) $deal['id']; ?>">
-									<?php $this->render_table_head( $deal ); ?>
+		$this->render_tray( $deals, $uid );
+
+		/*
+		 * The panel and the tray both live in the widget's markup but are moved
+		 * to the end of <body> the moment the script runs, because .zd-compare
+		 * carries a perspective for the 3D card reveals - and any perspective
+		 * makes an element the containing block for its fixed-position
+		 * descendants. Left where they are, a full-screen overlay would be
+		 * clipped to the widget instead of covering the page.
+		 */
+		?>
+		<div class="zd-cmpx zd-cmp" id="<?php echo esc_attr( $oid ); ?>"
+			data-zd-cmp data-zd-cmp-owner="<?php echo esc_attr( $uid ); ?>" hidden
+			role="dialog" aria-modal="true" aria-labelledby="<?php echo esc_attr( $oid ); ?>-title">
+
+			<div class="zd-cmp__backdrop" data-zd-cmp-close></div>
+
+			<div class="zd-cmp__panel">
+				<header class="zd-cmp__head">
+					<div class="zd-cmp__headtext">
+						<h2 class="zd-cmp__title" id="<?php echo esc_attr( $oid ); ?>-title">
+							<?php echo esc_html( $title ); ?>
+						</h2>
+						<p class="zd-cmp__sub">
+							<span class="zd-cmp__count" data-zd-cmp-count>0</span>
+							<?php
+							printf(
+								/* translators: %d: how many deals are on the page. */
+								esc_html__( 'of %d picked', 'zlaark-deals-pro' ),
+								count( $deals )
+							);
+							?>
+						</p>
+					</div>
+
+					<div class="zd-cmp__headtools">
+						<button type="button" class="zd-cmp__clear" data-zd-cmp-clear>
+							<?php esc_html_e( 'Clear all', 'zlaark-deals-pro' ); ?>
+						</button>
+						<button type="button" class="zd-cmp__close" data-zd-cmp-close
+							aria-label="<?php esc_attr_e( 'Close the comparison', 'zlaark-deals-pro' ); ?>">
+							<svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+								<path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" />
+							</svg>
+						</button>
+					</div>
+				</header>
+
+				<div class="zd-cmp__scroll" tabindex="0" role="region"
+					aria-label="<?php esc_attr_e( 'Comparison table', 'zlaark-deals-pro' ); ?>">
+					<table class="zd-cmp__table">
+						<thead>
+							<tr>
+								<th scope="col" class="zd-cmp__corner">
+									<?php esc_html_e( 'Comparing', 'zlaark-deals-pro' ); ?>
 								</th>
-							<?php endforeach; ?>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ( $rows as $row ) : ?>
-							<tr class="zd-cmp__r<?php echo '' !== $row['class'] ? ' ' . esc_attr( $row['class'] ) : ''; ?>" data-zd-cmp-row>
-								<th scope="row" class="zd-cmp__label"><?php echo esc_html( $row['label'] ); ?></th>
 								<?php foreach ( $deals as $deal ) : ?>
-									<?php $cell = isset( $row['cells'][ $deal['id'] ] ) ? $row['cells'][ $deal['id'] ] : ''; ?>
-									<td class="zd-cmp__cell is-off"
-										data-zd-cmp-col="<?php echo (int) $deal['id']; ?>"
-										<?php echo '' === $cell ? 'data-zd-cmp-empty="1"' : ''; ?>>
-										<?php
-										echo ( '' === $cell )
-											? '<span class="zd-cmp__none">&mdash;</span>'
-											: $cell; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in build_table_rows().
-										?>
-									</td>
+									<th scope="col" class="zd-cmp__prod is-off" data-zd-cmp-col="<?php echo (int) $deal['id']; ?>">
+										<?php $this->render_table_head( $deal ); ?>
+									</th>
 								<?php endforeach; ?>
 							</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							<?php foreach ( $rows as $row ) : ?>
+								<tr class="zd-cmp__r<?php echo '' !== $row['class'] ? ' ' . esc_attr( $row['class'] ) : ''; ?>" data-zd-cmp-row>
+									<th scope="row" class="zd-cmp__label"><?php echo esc_html( $row['label'] ); ?></th>
+									<?php foreach ( $deals as $deal ) : ?>
+										<?php $cell = isset( $row['cells'][ $deal['id'] ] ) ? $row['cells'][ $deal['id'] ] : ''; ?>
+										<td class="zd-cmp__cell is-off"
+											data-zd-cmp-col="<?php echo (int) $deal['id']; ?>"
+											<?php echo '' === $cell ? 'data-zd-cmp-empty="1"' : ''; ?>>
+											<?php
+											echo ( '' === $cell )
+												? '<span class="zd-cmp__none">&mdash;</span>'
+												: $cell; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in build_table_rows().
+											?>
+										</td>
+									<?php endforeach; ?>
+								</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</section>
+		</div>
 		<?php
 	}
+
+	/**
+	 * The docked bar that collects the picks.
+	 *
+	 * It is what makes "compare" a decision rather than a jump: a pick lands
+	 * here and the reader keeps reading, adds a second and a third, and opens
+	 * the panel when they are ready. Every deal's chip is printed up front and
+	 * hidden, so adding one is the same class toggle as everything else.
+	 */
+	private function render_tray( $deals, $uid ) {
+		?>
+		<div class="zd-cmpx zd-cmp-tray" data-zd-cmp-tray data-zd-cmp-owner="<?php echo esc_attr( $uid ); ?>" hidden>
+			<div class="zd-cmp-tray__inner">
+				<span class="zd-cmp-tray__label">
+					<?php esc_html_e( 'Comparing', 'zlaark-deals-pro' ); ?>
+				</span>
+
+				<ul class="zd-cmp-tray__items">
+					<?php foreach ( $deals as $deal ) : ?>
+						<?php
+						$drop = sprintf(
+							/* translators: %s: deal name. */
+							__( 'Remove %s from the comparison', 'zlaark-deals-pro' ),
+							$deal['title']
+						);
+						?>
+						<li class="zd-cmp-tray__item is-off" data-zd-cmp-col="<?php echo (int) $deal['id']; ?>">
+							<button type="button" class="zd-cmp-tray__thumb"
+								data-zd-cmp-drop="<?php echo (int) $deal['id']; ?>"
+								aria-label="<?php echo esc_attr( $drop ); ?>">
+								<?php if ( $deal['image_id'] ) : ?>
+									<?php echo wp_get_attachment_image( $deal['image_id'], 'thumbnail', false, array( 'loading' => 'lazy' ) ); ?>
+								<?php else : ?>
+									<span class="zd-cmp-tray__initial" aria-hidden="true">
+										<?php echo esc_html( mb_substr( $deal['title'], 0, 1 ) ); ?>
+									</span>
+								<?php endif; ?>
+								<span class="zd-cmp-tray__x" aria-hidden="true">
+									<svg viewBox="0 0 10 10" width="8" height="8" fill="none">
+										<path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="2"
+											stroke-linecap="round" />
+									</svg>
+								</span>
+							</button>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+
+				<button type="button" class="zd-cmp-tray__clear" data-zd-cmp-clear
+					aria-label="<?php esc_attr_e( 'Clear the comparison', 'zlaark-deals-pro' ); ?>">
+					<svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
+						<path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+					</svg>
+				</button>
+
+				<button type="button" class="zd-cmp-tray__go" data-zd-cmp-open
+					aria-controls="<?php echo esc_attr( 'zd-cmp-' . $uid ); ?>">
+					<span class="zd-cmp-tray__golabel"><?php esc_html_e( 'Compare', 'zlaark-deals-pro' ); ?></span>
+					<span class="zd-cmp-tray__gocount" data-zd-cmp-count>0</span>
+				</button>
+			</div>
+		</div>
+		<?php
+	}
+
 
 	/** The sticky product cell at the top of a comparison column. */
 	private function render_table_head( $deal ) {

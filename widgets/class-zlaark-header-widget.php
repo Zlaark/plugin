@@ -737,14 +737,26 @@ class Zlaark_Header_Widget extends Zlaark_Widget_Base {
 			return;
 		}
 		?>
+		<?php
+		/*
+		 * Auto-detection wins over the manual flag, but only when it actually
+		 * recognises the page. The default menu ships with "Deals" marked
+		 * active, so on any other page - Compare, say - both that item and the
+		 * detected one lit up at once, and the nav claimed the reader was in
+		 * two places. Where nothing matches (a post, a 404) the manual flag is
+		 * still the only signal there is, so it keeps its say.
+		 */
+		$detected = ( 'yes' === $s['auto_active'] ) && $this->detects_current( $s['items'] );
+		?>
 		<nav class="zd-hdr__nav" aria-label="<?php esc_attr_e( 'Main', 'zlaark-deals-pro' ); ?>">
 			<span class="zd-hdr__pill" aria-hidden="true"></span>
 			<ul class="zd-hdr__list">
 				<?php
 				foreach ( $s['items'] as $i => $item ) {
 					$url    = ! empty( $item['link']['url'] ) ? $item['link']['url'] : '';
-					$active = ( 'yes' === $item['is_active'] )
-						|| ( 'yes' === $s['auto_active'] && $this->is_current( $url ) );
+					$active = $detected
+						? $this->is_current( $url )
+						: ( 'yes' === $item['is_active'] );
 
 					$key = 'hdr_item_' . $i;
 					if ( $active ) {
@@ -918,6 +930,18 @@ class Zlaark_Header_Widget extends Zlaark_Widget_Base {
 		}
 
 		return $out;
+	}
+
+	/** True when one of the menu items points at the page being viewed. */
+	private function detects_current( $items ) {
+		foreach ( $items as $item ) {
+			$url = ! empty( $item['link']['url'] ) ? $item['link']['url'] : '';
+			if ( $this->is_current( $url ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/** True when a link points at the page currently being viewed. */
