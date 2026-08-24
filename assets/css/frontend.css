@@ -102,6 +102,7 @@
  * loudly - it renders unstyled text where a button should be.
  */
 .zd-byline,
+.zd-art,
 .zd-verdict,
 .zd-obar {
 	/* Type - all three faces are SIL Open Font License (free, self-hostable). */
@@ -193,6 +194,7 @@
 .zd-panel.zd-panel *,
 .zd-home.zd-home *,
 .zd-footer.zd-footer *,
+.zd-art.zd-art *,
 .zd-single.zd-single *,
 .zd-card.zd-card *,
 .zd-board.zd-board * {
@@ -214,6 +216,7 @@
 .zd-panel.zd-panel :is(h1, h2, h3, h4, h5, h6),
 .zd-home.zd-home :is(h1, h2, h3, h4, h5, h6),
 .zd-footer.zd-footer :is(h1, h2, h3, h4, h5, h6),
+.zd-art.zd-art :is(h1, h2, h3, h4, h5, h6),
 .zd-single.zd-single :is(h1, h2, h3, h4, h5, h6),
 .zd-card.zd-card :is(h1, h2, h3, h4, h5, h6),
 .zd-board.zd-board :is(h1, h2, h3, h4, h5, h6) {
@@ -246,6 +249,7 @@
 .zd-panel.zd-panel :is(h1, h2, h3, h4, h5, h6) *,
 .zd-home.zd-home :is(h1, h2, h3, h4, h5, h6) *,
 .zd-footer.zd-footer :is(h1, h2, h3, h4, h5, h6) *,
+.zd-art.zd-art :is(h1, h2, h3, h4, h5, h6) *,
 .zd-single.zd-single :is(h1, h2, h3, h4, h5, h6) *,
 .zd-card.zd-card :is(h1, h2, h3, h4, h5, h6) *,
 .zd-board.zd-board :is(h1, h2, h3, h4, h5, h6) * {
@@ -9045,4 +9049,483 @@
 /* The blurb no longer needs to absorb the slack once it sits inside __more. */
 .zd-lcard__more .zd-lcard__blurb {
 	flex: 0 1 auto;
+}
+
+/* =========================================================================
+   Article - the blog / review detail page as a report
+
+   Same spine as the rest of the plugin: a mono-stamped masthead, a byline that
+   signs the work, one hard-ruled instrument, and a numbered contents rail. The
+   body is the part that usually gets skipped, so it is set here properly - a
+   real measure, a scale that separates the heading levels, and rules doing the
+   work that boxes and shadows normally get asked to do.
+   ========================================================================= */
+
+.zd-art {
+	--zd-art-gap: clamp(28px, 4vw, 52px);
+	max-width: 1180px;
+	margin: 0 auto;
+	padding: 0 clamp(18px, 4vw, 32px);
+	color: var(--zd-body);
+}
+
+/* --- masthead ------------------------------------------------------------ */
+
+.zd-art__head { padding: clamp(24px, 4vw, 44px) 0 0; }
+
+.zd-art__eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 16px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-art__eyebrow i {
+	font-style: normal;
+	font-variant-numeric: tabular-nums;
+	color: var(--zd-accent);
+}
+
+/* A rule between the two stamps, not a bullet - the same divider the ticker
+   rail and the trust band use. */
+.zd-art__eyebrow i::before {
+	content: "";
+	display: inline-block;
+	width: 18px;
+	height: 1px;
+	margin-right: 12px;
+	vertical-align: middle;
+	background: var(--zd-hairline);
+}
+
+.zd-art__title {
+	margin: 0;
+	font-family: var(--zd-font-display);
+	font-size: clamp(2rem, 1.3rem + 3vw, 3.4rem);
+	font-weight: 800;
+	line-height: 1.04;
+	letter-spacing: -0.035em;
+	color: var(--zd-heading);
+	text-wrap: balance;
+	max-width: 20ch;
+}
+
+.zd-art__stand {
+	margin: 18px 0 0;
+	font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.24rem);
+	line-height: 1.55;
+	color: var(--zd-body);
+	max-width: 58ch;
+}
+
+/*
+ * The signature: the work, signed. A hairline row of mono stamps saying who
+ * did it and when - the same stamp language as the About credits and the
+ * header ticker, so a reader who has seen one recognises the other.
+ */
+.zd-art__by {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0;
+	margin-top: clamp(22px, 3vw, 34px);
+	border-top: 1px solid var(--zd-ink);
+	border-bottom: 1px solid var(--zd-hairline);
+}
+
+.zd-art__fact {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 14px 22px 15px;
+	border-left: 1px solid var(--zd-hairline);
+}
+
+.zd-art__fact:first-child { border-left: 0; padding-left: 0; }
+
+.zd-art__fact b {
+	font-family: var(--zd-font-mono);
+	font-size: 0.66rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-art__fact span {
+	font-size: 0.92rem;
+	font-weight: 600;
+	line-height: 1.3;
+	color: var(--zd-heading);
+}
+
+/* --- the instrument ------------------------------------------------------ */
+
+.zd-art__readout {
+	margin-top: clamp(26px, 3.5vw, 40px);
+	border: 1px solid var(--zd-ink);
+	border-radius: 0;
+	background: #fff;
+	overflow: hidden;
+}
+
+.zd-art__rohead {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 11px 18px;
+	background: var(--zd-ink);
+	font-family: var(--zd-font-mono);
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.zd-art__rohead b { font-weight: 500; color: var(--zd-on-accent); }
+.zd-art__rohead span { margin-left: auto; color: #5fd9a4; }
+
+.zd-art__robody {
+	display: flex;
+	align-items: center;
+	gap: 26px;
+	padding: 22px 24px;
+}
+
+.zd-art__verdict {
+	margin: 0;
+	flex: 1 1 auto;
+	font-family: var(--zd-font-display);
+	font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: -0.018em;
+	color: var(--zd-heading);
+	text-wrap: pretty;
+}
+
+.zd-art__score { flex: 0 0 auto; }
+
+.zd-art__rogrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 0;
+	margin: 0;
+	border-top: 1px solid var(--zd-hairline);
+}
+
+.zd-art__rogrid > div {
+	padding: 15px 24px 17px;
+	border-left: 1px solid var(--zd-hairline);
+}
+
+.zd-art__rogrid > div:first-child { border-left: 0; }
+
+.zd-art__rogrid dt {
+	margin: 0 0 4px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.66rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-art__rogrid dd {
+	margin: 0;
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.98rem;
+	font-weight: 600;
+	color: var(--zd-heading);
+}
+
+/* --- body + contents rail ------------------------------------------------ */
+
+.zd-art__grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--zd-art-gap);
+	margin-top: clamp(30px, 4vw, 50px);
+	padding-bottom: clamp(36px, 5vw, 64px);
+}
+
+.zd-art--toc .zd-art__grid { grid-template-columns: minmax(0, 1fr) 232px; }
+
+.zd-art__toc { min-width: 0; }
+
+.zd-art__tocinner {
+	position: sticky;
+	top: 96px;
+	border-top: 1px solid var(--zd-ink);
+	padding-top: 12px;
+}
+
+.zd-art__toclabel {
+	margin: 0 0 10px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.66rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-art__toclist {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	counter-reset: none;
+}
+
+.zd-art__toclist a {
+	display: grid;
+	grid-template-columns: 26px minmax(0, 1fr);
+	gap: 8px;
+	padding: 7px 0;
+	font-size: 0.86rem;
+	line-height: 1.4;
+	color: var(--zd-body);
+	text-decoration: none;
+	border-top: 1px solid var(--zd-hairline);
+	transition: color 0.2s ease;
+}
+
+.zd-art__toclist li:first-child a { border-top: 0; }
+
+.zd-art__toclist i {
+	font-style: normal;
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.72rem;
+	color: var(--zd-accent);
+}
+
+@media (hover: hover) {
+	.zd-art__toclist a:hover { color: var(--zd-ink); }
+}
+
+.zd-art__toclist a:focus-visible {
+	outline: 2px solid var(--zd-accent);
+	outline-offset: 2px;
+}
+
+/* --- body typography ------------------------------------------------------
+   The measure is a control, so it is set inline; everything else is here. */
+
+.zd-art__body { min-width: 0; }
+
+.zd-art__body > * { margin-top: 0; }
+
+.zd-art__body p,
+.zd-art__body ul,
+.zd-art__body ol,
+.zd-art__body figure,
+.zd-art__body blockquote,
+.zd-art__body table,
+.zd-art__body pre {
+	margin: 0 0 1.15em;
+}
+
+.zd-art__body p {
+	font-size: 1.05rem;
+	line-height: 1.72;
+	color: var(--zd-body);
+}
+
+/*
+ * Headings get their air above, not below - the gap belongs to the section
+ * starting, not to the paragraph that follows it.
+ */
+.zd-art__body :is(h2, h3, h4) {
+	font-family: var(--zd-font-display);
+	color: var(--zd-heading);
+	letter-spacing: -0.025em;
+	line-height: 1.18;
+	text-wrap: balance;
+}
+
+.zd-art__body h2 {
+	margin: 2em 0 0.5em;
+	padding-top: 0.55em;
+	border-top: 1px solid var(--zd-hairline);
+	font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.72rem);
+	font-weight: 800;
+	scroll-margin-top: 96px;
+}
+
+.zd-art__body h3 {
+	margin: 1.6em 0 0.4em;
+	font-size: clamp(1.1rem, 1rem + 0.4vw, 1.28rem);
+	font-weight: 700;
+	scroll-margin-top: 96px;
+}
+
+.zd-art__body h4 {
+	margin: 1.4em 0 0.35em;
+	font-size: 1.02rem;
+	font-weight: 700;
+}
+
+.zd-art__body a {
+	color: var(--zd-accent);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+	transition: color 0.2s ease;
+}
+
+.zd-art__body a:hover { color: var(--zd-accent-2); }
+
+.zd-art__body strong { color: var(--zd-heading); font-weight: 700; }
+
+.zd-art__body :is(ul, ol) { padding-left: 0; list-style: none; }
+
+.zd-art__body li {
+	position: relative;
+	padding-left: 24px;
+	margin-bottom: 0.5em;
+	font-size: 1.02rem;
+	line-height: 1.65;
+}
+
+/* A tick rather than a bullet, matching the checklists on the cards. */
+.zd-art__body ul > li::before {
+	content: "";
+	position: absolute;
+	left: 3px;
+	top: 0.55em;
+	width: 5px;
+	height: 9px;
+	border-right: 2px solid var(--zd-accent);
+	border-bottom: 2px solid var(--zd-accent);
+	transform: rotate(42deg);
+}
+
+.zd-art__body ol { counter-reset: zd-ol; }
+
+.zd-art__body ol > li { counter-increment: zd-ol; }
+
+.zd-art__body ol > li::before {
+	content: counter(zd-ol, decimal-leading-zero);
+	position: absolute;
+	left: 0;
+	top: 0.15em;
+	font-family: var(--zd-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.76rem;
+	font-weight: 600;
+	color: var(--zd-accent);
+}
+
+/* Pulled out with a rule, not a grey box - the quote is the page's voice
+   changing, not a panel. */
+.zd-art__body blockquote {
+	padding: 2px 0 2px 22px;
+	border-left: 2px solid var(--zd-accent);
+	font-family: var(--zd-font-display);
+	font-size: 1.16rem;
+	font-weight: 600;
+	line-height: 1.5;
+	letter-spacing: -0.015em;
+	color: var(--zd-heading);
+}
+
+.zd-art__body blockquote p { font: inherit; color: inherit; }
+.zd-art__body blockquote cite {
+	display: block;
+	margin-top: 8px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.7rem;
+	font-style: normal;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
+.zd-art__body :is(img, video) { max-width: 100%; height: auto; display: block; }
+
+.zd-art__body figcaption {
+	margin-top: 8px;
+	font-family: var(--zd-font-mono);
+	font-size: 0.7rem;
+	letter-spacing: 0.06em;
+	color: var(--zd-muted);
+}
+
+/* Tables carry numbers, so they get the instrument treatment. */
+.zd-art__body table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid var(--zd-ink);
+	font-size: 0.92rem;
+}
+
+.zd-art__body thead th {
+	padding: 10px 14px;
+	background: var(--zd-ink);
+	color: var(--zd-on-accent);
+	font-family: var(--zd-font-mono);
+	font-size: 0.68rem;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	text-align: left;
+}
+
+.zd-art__body tbody td,
+.zd-art__body tbody th {
+	padding: 11px 14px;
+	border-top: 1px solid var(--zd-hairline);
+	text-align: left;
+	font-variant-numeric: tabular-nums;
+}
+
+.zd-art__body tbody tr:nth-child(even) { background: var(--zd-surface); }
+
+.zd-art__body :is(code, kbd, samp) {
+	font-family: var(--zd-font-mono);
+	font-size: 0.88em;
+	padding: 0.12em 0.36em;
+	border-radius: 4px;
+	background: var(--zd-surface);
+	color: var(--zd-heading);
+}
+
+.zd-art__body pre {
+	padding: 16px 18px;
+	overflow-x: auto;
+	border: 1px solid var(--zd-hairline);
+	background: var(--zd-surface);
+}
+
+.zd-art__body pre code { padding: 0; background: none; }
+
+.zd-art__body hr {
+	margin: 2em 0;
+	border: 0;
+	border-top: 1px solid var(--zd-hairline);
+}
+
+/* --- narrow --------------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+	/* The rail becomes a block above the article; sticky would pin a list
+	   taller than the viewport. */
+	.zd-art--toc .zd-art__grid { grid-template-columns: minmax(0, 1fr); }
+	.zd-art__toc { order: -1; }
+	.zd-art__tocinner { position: static; }
+	.zd-art__body { max-width: none; }
+}
+
+@media (max-width: 640px) {
+	.zd-art__fact { padding: 12px 16px 13px; }
+	.zd-art__robody { flex-direction: column; align-items: flex-start; gap: 18px; }
+	.zd-art__rogrid > div { border-left: 0; border-top: 1px solid var(--zd-hairline); }
+	.zd-art__rogrid > div:first-child { border-top: 0; }
 }

@@ -24,6 +24,7 @@ class Zlaark_Deals_Elementor {
 		'about'        => 'Zlaark_About_Widget',
 		'deals'        => 'Zlaark_Deals_Widget',
 		'index'        => 'Zlaark_Index_Widget',
+		'article'      => 'Zlaark_Article_Widget',
 		'top-picks'    => 'Zlaark_Top_Picks_Widget',
 		'compare'      => 'Zlaark_Compare_Widget',
 		'panel'        => 'Zlaark_Panel_Widget',
