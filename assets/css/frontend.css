@@ -10523,14 +10523,142 @@
 }
 
 /*
- * The measure. Blocksy constrains .entry-content itself, so this only narrows
- * it - long lines are the single biggest reason readers give up, and the theme
- * default here runs well past 100 characters.
+ * The measure, set once on the container and centred there.
+ *
+ * Two things went wrong before this. Constraining .entry-content without
+ * giving it margins of its own dropped it to the left edge of Blocksy's
+ * full-width column while the self-centring header stayed put. Moving the
+ * measure onto the children instead was worse: `ch` resolves against each
+ * element's own font size, so the paragraphs got 748px and the headings 1224px
+ * - a different measure per element, which is not a measure at all. And the
+ * children's auto margins lost anyway, to the `margin: 0 0 1.15em` in the
+ * typography above at one point more specificity.
+ *
+ * One container, one font size, one measure, centred.
  */
-.zd-readable .entry-content { max-width: 68ch; }
+.zd-readable .entry-content {
+	max-width: 68ch;
+	margin-left: auto;
+	margin-right: auto;
+}
 
-/* Full-bleed children stay full-bleed: tables and figures earn the extra room,
-   and clamping them to the text measure is what makes a data table unreadable. */
-.zd-readable .entry-content > :is(figure, table, .wp-block-table, .alignwide, .alignfull) {
-	max-width: none;
+/* Same measure and centre for the header, so the title and the first
+   paragraph share a left edge rather than merely sharing a page. */
+.zd-readable .entry-header {
+	max-width: 68ch;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*
+ * A wide data table clamped to the reading measure is unreadable, and it
+ * cannot break out of a centred container without fragile negative margins -
+ * so the figure WordPress already wraps it in scrolls instead.
+ */
+.zd-readable .entry-content .wp-block-table {
+	overflow-x: auto;
+}
+
+/* -------------------------------------------------------------------------
+   Comments, on the same measure and in the same voice.
+
+   Blocksy prints its own comment block below the article. Left alone it sits
+   at a different width to the body and submits with the theme's stock blue
+   button, which is the one loud non-brand colour left on the page.
+   ------------------------------------------------------------------------- */
+
+.zd-readable .ct-comments {
+	max-width: 68ch;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.zd-readable .comment-reply-title {
+	font-family: var(--zd-font-display);
+	font-size: 1.28rem;
+	font-weight: 700;
+	letter-spacing: -0.022em;
+	color: var(--zd-heading);
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--zd-ink);
+}
+
+.zd-readable .comment-notes,
+.zd-readable .comment-form-cookies-consent label {
+	font-size: 0.86rem;
+	line-height: 1.55;
+	color: var(--zd-muted);
+}
+
+.zd-readable .comment-form :is(input[type="text"], input[type="email"], input[type="url"], textarea) {
+	width: 100%;
+	padding: 12px 14px;
+	border: 1px solid var(--zd-hairline);
+	border-radius: var(--zd-r-sm);
+	background: #fff;
+	font-family: var(--zd-font-sans);
+	font-size: 0.95rem;
+	color: var(--zd-ink);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.zd-readable .comment-form :is(input, textarea):focus {
+	outline: 0;
+	border-color: var(--zd-accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--zd-accent) 16%, transparent);
+}
+
+/*
+ * The submit button in the plugin's own language: ink at rest, accent on
+ * hover, the same move the header's finder button makes. The theme ships a
+ * blue that belongs to no other pixel on this site.
+ */
+.zd-readable .comment-form .submit,
+.zd-readable .form-submit :is(input[type="submit"], button) {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 13px 26px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--zd-ink);
+	color: #fff;
+	font-family: var(--zd-font-sans);
+	font-size: 0.92rem;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color 0.25s ease;
+}
+
+.zd-readable .comment-form .submit:hover,
+.zd-readable .form-submit :is(input[type="submit"], button):hover {
+	background: var(--zd-accent);
+}
+
+.zd-readable .comment-form .submit:focus-visible,
+.zd-readable .form-submit :is(input[type="submit"], button):focus-visible {
+	outline: 2px solid var(--zd-accent);
+	outline-offset: 3px;
+}
+
+/* Each comment as a ruled row, matching the credits and the ledger. */
+.zd-readable .ct-comments .comment-body {
+	padding: 18px 0;
+	border-top: 1px solid var(--zd-hairline);
+}
+
+.zd-readable .ct-comments .comment-author .fn {
+	font-family: var(--zd-font-display);
+	font-weight: 700;
+	letter-spacing: -0.018em;
+	color: var(--zd-heading);
+}
+
+.zd-readable .ct-comments .comment-meta {
+	font-family: var(--zd-font-mono);
+	font-size: 0.68rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
 }
