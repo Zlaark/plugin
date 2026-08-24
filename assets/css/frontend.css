@@ -5185,21 +5185,49 @@
 
 /* ---- counters ---- */
 
-.zd-index__counters { display: flex; flex-wrap: wrap; gap: 28px; }
+/*
+ * The counters as a ruled strip, not three numerals floating in whitespace.
+ * Every other count in this plugin - the trust band, the ticker rail, the mega
+ * heads - sits on a rule behind a mono stamp, and these were the one place
+ * that stated figures with nothing holding them.
+ */
+.zd-index__counters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0;
+	border-top: 1px solid var(--zd-ink);
+	border-bottom: 1px solid var(--zd-hairline);
+}
 
-.zd-index__counter { display: flex; flex-direction: column; gap: 2px; }
+.zd-index__counter {
+	display: flex;
+	align-items: baseline;
+	gap: 9px;
+	padding: 12px 20px 13px;
+	border-left: 1px solid var(--zd-hairline);
+}
+
+.zd-index__counter:first-child { border-left: 0; padding-left: 0; }
 
 .zd-index__counter b {
 	font-family: var(--zd-font-mono);
 	font-variant-numeric: tabular-nums;
-	font-size: 1.5rem;
+	font-size: 1.05rem;
 	font-weight: 600;
-	letter-spacing: -0.03em;
-	color: var(--zd-heading);
+	letter-spacing: 0.01em;
+	color: var(--zd-accent);
 	line-height: 1;
 }
 
-.zd-index__counter span { font-size: 0.82rem; color: var(--zd-muted); }
+.zd-index__counter span {
+	font-family: var(--zd-font-mono);
+	font-size: 0.68rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--zd-muted);
+}
+
 .zd-index__counter--ember b { color: var(--zd-ember); }
 
 /* ---- controls ---- */
@@ -5292,26 +5320,61 @@
 
 /* ---- rows ---- */
 
-.zd-index__list { display: flex; flex-direction: column; gap: 10px; }
+/*
+ * One ledger inside one ink rule, rows divided by hairlines - the readout
+ * motif the savings board and "ending soon" already use, and the reason it
+ * exists. Thirteen separately-bordered, separately-shadowed cards with gaps
+ * between them cannot be scanned: the eye has to re-find the score and the
+ * price on every card instead of running down two columns. A price list that
+ * cannot be scanned is not doing its job.
+ */
+.zd-index__list {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	border: 1px solid var(--zd-ink);
+	border-radius: 0;
+	overflow: hidden;
+	background: #fff;
+}
 
 .zd-row {
 	display: grid;
-	grid-template-columns: auto 56px 1fr auto auto;
+	grid-template-columns: auto 44px minmax(0, 1fr) auto 190px;
 	gap: 16px;
 	align-items: center;
-	padding: 16px 18px;
-	border: 1px solid var(--zd-hairline);
-	border-radius: var(--zd-r-md);
+	padding: 14px 18px;
+	border: 0;
+	border-top: 1px solid var(--zd-hairline);
+	border-radius: 0;
 	background: transparent;
-	transition: border-color var(--zd-dur-hover) ease,
-		box-shadow var(--zd-dur-hover) ease, transform var(--zd-dur-hover) var(--zd-ease);
+	transition: background-color var(--zd-dur-hover) ease;
 }
 
-.zd-row:hover {
-	border-color: color-mix(in srgb, var(--zd-accent) 35%, var(--zd-hairline));
-	box-shadow: var(--zd-shadow-hover);
-	transform: translateY(var(--zd-lift));
+.zd-row:first-child { border-top: 0; }
+
+/* No lift, no shadow: a row in a ledger that jumps out of the ledger breaks
+   the alignment that makes the ledger readable. */
+@media (hover: hover) {
+	.zd-row:hover { background: var(--zd-surface); }
 }
+
+/*
+ * The action column is a fixed width and the buttons fill it, so every CTA
+ * starts on the same vertical line. Scoped to the index: the homepage "live
+ * deals" strip uses the same row but sits in a narrower column where a
+ * full-width button would dominate.
+ */
+.zd-index__list .zd-row__end { align-items: stretch; }
+.zd-index__list .zd-row__end .zd-btn { width: 100%; justify-content: center; }
+
+/* Only the button fills the column. Stretching the saving chip too turned a
+   badge into a banner. */
+.zd-index__list .zd-row__save { align-self: flex-end; }
+.zd-index__list .zd-row__pricing { justify-content: flex-end; }
+
+/* The score reads as a column of figures, so it needs a column to sit in. */
+.zd-index__list .zd-row__score { min-width: 3ch; }
 
 .zd-row__pick { display: flex; align-items: center; }
 .zd-row__pick input { width: 18px; height: 18px; accent-color: var(--zd-accent); cursor: pointer; }
