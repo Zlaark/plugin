@@ -9113,7 +9113,7 @@
 .zd-compare .zd-compare__add:hover {
 	background: var(--zd-accent-tint);
 	border-color: color-mix(in srgb, var(--zd-accent) 40%, transparent);
-	color: var(--zd-accent-2);
+	color: var(--zd-accent);
 }
 
 .zd-compare .zd-compare__add:focus-visible {
@@ -9125,7 +9125,7 @@
 .zd-compare .zd-compare__add.is-on {
 	background: var(--zd-accent-tint);
 	border-color: color-mix(in srgb, var(--zd-accent) 55%, transparent);
-	color: var(--zd-accent-2);
+	color: var(--zd-accent);
 }
 
 .zd-compare .zd-compare__addicon {
@@ -9248,7 +9248,7 @@
 .zd-cmpx .zd-cmp-tray__initial {
 	font-size: 0.95rem;
 	font-weight: 800;
-	color: var(--zd-accent-2);
+	color: var(--zd-accent);
 }
 
 /* The chip IS the remove control, so it says so on hover and on focus. */
@@ -9327,7 +9327,7 @@
 	transition: background-color var(--zd-dur-hover) var(--zd-ease);
 }
 
-.zd-cmpx .zd-cmp-tray__go:hover { background: var(--zd-accent-2); }
+.zd-cmpx .zd-cmp-tray__go:hover { background: color-mix(in srgb, var(--zd-accent) 84%, #000); }
 
 .zd-cmpx .zd-cmp-tray__go:focus-visible {
 	outline: 2px solid var(--zd-accent);
@@ -9380,7 +9380,17 @@
 	 * refuses to shrink to a phone and the close button lands off-screen.
 	 */
 	min-width: 0;
-	max-height: 92vh;
+	/*
+	 * A fixed height, not a cap: the panel is always one screen and the table
+	 * scrolls inside it. With max-height the panel grew and shrank with the
+	 * number of criteria on screen, so dropping a column made the whole dialog
+	 * jump under the pointer.
+	 *
+	 * dvh over vh because on a phone vh is the tallest the viewport ever gets,
+	 * which puts the bottom of the panel behind the browser's own toolbar.
+	 */
+	height: 92vh;
+	height: 92dvh;
 	background: #fff;
 	border-radius: 26px 26px 0 0;
 	box-shadow: 0 -20px 60px -30px rgba(10, 19, 16, 0.8);
@@ -9537,8 +9547,16 @@
 
 /* ---- the criterion column, pinned left ---- */
 
-.zd-cmpx .zd-cmp__corner,
-.zd-cmpx .zd-cmp__label {
+/*
+ * .zd-cmp__table is repeated in every sticky selector below on purpose. The
+ * th/td reset above carries a type selector, so it outranks a plain
+ * `.zd-cmpx .zd-cmp__label` - which left every pinned cell transparent and let
+ * the rows scroll straight through the header they were supposed to slide
+ * under. A sticky cell has to be opaque or it is not a header, it is a
+ * watermark.
+ */
+.zd-cmpx .zd-cmp__table .zd-cmp__corner,
+.zd-cmpx .zd-cmp__table .zd-cmp__label {
 	position: sticky;
 	left: 0;
 	z-index: 2;
@@ -9554,7 +9572,7 @@
 	color: var(--zd-muted);
 }
 
-.zd-cmpx .zd-cmp__corner {
+.zd-cmpx .zd-cmp__table .zd-cmp__corner {
 	position: sticky;
 	top: 0;
 	z-index: 5;
@@ -9568,19 +9586,20 @@
 }
 
 /* Reading across one criterion is the whole job, so the row lights up. */
-.zd-cmpx .zd-cmp__r:hover :is(.zd-cmp__label, .zd-cmp__cell) {
+.zd-cmpx .zd-cmp__table .zd-cmp__r:hover :is(.zd-cmp__label, .zd-cmp__cell) {
 	background: var(--zd-surface);
 }
 
 /* ---- the product header, pinned top ---- */
 
-.zd-cmpx .zd-cmp__prod {
+.zd-cmpx .zd-cmp__table .zd-cmp__prod {
 	position: sticky;
 	top: 0;
 	z-index: 3;
 	min-width: 230px;
 	background: var(--zd-surface);
 	vertical-align: bottom;
+	box-shadow: 0 1px 0 var(--zd-hairline);
 }
 
 .zd-cmpx .zd-cmp__prodinner {
@@ -9627,7 +9646,7 @@
 	font-weight: 600;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	color: var(--zd-accent-2);
+	color: var(--zd-accent);
 	background: var(--zd-accent-tint);
 	border-radius: 999px;
 	padding: 4px 9px;
@@ -9688,7 +9707,7 @@
 	padding: 3px 7px;
 	border-radius: 999px;
 	background: var(--zd-accent-tint);
-	color: var(--zd-accent-2);
+	color: var(--zd-accent);
 	font-size: 0.7rem;
 	font-weight: 700;
 }
@@ -9758,7 +9777,7 @@
 	font-family: var(--zd-font-mono);
 	font-size: 0.8rem;
 	font-weight: 600;
-	color: var(--zd-accent-2);
+	color: var(--zd-accent);
 }
 
 .zd-cmpx .zd-cmp__r--verified .zd-cmp__cell {
@@ -9820,7 +9839,8 @@
 	}
 
 	.zd-cmpx .zd-cmp__panel {
-		max-height: 94vh;
+		height: 94vh;
+		height: 94dvh;
 		border-radius: 20px 20px 0 0;
 	}
 
