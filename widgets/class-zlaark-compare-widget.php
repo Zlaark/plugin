@@ -120,6 +120,57 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			)
 		);
 
+		/*
+		 * The compare button took the place of the old "Full review" link on
+		 * every card, so it is switchable: a page that only wants the scorecard
+		 * turns this off and gets the cards back exactly as they were, with no
+		 * table printed underneath at all.
+		 */
+		$this->add_control(
+			'show_table',
+			array(
+				'label'        => __( 'Show Compare Button & Table', 'zlaark-deals-pro' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'separator'    => 'before',
+				'description'  => __( 'Adds a Compare button to each card. Picks collect in a bar at the bottom of the screen, and that bar opens a full-screen side-by-side table with a column per deal.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_control(
+			'table_heading',
+			array(
+				'label'       => __( 'Table Heading', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'Compare side by side', 'zlaark-deals-pro' ),
+				'label_block' => true,
+				'condition'   => array( 'show_table' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'compare_text',
+			array(
+				'label'       => __( 'Compare Button Text', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'Compare', 'zlaark-deals-pro' ),
+				'label_block' => true,
+				'condition'   => array( 'show_table' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'compare_text_on',
+			array(
+				'label'       => __( 'Text When Added', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => __( 'Added to compare', 'zlaark-deals-pro' ),
+				'label_block' => true,
+				'condition'   => array( 'show_table' => 'yes' ),
+			)
+		);
+
 		$this->add_responsive_control(
 			'columns',
 			array(
@@ -290,6 +341,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 		$this->end_controls_section();
 	}
 
+
 	/* ----------------------------------------------------------------- render */
 
 	protected function render() {
@@ -301,11 +353,36 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			return;
 		}
 
-		$heading = $this->resolve_heading( $s );
-		$stagger = isset( $s['reveal_stagger']['size'] ) ? (int) $s['reveal_stagger']['size'] : 90;
-		$index   = 0;
+		/*
+		 * The deals are collected up front rather than rendered straight out of
+		 * the loop, because the comparison table underneath needs to know every
+		 * deal before it can print a single row - its rows are the union of the
+		 * score labels across the whole set, and a row that no deal fills is
+		 * dropped instead of printed as a line of dashes.
+		 */
+		$deals = array();
+
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$deal = Zlaark_Deals_Meta::get_deal_data( get_post() );
+			if ( ! empty( $deal ) ) {
+				$deals[] = $deal;
+			}
+		}
+
+		wp_reset_postdata();
+
+		if ( empty( $deals ) ) {
+			$this->render_empty_notice();
+			return;
+		}
+
+		$heading  = $this->resolve_heading( $s );
+		$stagger  = isset( $s['reveal_stagger']['size'] ) ? (int) $s['reveal_stagger']['size'] : 90;
+		$table_on = ! empty( $s['show_table'] ) && 'yes' === $s['show_table'];
 		?>
 		<div class="zd-compare zd-compare--<?php echo esc_attr( $s['style_mode'] ); ?>"
+			<?php echo $table_on ? 'data-zd-cmp-root="' . esc_attr( $this->get_id() ) . '"' : ''; ?>
 			data-zd-reveal-root="true" data-zd-stagger="<?php echo esc_attr( $stagger ); ?>">
 
 			<?php if ( '' !== $heading ) : ?>
@@ -316,26 +393,27 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 
 			<div class="zd-compare__grid">
 				<?php
-				while ( $query->have_posts() ) {
-					$query->the_post();
-					$deal = Zlaark_Deals_Meta::get_deal_data( get_post() );
-
+				foreach ( $deals as $index => $deal ) {
 					if ( 'rows' === $s['style_mode'] ) {
-						$this->render_row( $deal, $s, $index );
+						$this->render_row( $deal, $s, $index, $table_on );
 					} else {
-						$this->render_column( $deal, $s, $index );
+						$this->render_column( $deal, $s, $index, $table_on );
 					}
-					$index++;
 				}
 				?>
 			</div>
+
+			<?php
+			if ( $table_on ) {
+				$this->render_table( $deals, $s );
+			}
+			?>
 		</div>
 		<?php
-		wp_reset_postdata();
 	}
 
 	/** One panel per deal, scores stacked vertically. */
-	private function render_column( $deal, $s, $index ) {
+	private function render_column( $deal, $s, $index, $table_on = false ) {
 		if ( empty( $deal ) ) {
 			return;
 		}
@@ -409,14 +487,16 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 				<p class="zd-compare__verified"><?php echo esc_html( $deal['verified_label'] ); ?></p>
 			<?php endif; ?>
 
-			<?php if ( 'yes' === $s['show_button'] ) : ?>
+			<?php if ( 'yes' === $s['show_button'] || $table_on ) : ?>
 				<div class="zd-compare__foot">
-					<?php $this->render_cta( $deal, $s ); ?>
-					<?php if ( '' !== $deal['review_url'] ) : ?>
-						<a class="zd-compare__review" href="<?php echo esc_url( $deal['review_url'] ); ?>">
-							<?php esc_html_e( 'Full review', 'zlaark-deals-pro' ); ?>
-						</a>
-					<?php endif; ?>
+					<?php
+					if ( 'yes' === $s['show_button'] ) {
+						$this->render_cta( $deal, $s );
+					}
+					if ( $table_on ) {
+						$this->render_compare_toggle( $deal, $s );
+					}
+					?>
 				</div>
 			<?php endif; ?>
 		</div>
@@ -424,7 +504,7 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 	}
 
 	/** Compact horizontal row - logo, name, inline bars, CTA. */
-	private function render_row( $deal, $s, $index ) {
+	private function render_row( $deal, $s, $index, $table_on = false ) {
 		if ( empty( $deal ) ) {
 			return;
 		}
@@ -458,9 +538,16 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 				</div>
 			<?php endif; ?>
 
-			<?php if ( 'yes' === $s['show_button'] ) : ?>
+			<?php if ( 'yes' === $s['show_button'] || $table_on ) : ?>
 				<div class="zd-compare__foot">
-					<?php $this->render_cta( $deal, $s ); ?>
+					<?php
+					if ( 'yes' === $s['show_button'] ) {
+						$this->render_cta( $deal, $s );
+					}
+					if ( $table_on ) {
+						$this->render_compare_toggle( $deal, $s );
+					}
+					?>
 				</div>
 			<?php endif; ?>
 		</div>
@@ -538,5 +625,491 @@ class Zlaark_Compare_Widget extends Zlaark_Query_Widget_Base {
 			<?php endforeach; ?>
 		</ul>
 		<?php
+	}
+
+	/* ------------------------------------------------------- comparison table */
+
+	/**
+	 * The button that replaced the old "Full review" link on the card.
+	 *
+	 * It is a real button with aria-pressed rather than a link, because it
+	 * toggles a column of a table already on the page - nothing navigates. The
+	 * review link it displaced is not lost: it is printed in the table's last
+	 * row, next to that deal's CTA, which is where someone comparing is
+	 * actually looking for it.
+	 */
+	private function render_compare_toggle( $deal, $s ) {
+		$add    = ! empty( $s['compare_text'] ) ? $s['compare_text'] : __( 'Compare', 'zlaark-deals-pro' );
+		$remove = ! empty( $s['compare_text_on'] ) ? $s['compare_text_on'] : __( 'Added to compare', 'zlaark-deals-pro' );
+		?>
+		<button type="button" class="zd-compare__add"
+			data-zd-cmp-add="<?php echo (int) $deal['id']; ?>"
+			data-zd-label-off="<?php echo esc_attr( $add ); ?>"
+			data-zd-label-on="<?php echo esc_attr( $remove ); ?>"
+			aria-pressed="false">
+			<span class="zd-compare__addicon" aria-hidden="true">
+				<svg viewBox="0 0 16 16" width="14" height="14" fill="none">
+					<path class="zd-compare__addplus" d="M8 3.2v9.6M3.2 8h9.6" stroke="currentColor"
+						stroke-width="2" stroke-linecap="round" />
+					<path class="zd-compare__addtick" d="M3.4 8.4 6.6 11.6 12.6 4.8" stroke="currentColor"
+						stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</span>
+			<span class="zd-compare__addlabel"><?php echo esc_html( $add ); ?></span>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Every deal is printed into the table once, up front, and the script only
+	 * shows or hides whole columns.
+	 *
+	 * Building the cells in JavaScript from a JSON blob was the obvious other
+	 * route and a worse one: it would have meant re-implementing escaping,
+	 * number formatting and responsive images in the browser, and the table
+	 * would have been invisible to anything that does not run scripts. Here the
+	 * markup is server-rendered and correct before a single byte of JS runs;
+	 * the script's whole job is a class toggle.
+	 */
+	private function render_table( $deals, $s ) {
+		$rows = $this->build_table_rows( $deals, $s );
+
+		if ( empty( $rows ) ) {
+			return;
+		}
+
+		$title = ! empty( $s['table_heading'] ) ? $s['table_heading'] : __( 'Compare side by side', 'zlaark-deals-pro' );
+		$uid   = $this->get_id();
+		$oid   = 'zd-cmp-' . $uid;
+
+		$this->render_tray( $deals, $uid );
+
+		/*
+		 * The panel and the tray both live in the widget's markup but are moved
+		 * to the end of <body> the moment the script runs, because .zd-compare
+		 * carries a perspective for the 3D card reveals - and any perspective
+		 * makes an element the containing block for its fixed-position
+		 * descendants. Left where they are, a full-screen overlay would be
+		 * clipped to the widget instead of covering the page.
+		 */
+		?>
+		<div class="zd-cmpx zd-cmp" id="<?php echo esc_attr( $oid ); ?>"
+			data-zd-cmp data-zd-cmp-owner="<?php echo esc_attr( $uid ); ?>" hidden
+			role="dialog" aria-modal="true" aria-labelledby="<?php echo esc_attr( $oid ); ?>-title">
+
+			<div class="zd-cmp__backdrop" data-zd-cmp-close></div>
+
+			<div class="zd-cmp__panel">
+				<header class="zd-cmp__head">
+					<div class="zd-cmp__headtext">
+						<h2 class="zd-cmp__title" id="<?php echo esc_attr( $oid ); ?>-title">
+							<?php echo esc_html( $title ); ?>
+						</h2>
+						<p class="zd-cmp__sub">
+							<span class="zd-cmp__count" data-zd-cmp-count>0</span>
+							<?php
+							printf(
+								/* translators: %d: how many deals are on the page. */
+								esc_html__( 'of %d picked', 'zlaark-deals-pro' ),
+								count( $deals )
+							);
+							?>
+						</p>
+					</div>
+
+					<div class="zd-cmp__headtools">
+						<button type="button" class="zd-cmp__clear" data-zd-cmp-clear>
+							<?php esc_html_e( 'Clear all', 'zlaark-deals-pro' ); ?>
+						</button>
+						<button type="button" class="zd-cmp__close" data-zd-cmp-close
+							aria-label="<?php esc_attr_e( 'Close the comparison', 'zlaark-deals-pro' ); ?>">
+							<svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+								<path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2"
+									stroke-linecap="round" />
+							</svg>
+						</button>
+					</div>
+				</header>
+
+				<div class="zd-cmp__scroll" tabindex="0" role="region"
+					aria-label="<?php esc_attr_e( 'Comparison table', 'zlaark-deals-pro' ); ?>">
+					<table class="zd-cmp__table">
+						<thead>
+							<tr>
+								<th scope="col" class="zd-cmp__corner">
+									<?php esc_html_e( 'Comparing', 'zlaark-deals-pro' ); ?>
+								</th>
+								<?php foreach ( $deals as $deal ) : ?>
+									<th scope="col" class="zd-cmp__prod is-off" data-zd-cmp-col="<?php echo (int) $deal['id']; ?>">
+										<?php $this->render_table_head( $deal ); ?>
+									</th>
+								<?php endforeach; ?>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ( $rows as $row ) : ?>
+								<tr class="zd-cmp__r<?php echo '' !== $row['class'] ? ' ' . esc_attr( $row['class'] ) : ''; ?>" data-zd-cmp-row>
+									<th scope="row" class="zd-cmp__label"><?php echo esc_html( $row['label'] ); ?></th>
+									<?php foreach ( $deals as $deal ) : ?>
+										<?php $cell = isset( $row['cells'][ $deal['id'] ] ) ? $row['cells'][ $deal['id'] ] : ''; ?>
+										<td class="zd-cmp__cell is-off"
+											data-zd-cmp-col="<?php echo (int) $deal['id']; ?>"
+											<?php echo '' === $cell ? 'data-zd-cmp-empty="1"' : ''; ?>>
+											<?php
+											echo ( '' === $cell )
+												? '<span class="zd-cmp__none">&mdash;</span>'
+												: $cell; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in build_table_rows().
+											?>
+										</td>
+									<?php endforeach; ?>
+								</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * The docked bar that collects the picks.
+	 *
+	 * It is what makes "compare" a decision rather than a jump: a pick lands
+	 * here and the reader keeps reading, adds a second and a third, and opens
+	 * the panel when they are ready. Every deal's chip is printed up front and
+	 * hidden, so adding one is the same class toggle as everything else.
+	 */
+	private function render_tray( $deals, $uid ) {
+		?>
+		<div class="zd-cmpx zd-cmp-tray" data-zd-cmp-tray data-zd-cmp-owner="<?php echo esc_attr( $uid ); ?>" hidden>
+			<div class="zd-cmp-tray__inner">
+				<span class="zd-cmp-tray__label">
+					<?php esc_html_e( 'Comparing', 'zlaark-deals-pro' ); ?>
+				</span>
+
+				<ul class="zd-cmp-tray__items">
+					<?php foreach ( $deals as $deal ) : ?>
+						<?php
+						$drop = sprintf(
+							/* translators: %s: deal name. */
+							__( 'Remove %s from the comparison', 'zlaark-deals-pro' ),
+							$deal['title']
+						);
+						?>
+						<li class="zd-cmp-tray__item is-off" data-zd-cmp-col="<?php echo (int) $deal['id']; ?>">
+							<button type="button" class="zd-cmp-tray__thumb"
+								data-zd-cmp-drop="<?php echo (int) $deal['id']; ?>"
+								aria-label="<?php echo esc_attr( $drop ); ?>">
+								<?php if ( $deal['image_id'] ) : ?>
+									<?php echo wp_get_attachment_image( $deal['image_id'], 'thumbnail', false, array( 'loading' => 'lazy' ) ); ?>
+								<?php else : ?>
+									<span class="zd-cmp-tray__initial" aria-hidden="true">
+										<?php echo esc_html( mb_substr( $deal['title'], 0, 1 ) ); ?>
+									</span>
+								<?php endif; ?>
+								<span class="zd-cmp-tray__x" aria-hidden="true">
+									<svg viewBox="0 0 10 10" width="8" height="8" fill="none">
+										<path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="2"
+											stroke-linecap="round" />
+									</svg>
+								</span>
+							</button>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+
+				<button type="button" class="zd-cmp-tray__clear" data-zd-cmp-clear
+					aria-label="<?php esc_attr_e( 'Clear the comparison', 'zlaark-deals-pro' ); ?>">
+					<svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
+						<path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+					</svg>
+				</button>
+
+				<button type="button" class="zd-cmp-tray__go" data-zd-cmp-open
+					aria-controls="<?php echo esc_attr( 'zd-cmp-' . $uid ); ?>">
+					<span class="zd-cmp-tray__golabel"><?php esc_html_e( 'Compare', 'zlaark-deals-pro' ); ?></span>
+					<span class="zd-cmp-tray__gocount" data-zd-cmp-count>0</span>
+				</button>
+			</div>
+		</div>
+		<?php
+	}
+
+
+	/** The sticky product cell at the top of a comparison column. */
+	private function render_table_head( $deal ) {
+		$drop = sprintf(
+			/* translators: %s: deal name. */
+			__( 'Remove %s from the comparison', 'zlaark-deals-pro' ),
+			$deal['title']
+		);
+		?>
+		<div class="zd-cmp__prodinner">
+			<?php if ( $deal['image_id'] ) : ?>
+				<div class="zd-cmp__logo">
+					<?php echo wp_get_attachment_image( $deal['image_id'], 'medium', false, array( 'loading' => 'lazy' ) ); ?>
+				</div>
+			<?php endif; ?>
+
+			<?php
+			/*
+			 * The remove control sits against the name rather than in the far
+			 * corner of the cell. Comparison columns are wide, and an X pinned
+			 * to the cell's right edge ends up nearer the next product than the
+			 * one it drops.
+			 */
+			?>
+			<div class="zd-cmp__prodname">
+				<span class="zd-cmp__name"><?php echo esc_html( $deal['title'] ); ?></span>
+				<button type="button" class="zd-cmp__drop" data-zd-cmp-drop="<?php echo (int) $deal['id']; ?>"
+					aria-label="<?php echo esc_attr( $drop ); ?>">
+					<svg viewBox="0 0 12 12" width="10" height="10" fill="none" aria-hidden="true">
+						<path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+					</svg>
+				</button>
+			</div>
+
+			<?php if ( '' !== $deal['rank_label'] ) : ?>
+				<span class="zd-cmp__cap"><?php echo esc_html( $deal['rank_label'] ); ?></span>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Assembles the table body as [ label, class, cells keyed by deal id ].
+	 *
+	 * A row whose every cell came out empty is dropped here rather than printed
+	 * as a line of dashes - on a set of deals where nobody filled in, say, the
+	 * refund window, that row is noise in every column at once.
+	 */
+	private function build_table_rows( $deals, $s ) {
+		$rows   = array();
+		$banded = 'yes' === $s['score_colour'];
+
+		/* ---- overall ---- */
+
+		if ( 'yes' === $s['show_overall'] ) {
+			$cells = array();
+
+			foreach ( $deals as $d ) {
+				$overall = ( null !== $d['overall_score'] ) ? $d['overall_score'] : $d['rating'];
+				if ( null === $overall ) {
+					continue;
+				}
+				$cells[ $d['id'] ] = $this->capture(
+					function () use ( $overall ) {
+						$this->render_rating_ring( $overall, 52 );
+					}
+				);
+			}
+
+			$rows[] = $this->row( __( 'Overall score', 'zlaark-deals-pro' ), $cells, 'zd-cmp__r--ring' );
+		}
+
+		/* ---- price ---- */
+
+		$cells = array();
+
+		foreach ( $deals as $d ) {
+			$price = ( '' !== $d['price'] ) ? $d['price'] : $d['offer_headline'];
+			if ( '' === $price ) {
+				continue;
+			}
+
+			$html = '<span class="zd-cmp__pricenow">' . esc_html( $price ) . '</span>';
+
+			if ( '' !== $d['old_price'] ) {
+				$html .= ' <s class="zd-cmp__priceold">' . esc_html( $d['old_price'] ) . '</s>';
+			}
+			if ( null !== $d['discount_pct'] ) {
+				$html .= ' <span class="zd-cmp__save">' . esc_html(
+					sprintf(
+						/* translators: %s: discount percentage. */
+						__( '-%s%%', 'zlaark-deals-pro' ),
+						number_format_i18n( $d['discount_pct'] )
+					)
+				) . '</span>';
+			}
+
+			$cells[ $d['id'] ] = $html;
+		}
+
+		$rows[] = $this->row( __( 'Price', 'zlaark-deals-pro' ), $cells, 'zd-cmp__r--price' );
+
+		/* ---- renewal ---- */
+
+		$rows[] = $this->row(
+			__( 'Renews at', 'zlaark-deals-pro' ),
+			$this->text_cells( $deals, 'renewal_price' )
+		);
+
+		/* ---- one row per score label, in the order they first appear ---- */
+
+		foreach ( $this->score_labels( $deals ) as $key => $label ) {
+			$cells = array();
+
+			foreach ( $deals as $d ) {
+				$value = null;
+
+				foreach ( $d['scores'] as $score ) {
+					if ( $key === $this->score_key( $score['label'] ) ) {
+						$value = $score['value'];
+						break;
+					}
+				}
+
+				if ( null === $value ) {
+					continue;
+				}
+
+				$band  = $banded ? Zlaark_Deals_Computed::score_band( $value ) : '';
+				$width = max( 0, min( 100, $value * 10 ) );
+
+				$cells[ $d['id'] ] =
+					'<span class="zd-cmp__scorevalue' . ( '' !== $band ? ' zd-score--' . esc_attr( $band ) : '' ) . '">'
+					. esc_html( number_format_i18n( $value, 1 ) ) . '</span>'
+					. '<span class="zd-score__track"><span class="zd-score__bar'
+					. ( '' !== $band ? ' zd-fill--' . esc_attr( $band ) : '' )
+					. '" data-zd-bar="' . esc_attr( $width ) . '"'
+					. ' style="--zd-bar:' . esc_attr( $width ) . '%"></span></span>';
+			}
+
+			$rows[] = $this->row( $label, $cells, 'zd-cmp__r--score' );
+		}
+
+		/* ---- the written fields ---- */
+
+		$rows[] = $this->row( __( 'Best for', 'zlaark-deals-pro' ), $this->list_cells( $deals, 'best_for' ), 'zd-cmp__r--list' );
+		$rows[] = $this->row( __( 'Highlights', 'zlaark-deals-pro' ), $this->list_cells( $deals, 'highlights' ), 'zd-cmp__r--list' );
+		$rows[] = $this->row( __( 'Pros', 'zlaark-deals-pro' ), $this->list_cells( $deals, 'pros' ), 'zd-cmp__r--list' );
+		$rows[] = $this->row( __( 'Cons', 'zlaark-deals-pro' ), $this->list_cells( $deals, 'cons', 'zd-cmp__ticks--cons' ), 'zd-cmp__r--list' );
+
+		/* ---- coupon ---- */
+
+		$cells = array();
+
+		foreach ( $deals as $d ) {
+			if ( '' === $d['coupon_code'] ) {
+				continue;
+			}
+			$cells[ $d['id'] ] = '<code class="zd-cmp__code">' . esc_html( $d['coupon_code'] ) . '</code>';
+		}
+
+		$rows[] = $this->row( __( 'Coupon code', 'zlaark-deals-pro' ), $cells );
+
+		$rows[] = $this->row( __( 'Refund window', 'zlaark-deals-pro' ), $this->text_cells( $deals, 'refund_window' ) );
+		$rows[] = $this->row( __( 'Offer ends', 'zlaark-deals-pro' ), $this->text_cells( $deals, 'urgency_label' ) );
+		$rows[] = $this->row( __( 'Last verified', 'zlaark-deals-pro' ), $this->text_cells( $deals, 'verified_label' ), 'zd-cmp__r--verified' );
+
+		/* ---- the CTA, and the review link the card gave up ---- */
+
+		$cells = array();
+
+		foreach ( $deals as $d ) {
+			$html = $this->capture(
+				function () use ( $d, $s ) {
+					$this->render_cta( $d, $s, 'zd-btn zd-btn--solid zd-cmp__cta' );
+				}
+			);
+
+			if ( '' !== $d['review_url'] ) {
+				$html .= '<a class="zd-cmp__review" href="' . esc_url( $d['review_url'] ) . '">'
+					. esc_html__( 'Full review', 'zlaark-deals-pro' ) . '</a>';
+			}
+
+			if ( '' !== $html ) {
+				$cells[ $d['id'] ] = $html;
+			}
+		}
+
+		$rows[] = $this->row( __( 'Get the deal', 'zlaark-deals-pro' ), $cells, 'zd-cmp__r--cta' );
+
+		/* Drop the rows nobody filled in. */
+		return array_values( array_filter( $rows ) );
+	}
+
+	/** A row, or null when no deal filled it in. */
+	private function row( $label, $cells, $class = '' ) {
+		if ( empty( $cells ) ) {
+			return null;
+		}
+
+		return array(
+			'label' => $label,
+			'class' => $class,
+			'cells' => $cells,
+		);
+	}
+
+	/** Plain-text cells for a scalar deal field. */
+	private function text_cells( $deals, $field ) {
+		$cells = array();
+
+		foreach ( $deals as $d ) {
+			$value = isset( $d[ $field ] ) ? (string) $d[ $field ] : '';
+			if ( '' === $value ) {
+				continue;
+			}
+			$cells[ $d['id'] ] = esc_html( $value );
+		}
+
+		return $cells;
+	}
+
+	/** Ticked-list cells for a deal field that parses into lines. */
+	private function list_cells( $deals, $field, $extra = '' ) {
+		$cells = array();
+
+		foreach ( $deals as $d ) {
+			if ( empty( $d[ $field ] ) ) {
+				continue;
+			}
+
+			$html = '<ul class="zd-cmp__ticks' . ( '' !== $extra ? ' ' . esc_attr( $extra ) : '' ) . '">';
+
+			foreach ( array_slice( $d[ $field ], 0, 5 ) as $line ) {
+				$html .= '<li>' . esc_html( $line ) . '</li>';
+			}
+
+			$cells[ $d['id'] ] = $html . '</ul>';
+		}
+
+		return $cells;
+	}
+
+	/**
+	 * The union of score labels across the set, in the order they first appear.
+	 *
+	 * Two deals rarely spell a criterion identically - "Ease of use" against
+	 * "Ease of Use" - and a table that printed both as separate rows would show
+	 * each product scoring on half the rows and dashing the other half. The key
+	 * is folded; the label printed is the first spelling seen.
+	 */
+	private function score_labels( $deals ) {
+		$labels = array();
+
+		foreach ( $deals as $d ) {
+			foreach ( $d['scores'] as $score ) {
+				$key = $this->score_key( $score['label'] );
+				if ( '' !== $key && ! isset( $labels[ $key ] ) ) {
+					$labels[ $key ] = $score['label'];
+				}
+			}
+		}
+
+		return $labels;
+	}
+
+	private function score_key( $label ) {
+		return preg_replace( '/[^a-z0-9]+/', '', strtolower( (string) $label ) );
+	}
+
+	/** Runs a renderer that echoes, and hands back what it printed. */
+	private function capture( $callback ) {
+		ob_start();
+		$callback();
+		return trim( (string) ob_get_clean() );
 	}
 }

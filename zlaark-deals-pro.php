@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zlaark Deals
  * Description: Premium animated Elementor widgets - Hero, Deals Grid, Top Picks, Comparison, Stats and Logo Marquee - powered by a Deals manager with categories in the WordPress sidebar.
- * Version:     4.8.0
+ * Version:     4.9.4
  * Author:      Zlaark
  * Text Domain: zlaark-deals-pro
  * Requires PHP: 7.4
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ZLAARK_DEALS_VERSION', '4.8.0' );
+define( 'ZLAARK_DEALS_VERSION', '4.9.4' );
 define( 'ZLAARK_DEALS_FILE', __FILE__ );
 define( 'ZLAARK_DEALS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZLAARK_DEALS_URL', plugin_dir_url( __FILE__ ) );

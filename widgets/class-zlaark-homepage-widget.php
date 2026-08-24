@@ -360,6 +360,57 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		$this->end_controls_section();
 	}
 
+	/**
+	 * Rail or grid, for the two strips that share section_articles().
+	 *
+	 * The rail was the only shape, and it holds every card on one line however
+	 * many there are - so raising "How Many" past what fits just made the line
+	 * longer and pushed the rest behind a sideways scroll. That is right for a
+	 * teaser of three and wrong for a section meant to show eight, which is
+	 * what the grid is for: same cards, wrapped onto rows.
+	 *
+	 * @param string $prefix    Control prefix - 'rev' or 'vs'.
+	 * @param array  $condition Section-level condition to inherit.
+	 */
+	protected function strip_layout_controls( $prefix, $condition ) {
+		$this->add_control(
+			$prefix . '_layout',
+			array(
+				'label'       => __( 'Layout', 'zlaark-deals-pro' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'rail',
+				'separator'   => 'before',
+				'condition'   => $condition,
+				'options'     => array(
+					'rail' => __( 'Rail (one line, scrolls sideways)', 'zlaark-deals-pro' ),
+					'grid' => __( 'Grid (wraps onto rows)', 'zlaark-deals-pro' ),
+				),
+				'description' => __( 'Pick Grid when you raise How Many past what fits on one line.', 'zlaark-deals-pro' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			$prefix . '_cols',
+			array(
+				'label'          => __( 'Cards Per Row', 'zlaark-deals-pro' ),
+				'type'           => Controls_Manager::SELECT,
+				'default'        => '3',
+				'tablet_default' => '2',
+				'mobile_default' => '1',
+				'options'        => array(
+					'1' => '1',
+					'2' => '2',
+					'3' => '3',
+					'4' => '4',
+				),
+				'condition'      => array_merge( $condition, array( $prefix . '_layout' => 'grid' ) ),
+				'selectors'      => array(
+					'{{WRAPPER}} .zd-strip__grid--' . $prefix => 'grid-template-columns: repeat({{VALUE}}, minmax(0, 1fr));',
+				),
+			)
+		);
+	}
+
 	protected function controls_reviews() {
 		/* ------------------------------------------------- 02c reviews */
 
@@ -404,6 +455,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->article_source_controls( 'rev', array( 'show_rev' => 'yes' ), 3 );
+		$this->strip_layout_controls( 'rev', array( 'show_rev' => 'yes' ) );
 
 		$this->end_controls_section();
 	}
@@ -461,6 +513,7 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		);
 
 		$this->article_source_controls( 'vs', array( 'show_vs' => 'yes' ), 3 );
+		$this->strip_layout_controls( 'vs', array( 'show_vs' => 'yes' ) );
 
 		$this->end_controls_section();
 	}
@@ -2013,6 +2066,10 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 		$cta   = isset( $s[ $prefix . '_cta' ] ) && '' !== $s[ $prefix . '_cta' ]
 			? $s[ $prefix . '_cta' ]
 			: __( 'Read', 'zlaark-deals-pro' );
+
+		// Strips saved before the control existed have no value, and the rail
+		// is what they were already showing.
+		$layout = ! empty( $s[ $prefix . '_layout' ] ) ? $s[ $prefix . '_layout' ] : 'rail';
 		?>
 		<?php
 		/*
@@ -2030,30 +2087,45 @@ class Zlaark_Homepage_Widget extends Zlaark_Query_Widget_Base {
 					</h2>
 				<?php endif; ?>
 
-				<div class="zd-rail" data-zd-rail="true">
-					<div class="zd-rail__track">
+				<?php if ( 'grid' === $layout ) : ?>
+					<?php
+					/*
+					 * Same cards, no rail: they wrap onto as many rows as the
+					 * count needs. The nav arrows go with the rail - there is
+					 * nothing left to scroll.
+					 */
+					?>
+					<div class="zd-strip__grid zd-strip__grid--<?php echo esc_attr( $prefix ); ?>">
 						<?php foreach ( $articles as $i => $article ) : ?>
 							<?php $this->article_card( $article, $variant, $cta, $i ); ?>
 						<?php endforeach; ?>
 					</div>
+				<?php else : ?>
+					<div class="zd-rail" data-zd-rail="true">
+						<div class="zd-rail__track">
+							<?php foreach ( $articles as $i => $article ) : ?>
+								<?php $this->article_card( $article, $variant, $cta, $i ); ?>
+							<?php endforeach; ?>
+						</div>
 
-					<div class="zd-rail__nav">
-						<button class="zd-rail__btn zd-rail__btn--prev" type="button"
-							aria-label="<?php esc_attr_e( 'Scroll left', 'zlaark-deals-pro' ); ?>">
-							<svg viewBox="0 0 16 16" width="18" height="18" fill="none" aria-hidden="true">
-								<path d="M14 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-						</button>
-						<button class="zd-rail__btn zd-rail__btn--next" type="button"
-							aria-label="<?php esc_attr_e( 'Scroll right', 'zlaark-deals-pro' ); ?>">
-							<svg viewBox="0 0 16 16" width="18" height="18" fill="none" aria-hidden="true">
-								<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-						</button>
+						<div class="zd-rail__nav">
+							<button class="zd-rail__btn zd-rail__btn--prev" type="button"
+								aria-label="<?php esc_attr_e( 'Scroll left', 'zlaark-deals-pro' ); ?>">
+								<svg viewBox="0 0 16 16" width="18" height="18" fill="none" aria-hidden="true">
+									<path d="M14 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="2"
+										stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</button>
+							<button class="zd-rail__btn zd-rail__btn--next" type="button"
+								aria-label="<?php esc_attr_e( 'Scroll right', 'zlaark-deals-pro' ); ?>">
+								<svg viewBox="0 0 16 16" width="18" height="18" fill="none" aria-hidden="true">
+									<path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="2"
+										stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</button>
+						</div>
 					</div>
-				</div>
+				<?php endif; ?>
 			</div>
 		</section>
 		<?php

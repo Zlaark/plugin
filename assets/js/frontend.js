@@ -1492,6 +1492,235 @@
 			apply();
 		} );
 	}
+	/* ------------------------------------------------- comparison overlay */
+
+	/*
+	 * The Compare button on a scorecard, the bar the picks collect in, and the
+	 * full-screen panel that bar opens.
+	 *
+	 * Every deal is already printed into the panel server-side - one column
+	 * each, all of them off - so nothing here builds markup: picking a deal
+	 * un-hides its column, dropping it hides the column again. That keeps the
+	 * escaping, the number formatting and the responsive logos in PHP, where
+	 * they are already correct, and leaves this file with a class toggle.
+	 *
+	 * A row whose every showing cell is empty hides itself, so comparing two
+	 * deals that both left the refund window blank does not print a row of
+	 * dashes across the table.
+	 */
+	function initCompare( scope ) {
+		each( scope, '[data-zd-cmp-root]', function ( root ) {
+			if ( ! once( root, 'Compare' ) ) {
+				return;
+			}
+
+			var overlay = root.querySelector( '[data-zd-cmp]' );
+			var tray    = root.querySelector( '[data-zd-cmp-tray]' );
+
+			if ( ! overlay || ! tray ) {
+				return;
+			}
+
+			hoistCompare( root, [ tray, overlay ] );
+
+			/*
+			 * The three pieces no longer share an ancestor once they are moved,
+			 * so every lookup runs over all of them. Binding through the old
+			 * root would silently miss the tray and the panel - which is to
+			 * say, everything except the buttons on the cards.
+			 */
+			var parts = [ root, tray, overlay ];
+
+			var eachPart = function ( selector, fn ) {
+				parts.forEach( function ( part ) {
+					each( part, selector, fn );
+				} );
+			};
+
+			var picked = [];
+			var opener = null;
+
+			var has = function ( id ) {
+				return picked.indexOf( id ) !== -1;
+			};
+
+			var isOpen = function () {
+				return ! overlay.hidden;
+			};
+
+			var sync = function () {
+				eachPart( '[data-zd-cmp-col]', function ( cell ) {
+					cell.classList.toggle( 'is-off', ! has( cell.getAttribute( 'data-zd-cmp-col' ) ) );
+				} );
+
+				eachPart( '[data-zd-cmp-row]', function ( row ) {
+					var cells  = row.querySelectorAll( '[data-zd-cmp-col]' );
+					var filled = false;
+
+					for ( var i = 0; i < cells.length; i++ ) {
+						if ( has( cells[ i ].getAttribute( 'data-zd-cmp-col' ) )
+							&& ! cells[ i ].hasAttribute( 'data-zd-cmp-empty' ) ) {
+							filled = true;
+							break;
+						}
+					}
+
+					row.hidden = ! filled;
+				} );
+
+				eachPart( '[data-zd-cmp-add]', function ( btn ) {
+					var on    = has( btn.getAttribute( 'data-zd-cmp-add' ) );
+					var label = btn.querySelector( '.zd-compare__addlabel' );
+					var text  = btn.getAttribute( on ? 'data-zd-label-on' : 'data-zd-label-off' );
+
+					btn.classList.toggle( 'is-on', on );
+					btn.setAttribute( 'aria-pressed', String( on ) );
+
+					if ( label && text ) {
+						label.textContent = text;
+					}
+				} );
+
+				eachPart( '[data-zd-cmp-count]', function ( el ) {
+					el.textContent = String( picked.length );
+				} );
+
+				tray.hidden = 0 === picked.length;
+
+				// Emptying the comparison while it is open leaves nothing to
+				// look at, so the panel gets out of the way by itself.
+				if ( 0 === picked.length && isOpen() ) {
+					close();
+				}
+			};
+
+			var open = function ( from ) {
+				if ( ! picked.length || isOpen() ) {
+					return;
+				}
+
+				opener = from || null;
+				overlay.hidden = false;
+				document.documentElement.classList.add( 'zd-cmp-lock' );
+
+				var close_btn = overlay.querySelector( '[data-zd-cmp-close]' );
+				if ( close_btn && close_btn.focus ) {
+					close_btn.focus();
+				}
+			};
+
+			function close() {
+				if ( ! isOpen() ) {
+					return;
+				}
+
+				overlay.hidden = true;
+				document.documentElement.classList.remove( 'zd-cmp-lock' );
+
+				// Send the caret back where it came from, so a keyboard reader
+				// is not dropped at the top of the document.
+				if ( opener && document.contains( opener ) && opener.focus ) {
+					opener.focus();
+				}
+				opener = null;
+			}
+
+			var toggle = function ( id ) {
+				var at = picked.indexOf( id );
+
+				if ( at === -1 ) {
+					picked.push( id );
+				} else {
+					picked.splice( at, 1 );
+				}
+
+				sync();
+			};
+
+			eachPart( '[data-zd-cmp-add]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					toggle( btn.getAttribute( 'data-zd-cmp-add' ) );
+				} );
+			} );
+
+			eachPart( '[data-zd-cmp-drop]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					toggle( btn.getAttribute( 'data-zd-cmp-drop' ) );
+				} );
+			} );
+
+			eachPart( '[data-zd-cmp-clear]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					picked = [];
+					sync();
+				} );
+			} );
+
+			eachPart( '[data-zd-cmp-open]', function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					open( btn );
+				} );
+			} );
+
+			eachPart( '[data-zd-cmp-close]', function ( btn ) {
+				btn.addEventListener( 'click', close );
+			} );
+
+			document.addEventListener( 'keydown', function ( e ) {
+				if ( 'Escape' === e.key && isOpen() ) {
+					close();
+				}
+			} );
+
+			sync();
+		} );
+	}
+
+	/*
+	 * Moves the tray and the panel to the end of <body>.
+	 *
+	 * .zd-compare carries a perspective for the 3D card reveals, and an element
+	 * with a perspective becomes the containing block for its fixed-position
+	 * descendants - so a panel left inside the widget is clipped to the widget
+	 * instead of covering the page. Elementor sections add their own transforms
+	 * and overflow rules on top of that, which is the same trap by a different
+	 * name. Body is the only place a modal is reliably a modal.
+	 *
+	 * The colour controls write their custom properties onto the widget root,
+	 * which the moved nodes no longer inherit, so those three are copied across
+	 * by hand - otherwise a site that recoloured its bars would find the panel
+	 * still wearing the defaults.
+	 */
+	function hoistCompare( root, nodes ) {
+		var owner = root.getAttribute( 'data-zd-cmp-root' ) || '';
+		var read  = window.getComputedStyle( root );
+		var vars  = [ '--zd-accent', '--zd-accent-2', '--zd-track' ];
+
+		/*
+		 * A re-render in the Elementor editor would otherwise stack a second
+		 * tray on the body for the same widget. This runs once, before
+		 * anything moves, and skips the nodes being hoisted - checking
+		 * "not me" per node instead meant the tray and the panel, which share
+		 * an owner, each deleted the other on the way past.
+		 */
+		each( document.body, '[data-zd-cmp-owner="' + owner + '"]', function ( stale ) {
+			if ( nodes.indexOf( stale ) === -1 && stale.parentNode ) {
+				stale.parentNode.removeChild( stale );
+			}
+		} );
+
+		nodes.forEach( function ( node ) {
+			vars.forEach( function ( name ) {
+				var value = read.getPropertyValue( name );
+				if ( value ) {
+					node.style.setProperty( name, value.trim() );
+				}
+			} );
+
+			document.body.appendChild( node );
+		} );
+	}
+
 
 	/* ------------------------------------------------- scrollbar gutter */
 
@@ -1520,6 +1749,7 @@
 		initOfferBars( scope );
 		initCoupons( scope );
 		initIndex( scope );
+		initCompare( scope );
 		syncScrollbarWidth();
 	}
 
